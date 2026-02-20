@@ -32,8 +32,8 @@ export default async function Home() {
               AI Powered System
             </div>
             <h1 className="text-white text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight hero-text-shadow">
-              Nature&apos;s Pharmacy,<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">AI Diagnosis</span>
+              Proyek Skripsi,<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">AI SITOGA UP</span>
             </h1>
             <p className="text-slate-200 text-lg md:text-xl font-light max-w-2xl leading-relaxed hero-text-shadow">
               Explore our campus collection and identify herbal remedies instantly. Just snap a photo to unlock centuries of botanical wisdom.
