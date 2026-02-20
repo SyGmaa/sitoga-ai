@@ -22,7 +22,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
     : [];
   
   return (
-    <div className="bg-background-light dark:bg-background-dark font-sans text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+    <div className="bg-background-dark font-sans text-slate-100 min-h-screen flex flex-col">
       <Navbar />
 
       <main className="flex-grow">
