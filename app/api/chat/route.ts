@@ -60,7 +60,7 @@ Pesan pengguna saat ini: "${latestMessage}"`;
 
     // 2. Generate Structured Output with Vercel AI SDK
     const result = streamObject({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-2.5-flash'),
       system: systemPrompt,
       prompt: latestMessage,
       schema: z.object({
