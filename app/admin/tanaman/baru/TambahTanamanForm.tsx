@@ -75,9 +75,9 @@ export function TambahTanamanForm() {
         </div>
         
         <div className="flex flex-col gap-2">
-          <label htmlFor="gambarUrl" className="text-sm font-bold text-slate-700 dark:text-slate-300">Image URL (Opsional)</label>
-          <input name="gambarUrl" id="gambarUrl" placeholder="https://example.com/image.jpg" type="url" className="w-full bg-transparent border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-slate-900 dark:text-white" />
-          <p className="text-xs text-slate-500">Provide a direct link to an image. Image uploads are simplified to URL links for this demo.</p>
+          <label htmlFor="gambar" className="text-sm font-bold text-slate-700 dark:text-slate-300">Image Upload (Opsional)</label>
+          <input name="gambar" id="gambar" type="file" accept="image/*" className="w-full bg-transparent border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-slate-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
+          <p className="text-xs text-slate-500">Upload a high-quality picture of the plant.</p>
         </div>
       </div>
 
