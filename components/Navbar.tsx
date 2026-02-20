@@ -8,7 +8,7 @@ export function Navbar() {
           <div className="flex items-center justify-center size-10 rounded-full bg-primary/10 text-primary">
             <span className="material-symbols-outlined text-3xl">eco</span>
           </div>
-          <h2 className="text-white text-xl font-bold tracking-tight">Campus Botanical</h2>
+          <h2 className="text-white text-xl font-bold tracking-tight">AI SITOGA UP</h2>
         </div>
         <nav className="hidden md:flex items-center gap-8">
           <Link href="/" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Home</Link>
@@ -21,9 +21,6 @@ export function Navbar() {
             <span className="material-symbols-outlined text-[20px]">qr_code_scanner</span>
             <span>Quick Scan</span>
           </Link>
-          <button className="md:hidden text-white">
-            <span className="material-symbols-outlined text-3xl">menu</span>
-          </button>
         </div>
       </div>
     </header>
