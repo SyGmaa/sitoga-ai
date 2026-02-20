@@ -5,8 +5,9 @@ import { Footer } from "@/components/Footer";
 import { notFound } from "next/navigation";
 import { getTanamanById, getAllTanaman } from "@/actions/tanaman";
 
-export default async function PlantDetailPage({ params }: { params: { id: string } }) {
-  const result = await getTanamanById(params.id);
+export default async function PlantDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const result = await getTanamanById(id);
   
   if (!result.success || !result.data) {
     notFound();
