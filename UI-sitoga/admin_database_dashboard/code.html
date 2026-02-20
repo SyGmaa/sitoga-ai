@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Botanical Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#1f8825", "primary-dark": "#0dbd2a", "background-light": "#f6f8f6", "background-dark": "#131f13", "surface-light": "rgba(255, 255, 255, 0.7)", "surface-dark": "rgba(20, 40, 25, 0.6)", "glass-border": "rgba(255, 255, 255, 0.2)"}, fontFamily: {display: "Manrope"}, borderRadius: {DEFAULT: "0.5rem", lg: "1rem", xl: "1.5rem", full: "9999px"}, animation: {blob: "blob 7s infinite", float: "float 6s ease-in-out infinite", "pulse-glow": "pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite", "slide-up": "slide-up 0.5s ease-out forwards"}, keyframes: {blob: {"0%": {transform: "translate(0px, 0px) scale(1)"}, "33%": {transform: "translate(30px, -50px) scale(1.1)"}, "66%": {transform: "translate(-20px, 20px) scale(0.9)"}, "100%": {transform: "translate(0px, 0px) scale(1)"}}, float: {"0%, 100%": {transform: "translateY(0)"}, "50%": {transform: "translateY(-10px)"}}, "pulse-glow": {"0%, 100%": {opacity: 1}, "50%": {opacity: 0.5}}, "slide-up": {"0%": {transform: "translateY(20px)", opacity: 0}, "100%": {transform: "translateY(0)", opacity: 1}}}}}};</script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+        .dark .glass-panel {
+            background: rgba(10, 30, 15, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .dark .glass-card {
+            background: rgba(30, 50, 35, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-sidebar {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-sidebar {
+            background: rgba(5, 20, 10, 0.6);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 20px;
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(to right, #13ec37, #0ea5e9);
+        }.blob-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: blob 10s infinite;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: rgba(19, 236, 55, 0.2); animation-delay: 0s; }
+        .blob-2 { top: 20%; right: -20%; width: 400px; height: 400px; background: rgba(14, 165, 233, 0.2); animation-delay: 2s; }
+        .blob-3 { bottom: -20%; left: 20%; width: 600px; height: 600px; background: rgba(168, 85, 247, 0.15); animation-delay: 4s; }
+        .dark .blob-1 { background: rgba(19, 236, 55, 0.15); }
+        .dark .blob-2 { background: rgba(14, 165, 233, 0.15); }
+        .dark .blob-3 { background: rgba(168, 85, 247, 0.1); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-hidden selection:bg-primary selection:text-white">
+<div class="blob-bg">
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+</div>
+<header class="h-20 glass-sidebar flex items-center justify-between px-6 lg:px-10 z-30 sticky top-0 border-b border-white/20 dark:border-white/5 shadow-sm">
+<div class="flex items-center gap-4 lg:gap-8">
+<button class="lg:hidden p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex items-center gap-3 group cursor-pointer">
+<div class="relative">
+<div class="absolute inset-0 bg-primary/40 rounded-xl blur-sm group-hover:blur-md transition-all duration-300"></div>
+<div class="relative bg-gradient-to-br from-primary/20 to-emerald-500/20 p-2 rounded-xl text-primary-dark dark:text-primary border border-primary/20">
+<span class="material-symbols-outlined text-3xl animate-pulse-glow">spa</span>
+</div>
+</div>
+<h1 class="text-2xl font-extrabold tracking-tight hidden sm:block">
+                Botanical<span class="gradient-text">Core</span>
+</h1>
+</div>
+<div class="hidden md:flex items-center glass-card rounded-2xl px-4 py-2.5 w-80 lg:w-96 focus-within:ring-2 focus-within:ring-primary/50 focus-within:bg-white/60 dark:focus-within:bg-black/40 transition-all">
+<span class="material-symbols-outlined text-slate-400">search</span>
+<input class="bg-transparent border-none outline-none text-sm ml-3 w-full placeholder-slate-400 focus:ring-0 text-slate-700 dark:text-slate-200" placeholder="Search plant species, ailments..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4 lg:gap-6">
+<button class="relative p-3 rounded-xl hover:bg-white/40 dark:hover:bg-white/10 transition-all text-slate-600 dark:text-slate-300 group">
+<span class="material-symbols-outlined group-hover:animate-bounce">notifications</span>
+<span class="absolute top-2 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900 animate-ping"></span>
+<span class="absolute top-2 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-slate-300 dark:border-slate-700/50">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">Dr. Sarah L.</p>
+<p class="text-xs text-primary font-medium mt-1">Head Botanist</p>
+</div>
+<div class="h-11 w-11 rounded-full p-0.5 bg-gradient-to-tr from-primary to-blue-500 shadow-lg shadow-primary/20">
+<div class="h-full w-full rounded-full bg-cover bg-center border-2 border-white dark:border-slate-900" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDp9hEbby8EqqVO3SshyvL5tEtklMuweuOa-q25kmBkH-eA-jjXuX3T4A0vBHyVco8Uilt831sypDqKFCpuxaC9_aUuSoYxBN4MGZBIwK68cbw-UHlPHwa63bNMPQVTtcITiRXC0DtdqwHsCWen8vHRs9_B0t2TxQM5dxnpRGqv268zS8okCBhkY-BtiY5GWdChWmiGAM2XS7UC2RTJOOtDKWPWz47aJkWYDVYt6R3urnQ9gUucShIke35XoQBUAUliSpib4I6nmQ');"></div>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden relative z-20">
+<aside class="hidden lg:flex w-72 flex-col glass-sidebar py-8 px-5 gap-3 overflow-y-auto custom-scrollbar">
+<div class="mb-2 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-slate-400"></span> Main Menu
+        </div>
+<a class="group flex items-center gap-4 px-4 py-3.5 rounded-2xl bg-primary/10 text-primary-dark dark:text-primary font-bold shadow-sm border border-primary/20 transition-all hover:shadow-md hover:scale-[1.02]" href="#">
+<span class="material-symbols-outlined filled drop-shadow-sm group-hover:scale-110 transition-transform">dashboard</span>
+            Dashboard
+            <div class="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(19,236,55,0.8)]"></div>
+</a>
+<a class="group flex items-center gap-4 px-4 py-3.5 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition-all hover:text-slate-900 dark:hover:text-white hover:pl-5" href="#">
+<span class="material-symbols-outlined group-hover:text-emerald-500 transition-colors">potted_plant</span>
+            Plant Database
+        </a>
+<a class="group flex items-center gap-4 px-4 py-3.5 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition-all hover:text-slate-900 dark:hover:text-white hover:pl-5" href="#">
+<span class="material-symbols-outlined group-hover:text-blue-500 transition-colors">medical_services</span>
+            Consultations
+            <span class="ml-auto bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 py-0.5 px-2 rounded-lg text-xs font-bold">12</span>
+</a>
+<a class="group flex items-center gap-4 px-4 py-3.5 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition-all hover:text-slate-900 dark:hover:text-white hover:pl-5" href="#">
+<span class="material-symbols-outlined group-hover:text-purple-500 transition-colors">group</span>
+            User Management
+        </a>
+<div class="mt-8 mb-2 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-slate-400"></span> System
+        </div>
+<a class="group flex items-center gap-4 px-4 py-3.5 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition-all hover:text-slate-900 dark:hover:text-white hover:pl-5" href="#">
+<span class="material-symbols-outlined group-hover:animate-spin transition-transform" style="animation-duration: 3s;">settings</span>
+            Settings
+        </a>
+<a class="group flex items-center gap-4 px-4 py-3.5 rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition-all hover:text-slate-900 dark:hover:text-white hover:pl-5" href="#">
+<span class="material-symbols-outlined group-hover:text-yellow-500 transition-colors">help</span>
+            Help Center
+        </a>
+<div class="mt-auto pt-6">
+<div class="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 dark:from-black dark:to-slate-900 text-white shadow-xl">
+<div class="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-primary/20 blur-2xl"></div>
+<div class="absolute -left-6 -bottom-6 w-20 h-20 rounded-full bg-blue-500/20 blur-2xl"></div>
+<div class="flex items-center justify-between mb-3 relative z-10">
+<p class="text-sm font-bold text-slate-200">System Health</p>
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+</span>
+</div>
+<div class="w-full bg-white/10 rounded-full h-1.5 mb-2 overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-emerald-400 h-1.5 rounded-full" style="width: 94%"></div>
+</div>
+<p class="text-xs text-slate-400 font-medium">98% Operational Efficiency</p>
+<div class="mt-4 h-16 w-full rounded-xl bg-white/5 relative overflow-hidden flex items-end justify-center">
+<svg class="absolute bottom-0 w-full h-full text-primary/30 fill-current animate-pulse-glow" preserveaspectratio="none" viewbox="0 0 100 25">
+<path d="M0,25 L0,10 C10,20 20,0 30,10 C40,20 50,5 60,15 C70,25 80,10 90,20 L100,10 L100,25 Z"></path>
+</svg>
+<svg class="absolute bottom-0 w-full h-full text-blue-500/20 fill-current" preserveaspectratio="none" style="animation: pulse-glow 3s infinite reverse;" viewbox="0 0 100 30">
+<path d="M0,30 L0,15 C15,5 30,25 45,15 C60,5 75,20 90,10 L100,20 L100,30 Z"></path>
+</svg>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto overflow-x-hidden p-4 lg:p-8 custom-scrollbar">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 animate-slide-up">
+<div>
+<h2 class="text-3xl font-extrabold text-slate-900 dark:text-white">Dashboard Overview</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Welcome back, here's what's happening in the garden today.</p>
+</div>
+<div class="flex gap-3">
+<button class="glass-card px-4 py-2 rounded-xl text-sm font-semibold hover:bg-white/80 dark:hover:bg-white/10 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-base">calendar_today</span> Oct 24, 2023
+                </button>
+<button class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-105 flex items-center gap-2">
+<span class="material-symbols-outlined text-base">add</span> New Entry
+                </button>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-8">
+<div class="flex-1 flex flex-col gap-8">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up" style="animation-delay: 0.1s;">
+<div class="glass-panel rounded-3xl p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+<div class="absolute -right-6 -top-6 w-32 h-32 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all"></div>
+<div class="absolute top-4 right-4 p-2 bg-white/50 dark:bg-white/10 rounded-lg backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-green-600 dark:text-green-400">arrow_outward</span>
+</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">local_florist</span>
+</div>
+<div>
+<h3 class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Total Plants</h3>
+<div class="flex items-center gap-2">
+<span class="text-green-600 font-bold text-xs bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded-full flex items-center">
+<span class="material-symbols-outlined text-sm mr-0.5">trending_up</span> 12%
+                                    </span>
+</div>
+</div>
+</div>
+<p class="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight">1,240</p>
+<p class="text-xs text-slate-400 mt-2">Added 24 new species this month</p>
+</div>
+<div class="glass-panel rounded-3xl p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+<div class="absolute -right-6 -top-6 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
+<div class="absolute top-4 right-4 p-2 bg-white/50 dark:bg-white/10 rounded-lg backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400">arrow_outward</span>
+</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">stethoscope</span>
+</div>
+<div>
+<h3 class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Consultations</h3>
+<div class="flex items-center gap-2">
+<span class="text-blue-600 font-bold text-xs bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 rounded-full flex items-center">
+<span class="material-symbols-outlined text-sm mr-0.5">trending_up</span> 5%
+                                    </span>
+</div>
+</div>
+</div>
+<p class="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight">85 <span class="text-lg font-normal text-slate-400">/wk</span></p>
+<p class="text-xs text-slate-400 mt-2">Above average daily visits</p>
+</div>
+<div class="glass-panel rounded-3xl p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+<div class="absolute -right-6 -top-6 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl group-hover:bg-orange-500/20 transition-all"></div>
+<div class="absolute top-4 right-4 p-2 bg-white/50 dark:bg-white/10 rounded-lg backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-orange-600 dark:text-orange-400">arrow_outward</span>
+</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-orange-400 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">healing</span>
+</div>
+<div>
+<h3 class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Top Ailment</h3>
+<div class="flex items-center gap-2">
+<span class="text-orange-600 font-bold text-xs bg-orange-100 dark:bg-orange-900/40 px-2 py-0.5 rounded-full flex items-center">
+<span class="material-symbols-outlined text-sm mr-0.5">trending_flat</span> 2%
+                                    </span>
+</div>
+</div>
+</div>
+<p class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight truncate">Migraine</p>
+<p class="text-xs text-slate-400 mt-2">High request frequency</p>
+</div>
+</div>
+<div class="glass-panel rounded-3xl p-6 animate-slide-up" style="animation-delay: 0.2s;">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-bold text-slate-800 dark:text-white">Recent Activity</h3>
+<a class="text-sm text-primary font-bold hover:underline" href="#">View All</a>
+</div>
+<div class="space-y-4">
+<div class="flex items-start gap-4 p-3 rounded-2xl hover:bg-white/40 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-xl">medical_services</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="text-sm font-bold text-slate-800 dark:text-white">New Consultation Request</p>
+<span class="text-xs text-slate-400">2 min ago</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Student requested diagnosis for <span class="text-slate-700 dark:text-slate-300 font-medium">Headache</span>.</p>
+</div>
+</div>
+<div class="flex items-start gap-4 p-3 rounded-2xl hover:bg-white/40 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-xl">add_circle</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="text-sm font-bold text-slate-800 dark:text-white">Plant Database Update</p>
+<span class="text-xs text-slate-400">1 hour ago</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Added <span class="text-slate-700 dark:text-slate-300 font-medium">Ocimum tenuiflorum</span> (Holy Basil) details.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6 animate-slide-up" style="animation-delay: 0.3s;">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Quick Management</h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Manage recent plant entries and status.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 bg-white/40 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/5 rounded-xl p-1">
+<button class="p-2 rounded-lg bg-white dark:bg-slate-800 shadow-sm text-primary dark:text-primary transition-all">
+<span class="material-symbols-outlined text-xl">view_list</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-white/50 dark:hover:bg-white/10 text-slate-400 transition-all">
+<span class="material-symbols-outlined text-xl">grid_view</span>
+</button>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 glass-card rounded-xl text-sm font-semibold hover:bg-white/80 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+                                Filter
+                            </button>
+</div>
+</div>
+<div class="glass-panel rounded-3xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm whitespace-nowrap">
+<thead class="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200/50 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
+<tr>
+<th class="px-6 py-5 font-bold" scope="col">Plant Name</th>
+<th class="px-6 py-5 font-bold hidden sm:table-cell" scope="col">Scientific Name</th>
+<th class="px-6 py-5 font-bold hidden md:table-cell" scope="col">Primary Use</th>
+<th class="px-6 py-5 font-bold hidden lg:table-cell" scope="col">Date Added</th>
+<th class="px-6 py-5 font-bold" scope="col">Status</th>
+<th class="px-6 py-5 font-bold text-right" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200/50 dark:divide-slate-700/50">
+<tr class="hover:bg-white/40 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-xl bg-cover bg-center shadow-md group-hover:scale-110 transition-transform duration-300" data-alt="Close up of aloe vera plant leaves" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAMv3qaybES3TJR-jSnWZ2nWkIs01RKdkiTK23snMH4a2T6BWcJ09CfFyvU4_eHNRQiT-lRySF2DBelal-2dsU_SXJswMul6TSYMU1e_G1bt6IKyFDyrUensfV6-RaUiQa28u9XnII4zN1AIONuVnabKhhHFzBQNI5K8e1RdcPdAL9tNbmaxA5yjpicjca81VazwaMjWClArVVlp5lDk1jyRGrd3wwHhyfrlaZzjrXjvzzI0xZe7wpPPRfNRfVlstltv0uiRZuJRw');"></div>
+<div>
+<div class="font-bold text-slate-900 dark:text-slate-100 text-base">Aloe Vera</div>
+<div class="text-xs text-slate-500 sm:hidden">Asphodelaceae</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300 italic hidden sm:table-cell">Aloe barbadensis miller</td>
+<td class="px-6 py-4 hidden md:table-cell">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                                                Skin Care
+                                            </span>
+</td>
+<td class="px-6 py-4 text-slate-500 hidden lg:table-cell">Oct 24, 2023</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+</div>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-red-500 hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-xl bg-cover bg-center shadow-md group-hover:scale-110 transition-transform duration-300" data-alt="Fresh green mint leaves" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA1uRbuT62z7h1kl-WmNi4MS626syZVdOgMmbDUXjCy9TOYi8VDUVsdjt9b2Sm0ltSDHfhcPjZxuOw67KvyjkZCJt3-pj0t18F7KkAimiJ-zAZjm9YzxlPcF0TtJRj_dXSwfz8Y6lJ_grS6C8mBV6q_7CLObv-6_IYCISVUJlADKBgcBji_6Ko3qWxYvIE0NxKrrcBhKu94zm913Va2TkTPymo44JXwFasUpf1mb-hW-gpN3o3XfjWYiYzJvEzrwZuF2OGt8G0bKw');"></div>
+<div>
+<div class="font-bold text-slate-900 dark:text-slate-100 text-base">Peppermint</div>
+<div class="text-xs text-slate-500 sm:hidden">Lamiaceae</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300 italic hidden sm:table-cell">Mentha × piperita</td>
+<td class="px-6 py-4 hidden md:table-cell">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
+                                                Digestion
+                                            </span>
+</td>
+<td class="px-6 py-4 text-slate-500 hidden lg:table-cell">Oct 22, 2023</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="relative flex h-2.5 w-2.5">
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+</div>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-red-500 hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-xl bg-cover bg-center shadow-md group-hover:scale-110 transition-transform duration-300" data-alt="Purple lavender flowers in a field" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCA1tb7DTNZO8mmjchTxIHXIbVjEyEK_cW_nM333buVJefEDPpiqJD6WAFd_h0hOJIVplO5hkSYPYC2t6qymeK8y2AAn8cxLbX_ce3Qjz8MsYUYpJFZ4aJCMkclCoiZnPZ3CkD9RHwHGkHJSPwCMVFLIE_gp99nhueIPzN-NEVoltEGAFcZJ-oYNdZmqUG3zceR0Y2_bhX-u9Cqindx73BTy6vaq7yx6jYGFm0z4vzOuwVkQFJ15TkdhklQuwJvr476d_kz8OlEdQ');"></div>
+<div>
+<div class="font-bold text-slate-900 dark:text-slate-100 text-base">Lavender</div>
+<div class="text-xs text-slate-500 sm:hidden">Lamiaceae</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300 italic hidden sm:table-cell">Lavandula angustifolia</td>
+<td class="px-6 py-4 hidden md:table-cell">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                                                Anxiety
+                                            </span>
+</td>
+<td class="px-6 py-4 text-slate-500 hidden lg:table-cell">Oct 20, 2023</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="relative flex h-2.5 w-2.5">
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500"></span>
+</div>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Review</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-red-500 hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-xl bg-cover bg-center shadow-md group-hover:scale-110 transition-transform duration-300" data-alt="Yellow ginger root on wooden surface" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDdPU_2CWAnhBKYeCsp47pw4dzygtJmMdPEEgZUVne7pf6F5H5v6C63gmRskDNrejwuRICOwiRiu82AZGh59_nD-K8n42xW2K3uXdl0EqpLBJb6_pOoirsrUoAhQHMDRQ0UqTaHp8mj4f9a7jio73kehz3o492u-IhnTchmOunV3Nbv2WuKgtm3Vldh0fIyCsekZStHQTRHQ8-FGnYkXMMQts90uXqwD8vjukAqzlwn9XwjEjBhb2ZzZraOfsnLr8QVlO6ipP_osg');"></div>
+<div>
+<div class="font-bold text-slate-900 dark:text-slate-100 text-base">Ginger</div>
+<div class="text-xs text-slate-500 sm:hidden">Zingiberaceae</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300 italic hidden sm:table-cell">Zingiber officinale</td>
+<td class="px-6 py-4 hidden md:table-cell">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800">
+                                                Immunity
+                                            </span>
+</td>
+<td class="px-6 py-4 text-slate-500 hidden lg:table-cell">Oct 18, 2023</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="relative flex h-2.5 w-2.5">
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+</div>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-red-500 hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-xl bg-cover bg-center shadow-md group-hover:scale-110 transition-transform duration-300" data-alt="Yellow turmeric powder in bowl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBxwUqjygG8lZmeCkAdWodeuI7hQ4JeDV9UwL3R_szr0sozF9iX5XWWa9R7I8x02x-px8tYXpxcrUI7r6T-SVguhdlbKQ822l7CHmxsxMKnfxokNic-VRwkb1XD7nDW384UsQVuQ6luVqYkOZDTkVCLM4uNZPfQTJsouVRXmJktCIERZWQbGsbXC6bXglZIdUYR_YAMhrLo5MAxGi6G4DrHJ_oJNR3gFoA8jGVo379RfuwVsKre_pX0OX8MVNLJf-6Bx4Uv5nlmjA');"></div>
+<div>
+<div class="font-bold text-slate-900 dark:text-slate-100 text-base">Turmeric</div>
+<div class="text-xs text-slate-500 sm:hidden">Zingiberaceae</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300 italic hidden sm:table-cell">Curcuma longa</td>
+<td class="px-6 py-4 hidden md:table-cell">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                                Inflammation
+                                            </span>
+</td>
+<td class="px-6 py-4 text-slate-500 hidden lg:table-cell">Oct 15, 2023</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="relative flex h-2.5 w-2.5">
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-slate-300 dark:bg-slate-500"></span>
+</div>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Draft</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-red-500 hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between px-6 py-4 border-t border-slate-200/50 dark:border-slate-700/50 bg-slate-50/30 dark:bg-slate-800/20">
+<span class="text-sm text-slate-500 dark:text-slate-400 font-medium">Showing 1-5 of 120 items</span>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-colors disabled:opacity-50">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-lg bg-primary text-white font-bold text-sm shadow-md shadow-primary/30">1</button>
+<button class="px-3.5 py-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-medium transition-colors">2</button>
+<button class="px-3.5 py-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-medium transition-colors">3</button>
+<button class="p-2 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="hidden xl:flex w-80 flex-col gap-6 animate-slide-up" style="animation-delay: 0.4s;">
+<div class="glass-panel rounded-3xl p-6 relative overflow-hidden text-white">
+<div class="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-400 opacity-90"></div>
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-bold text-lg">Garden Conditions</h3>
+<p class="text-blue-100 text-sm">Campus Greenhouse A</p>
+</div>
+<span class="material-symbols-outlined text-4xl text-yellow-300 animate-pulse">sunny</span>
+</div>
+<div class="flex items-end gap-2 mb-4">
+<span class="text-5xl font-extrabold">24°</span>
+<span class="text-xl mb-1 opacity-80">C</span>
+</div>
+<div class="grid grid-cols-2 gap-2 text-sm">
+<div class="bg-white/20 rounded-xl p-2 flex flex-col items-center">
+<span class="material-symbols-outlined text-blue-100 mb-1">humidity_percentage</span>
+<span class="font-bold">65%</span>
+<span class="text-xs text-blue-100">Humidity</span>
+</div>
+<div class="bg-white/20 rounded-xl p-2 flex flex-col items-center">
+<span class="material-symbols-outlined text-blue-100 mb-1">water_drop</span>
+<span class="font-bold">Optimal</span>
+<span class="text-xs text-blue-100">Soil</span>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-panel rounded-3xl p-6">
+<h3 class="font-bold text-lg text-slate-900 dark:text-white mb-4">Upcoming Tasks</h3>
+<div class="space-y-3">
+<div class="flex items-center gap-3 p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-white/50 dark:border-white/5 hover:border-primary/50 transition-colors cursor-pointer">
+<div class="h-2 w-2 rounded-full bg-red-500"></div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-800 dark:text-white">Water Fern Zone</p>
+<p class="text-xs text-slate-500">Due in 2 hours</p>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">check_circle</span>
+</button>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-white/50 dark:border-white/5 hover:border-primary/50 transition-colors cursor-pointer">
+<div class="h-2 w-2 rounded-full bg-yellow-500"></div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-800 dark:text-white">Review Soil pH</p>
+<p class="text-xs text-slate-500">Due tomorrow</p>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">check_circle</span>
+</button>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-white/50 dark:border-white/5 hover:border-primary/50 transition-colors cursor-pointer">
+<div class="h-2 w-2 rounded-full bg-blue-500"></div>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-800 dark:text-white">Weekly Report</p>
+<p class="text-xs text-slate-500">Friday</p>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">check_circle</span>
+</button>
+</div>
+</div>
+<button class="w-full mt-4 py-2 text-sm text-primary font-bold border border-primary/30 rounded-xl hover:bg-primary hover:text-white transition-all">
+                        View All Tasks
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<button class="fixed bottom-8 right-8 h-16 w-16 bg-gradient-to-r from-primary to-emerald-500 text-white rounded-full shadow-lg shadow-primary/40 flex items-center justify-center hover:scale-110 hover:rotate-90 transition-all duration-300 active:scale-95 group z-50 animate-bounce" style="animation-duration: 3s;">
+<span class="material-symbols-outlined text-3xl">add</span>
+<span class="absolute right-full mr-4 px-3 py-1.5 bg-slate-900/90 backdrop-blur text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none transform translate-x-2 group-hover:translate-x-0 transition-transform">Add Plant</span>
+</button>
+</div>
+</body></html>

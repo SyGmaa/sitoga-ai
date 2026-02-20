@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// 1. TABEL PENGELOLA (ADMIN)
+// ==========================================
+model Admin {
+  id        String   @id @default(cuid())
+  nama      String
+  email     String   @unique
+  password  String   // Akan di-hash menggunakan bcrypt nanti
+  createdAt DateTime @default(now())
+}
+
+// ==========================================
+// 2. TABEL MASTER BOTANI (DATA TANAMAN)
+// ==========================================
+model Tanaman {
+  id               String   @id @default(cuid())
+  namaLokal        String
+  namaLatin        String
+  deskripsi        String   @db.Text
+  kandunganSenyawa String   @db.Text
+  khasiatUtama     String   @db.Text
+  lokasiTanam      String   @db.Text // Berupa teks deskriptif, misal: "Blok A Taman Herbal"
+  gambarUrl        String?  // URL gambar setelah di-upload
+
+  // Relasi
+  resepPengolahan  Resep[]
+  penyakitTerkait  TanamanPenyakit[]
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+// Tabel untuk menyimpan langkah-langkah racikan secara terstruktur
+model Resep {
+  id          String   @id @default(cuid())
+  tanamanId   String
+  langkah     String   @db.Text 
+  
+  tanaman     Tanaman  @relation(fields: [tanamanId], references: [id], onDelete: Cascade)
+}
+
+// ==========================================
+// 3. TABEL BASIS PENGETAHUAN MEDIS
+// ==========================================
+model Penyakit {
+  id          String   @id @default(cuid())
+  nama        String
+  deskripsi   String?  @db.Text
+  
+  // Relasi
+  gejala      PenyakitGejala[]
+  tanamanObat TanamanPenyakit[]
+}
+
+model Gejala {
+  id          String   @id @default(cuid())
+  nama        String
+  
+  // Relasi
+  penyakit    PenyakitGejala[]
+}
+
+// ==========================================
+// 4. TABEL RELASI (PIVOT TABLES)
+// ==========================================
+
+// Relasi Many-to-Many: Penyakit <-> Gejala
+// (Satu penyakit punya banyak gejala, satu gejala bisa merujuk ke banyak penyakit)
+model PenyakitGejala {
+  penyakitId  String
+  gejalaId    String
+  
+  penyakit    Penyakit @relation(fields: [penyakitId], references: [id], onDelete: Cascade)
+  gejala      Gejala   @relation(fields: [gejalaId], references: [id], onDelete: Cascade)
+
+  @@id([penyakitId, gejalaId])
+}
+
+// Relasi Many-to-Many: Tanaman <-> Penyakit
+// (Satu tanaman bisa mengobati banyak penyakit, satu penyakit bisa diobati banyak tanaman)
+model TanamanPenyakit {
+  tanamanId   String
+  penyakitId  String
+  
+  tanaman     Tanaman  @relation(fields: [tanamanId], references: [id], onDelete: Cascade)
+  penyakit    Penyakit @relation(fields: [penyakitId], references: [id], onDelete: Cascade)
+
+  @@id([tanamanId, penyakitId])
+}
+
+// ==========================================
+// 5. TABEL LOG / RIWAYAT SISTEM
+// ==========================================
+model RiwayatDiagnosa {
+  id              String   @id @default(cuid())
+  keluhanPengguna String   @db.Text
+  hasilDiagnosa   Json     // Menyimpan output raw JSON dari AI
+  createdAt       DateTime @default(now())
+}
