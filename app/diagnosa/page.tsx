@@ -10,7 +10,10 @@ import { saveRiwayatDiagnosa } from "@/actions/riwayat";
 const diagnosisSchema = z.object({
   nama_penyakit: z.string().optional(),
   gejala_terdeteksi: z.array(z.string()).optional(),
-  rekomendasi_tanaman_ids: z.array(z.string()).optional(),
+  rekomendasi_tanaman: z.array(z.object({
+    id: z.string(),
+    nama: z.string()
+  })).optional(),
   penjelasan_singkat: z.string().optional(),
 });
 type DiagnosisResult = z.infer<typeof diagnosisSchema>;
@@ -28,7 +31,7 @@ export default function DiagnosaPage() {
     {
       id: "system-1",
       role: "assistant",
-      content: "Hello! I am your botanical health assistant. Describe your symptoms or ask about specific plants in our Campus Garden."
+      content: "Yooo... aku clonenya gama, siap membantu mendiagnosa penyakit kamu dengan gacorrr."
     }
   ]);
   const [input, setInput] = useState("");
@@ -75,7 +78,7 @@ export default function DiagnosaPage() {
         nama_penyakit: object.nama_penyakit,
         penjelasan_singkat: object.penjelasan_singkat,
         gejala_terdeteksi: object.gejala_terdeteksi?.filter((g): g is string => g !== undefined),
-        rekomendasi_tanaman_ids: object.rekomendasi_tanaman_ids?.filter((r): r is string => r !== undefined),
+        rekomendasi_tanaman: object.rekomendasi_tanaman?.filter((r): r is { id: string; nama: string } => r !== undefined && r.id !== undefined && r.nama !== undefined),
       };
 
       setMessages(prev => [
@@ -104,7 +107,7 @@ export default function DiagnosaPage() {
     
     // Clean up potentially undefined elements from arrays during stream
     const gejalaClean = data.gejala_terdeteksi?.filter((g): g is string => g !== undefined) || [];
-    const rekomendasiClean = data.rekomendasi_tanaman_ids?.filter((r): r is string => r !== undefined) || [];
+    const rekomendasiClean = data.rekomendasi_tanaman?.filter((r): r is { id: string; nama: string } => r !== undefined && r.id !== undefined && r.nama !== undefined) || [];
 
     return (
       <div className="flex flex-col gap-4 w-full">
@@ -137,13 +140,13 @@ export default function DiagnosaPage() {
               {rekomendasiClean.length > 0 ? (
                 <div className="space-y-4">
                   <h5 className="text-[#92c99b] text-xs font-bold uppercase tracking-wider mb-2">Rekomendasi Tanaman</h5>
-                  {rekomendasiClean.map((id: string, idx: number) => (
+                  {rekomendasiClean.map((plant, idx: number) => (
                     <div key={idx} className="group flex items-center gap-4 p-3 rounded-xl bg-[#234829]/20 border border-transparent hover:border-primary/40 hover:bg-[#234829]/40 transition-all cursor-pointer">
                       <div className="flex-1">
-                        <h6 className="text-white font-bold">Plant ID: {id}</h6>
+                        <h6 className="text-white font-bold">{plant.nama}</h6>
                         <p className="text-slate-400 text-xs italic">View full details to see instructions.</p>
                       </div>
-                      <Link href={`/tanaman/${id}`} className="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">chevron_right</Link>
+                      <Link href={`/tanaman/${plant.id}`} className="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">chevron_right</Link>
                     </div>
                   ))}
                 </div>

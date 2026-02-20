@@ -53,8 +53,8 @@ ${knowledgeBase}
 INSTRUKSI PENTING:
 1. Analisis gejala yang diberikan pengguna.
 2. Cari "Penyakit" dalam database di atas yang memiliki "Gejala" paling cocok.
-3. Kembalikan array ID tanaman dari bidang "Tanaman Pengobatan yang direkomendasikan beserta ID-nya". HANYA GUNAKAN ID YANG TERDAPAT PADA TEKS DI ATAS! Jangan mengarang ID atau nama tanaman.
-4. Jika gejala tidak cocok dengan penyakit apapun di database, kembalikan nama_penyakit "Tidak Diketahui/Di luar basis data kami", gejala_terdeteksi dengan gejala yang disebutkan, dan rekomendasi_tanaman_ids kosong [].
+3. Kembalikan array objek berisi ID dan nama tanaman dari bidang "Tanaman Pengobatan yang direkomendasikan beserta ID-nya". HANYA GUNAKAN DATA YANG TERDAPAT PADA TEKS DI ATAS! Jangan mengarang ID atau nama tanaman.
+4. Jika gejala tidak cocok dengan penyakit apapun di database, kembalikan nama_penyakit "Tidak Diketahui/Di luar basis data kami", gejala_terdeteksi dengan gejala yang disebutkan, dan rekomendasi_tanaman kosong [].
 
 Pesan pengguna saat ini: "${latestMessage}"`;
 
@@ -66,7 +66,10 @@ Pesan pengguna saat ini: "${latestMessage}"`;
       schema: z.object({
         nama_penyakit: z.string().describe('Nama penyakit yang paling cocok dengan gejala dari database, atau "Tidak Diketahui"'),
         gejala_terdeteksi: z.array(z.string()).describe('Daftar gejala spesifik yang berhasil dianalisis dari input pengguna'),
-        rekomendasi_tanaman_ids: z.array(z.string()).describe('Array berisi ID tanaman (string) yang terkait dengan penyakit tersebut BERDASARKAN SYSTEM PROMPT. HANYA RETURN ID, bukan strukturnya.'),
+        rekomendasi_tanaman: z.array(z.object({
+          id: z.string().describe('ID unik tanaman (cuid)'),
+          nama: z.string().describe('Nama lokal tanaman'),
+        })).describe('Array berisi objek tanaman yang terkait dengan penyakit tersebut BERDASARKAN SYSTEM PROMPT.'),
         penjelasan_singkat: z.string().describe('Penjelasan singkat dan ramah (max 2 kalimat) menyapa pengguna dan menjelaskan diagnosis awal.'),
       }),
     });
