@@ -165,7 +165,7 @@ export default async function Home() {
 
       {/* Floating Action Button */}
       <div className="fixed bottom-6 right-6 z-50">
-        <Link href="/diagnosa" className="flex items-center justify-center size-14 rounded-full bg-primary text-background-dark shadow-[0_4px_20px_rgba(19,236,55,0.4)] hover:scale-110 transition-transform cursor-pointer">
+        <Link href="/scan" className="flex items-center justify-center size-14 rounded-full bg-primary text-background-dark shadow-[0_4px_20px_rgba(19,236,55,0.4)] hover:scale-110 transition-transform cursor-pointer">
           <span className="material-symbols-outlined text-3xl">qr_code_scanner</span>
         </Link>
       </div>

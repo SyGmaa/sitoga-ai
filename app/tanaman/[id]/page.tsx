@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+
 import { notFound } from "next/navigation";
 import { getTanamanById, getAllTanaman } from "@/actions/tanaman";
 
@@ -93,6 +94,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
                     <span className="material-symbols-outlined">share</span>
                   </button>
                 </div>
+
               </div>
             </div>
 

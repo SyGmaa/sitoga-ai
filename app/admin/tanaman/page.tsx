@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getAllTanaman } from '@/actions/tanaman';
 import Image from 'next/image';
+import { QRButton } from '@/components/QRButton';
 
 export default async function AdminTanamanPage() {
   const result = await getAllTanaman();
@@ -64,6 +65,7 @@ export default async function AdminTanamanPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                      <QRButton plantId={tanaman.id} plantName={tanaman.namaLokal} />
                       <Link href={`/admin/tanaman/${tanaman.id}/edit`} className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 hover:shadow-sm transition-all inline-flex items-center justify-center">
                         <span className="material-symbols-outlined text-lg">edit</span>
                       </Link>
