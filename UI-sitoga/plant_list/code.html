@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Database Tanaman - Botanical Garden</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#1f8825", "background-light": "#f6f8f6", "background-dark": "#131f13", "card-dark": "#1e2b1f"}, fontFamily: {display: "Space Grotesk", body: ["Noto Sans", "sans-serif"]}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, boxShadow: {glow: "0 0 20px -5px rgba(31, 136, 37, 0.5)", "glow-hover": "0 0 30px -5px rgba(31, 136, 37, 0.7)"}}}};</script>
+<style>
+        /* Custom Scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #132014;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #28432a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1f8825;
+        }
+        
+        .glass-card {
+            background: rgba(30, 43, 31, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 w-full glass-card border-b border-[#28432a]/50">
+<div class="px-4 md:px-10 py-3 max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-4 text-white">
+<div class="size-8 text-primary">
+<span class="material-symbols-outlined text-3xl">eco</span>
+</div>
+<h2 class="text-white text-xl font-bold leading-tight tracking-tight">Botanical Garden</h2>
+</div>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-white/80 hover:text-primary transition-colors text-sm font-medium" href="#">Beranda</a>
+<a class="text-primary font-bold text-sm" href="#">Database</a>
+<a class="text-white/80 hover:text-primary transition-colors text-sm font-medium" href="#">Peta</a>
+<a class="text-white/80 hover:text-primary transition-colors text-sm font-medium" href="#">Tentang</a>
+</nav>
+<div class="flex gap-3">
+<button class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-[#28432a] text-white hover:bg-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-[#28432a] text-white hover:bg-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center w-full">
+<div class="w-full max-w-7xl px-4 md:px-10 py-8 flex flex-col gap-8">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-end gap-6 pb-4 border-b border-[#28432a]/50">
+<div class="flex flex-col gap-2 max-w-2xl">
+<h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white">
+                        Database <span class="text-primary">Tanaman</span>
+</h1>
+<p class="text-[#99c29b] text-lg font-light leading-relaxed">
+                        Jelajahi koleksi flora di kampus kami. Temukan manfaat, spesies, dan karakteristik unik dari setiap tanaman.
+                    </p>
+</div>
+<div class="flex gap-2">
+<button class="group flex h-10 items-center justify-center gap-2 rounded-full border border-[#28432a] bg-[#1e2b1f] px-4 text-sm font-medium text-white hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+<span>Filter Lanjutan</span>
+</button>
+</div>
+</div>
+<!-- Search & Quick Filters -->
+<div class="flex flex-col gap-6">
+<!-- Search Bar -->
+<div class="relative w-full max-w-3xl mx-auto">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="block w-full rounded-full border-none bg-[#28432a]/50 py-4 pl-12 pr-4 text-white placeholder-[#99c29b] focus:ring-2 focus:ring-primary focus:bg-[#28432a] transition-all shadow-lg backdrop-blur-sm text-lg" placeholder="Cari nama tanaman, spesies latin, atau manfaat..." type="text"/>
+<div class="absolute inset-y-0 right-2 flex items-center">
+<button class="bg-primary hover:bg-green-600 text-white rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Category Pills (Horizontal Scroll) -->
+<div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide justify-start md:justify-center">
+<button class="flex h-10 shrink-0 items-center gap-2 rounded-full bg-primary text-white px-5 transition-transform hover:scale-105 active:scale-95 shadow-glow">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+<span class="text-sm font-bold">Semua</span>
+</button>
+<button class="flex h-10 shrink-0 items-center gap-2 rounded-full bg-[#28432a] text-white px-5 hover:bg-[#365738] transition-all hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-[20px]">prescriptions</span>
+<span class="text-sm font-medium">Tanaman Obat</span>
+</button>
+<button class="flex h-10 shrink-0 items-center gap-2 rounded-full bg-[#28432a] text-white px-5 hover:bg-[#365738] transition-all hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-[20px]">potted_plant</span>
+<span class="text-sm font-medium">Tanaman Hias</span>
+</button>
+<button class="flex h-10 shrink-0 items-center gap-2 rounded-full bg-[#28432a] text-white px-5 hover:bg-[#365738] transition-all hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-[20px]">park</span>
+<span class="text-sm font-medium">Pohon Peneduh</span>
+</button>
+<button class="flex h-10 shrink-0 items-center gap-2 rounded-full bg-[#28432a] text-white px-5 hover:bg-[#365738] transition-all hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-[20px]">stars</span>
+<span class="text-sm font-medium">Tanaman Langka</span>
+</button>
+</div>
+</div>
+<!-- Plant Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-4">
+<!-- Card 1 -->
+<div class="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 hover:shadow-glow-hover transition-all duration-300 cursor-pointer">
+<div class="relative h-64 w-full overflow-hidden">
+<div class="absolute top-3 right-3 z-10">
+<button class="bg-black/40 hover:bg-primary backdrop-blur-md text-white rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<img alt="Close up of aloe vera plant leaves with water droplets" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Detailed view of aloe vera plant succulent leaves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDSGAL64rpoVDgxobGFeIjOV0aTeAKsTVpi4C1v48q3Vkgq85LPwqRxugygyR9DN_Gvqp7pq2vNay48MM1bqF_dpdnYceXAZndCIE2J9SIKge8zYxe67EVcxPAkkw9AB1usXC-ldM2ksiFEdOXaJ0yat2QRbnVKgnYYe97Q-BDxcUPS-xsWdrPiijZ3zMD-C3I-CNrohjwFkRthoA2NzsxDRZt49myDLXSx-MKFarmf9TqBd7xhiR09UIZxZZXnlInWyB5Oi-_ow"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#132014] via-transparent to-transparent opacity-80"></div>
+</div>
+<div class="p-5 flex flex-col gap-3 flex-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="text-white text-xl font-bold leading-tight group-hover:text-primary transition-colors">Lidah Buaya</h3>
+<span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">Obat</span>
+</div>
+<p class="text-[#99c29b] text-sm italic mt-1 font-serif">Aloe vera</p>
+</div>
+<div class="flex flex-wrap gap-2 mt-auto pt-2">
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Penyembuh Luka</span>
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Perawatan Kulit</span>
+</div>
+<div class="pt-3 border-t border-white/10 mt-2 flex justify-between items-center opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="text-xs text-[#99c29b] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Zona B
+                            </span>
+<span class="text-xs text-primary font-bold flex items-center gap-1 group/btn">
+                                Detail <span class="material-symbols-outlined text-[14px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 hover:shadow-glow-hover transition-all duration-300 cursor-pointer">
+<div class="relative h-64 w-full overflow-hidden">
+<div class="absolute top-3 right-3 z-10">
+<button class="bg-black/40 hover:bg-primary backdrop-blur-md text-white rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<img alt="Fresh red ginger root on dark soil background" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Red ginger plant roots freshly harvested" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBSOoAvrqcwxRhW5vPhbYNZjULGCLJMW3G4G7WP0cpq0Ncsfhb4qwhHupia6_w2eS30y8IYMTxi9Na-WIpbatZ14Cnf17b-UCczrQV0TTom651Qammdu0HAeN69jII1UMp0Ni3-BYxBxVA1vFv7TQBvumA0IEKv61vYOFcTxVG5KuPqKkKlJ9l-ErC_BpI6N6FDnRuoiwPoqOSu9vDdgf6EHUvophINyTHCjL7RV6x3IDds9oWNhvArf_3MzRKNHI9b6_tm3Kz6w"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#132014] via-transparent to-transparent opacity-80"></div>
+</div>
+<div class="p-5 flex flex-col gap-3 flex-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="text-white text-xl font-bold leading-tight group-hover:text-primary transition-colors">Jahe Merah</h3>
+<span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">Herbal</span>
+</div>
+<p class="text-[#99c29b] text-sm italic mt-1 font-serif">Zingiber officinale var. rubrum</p>
+</div>
+<div class="flex flex-wrap gap-2 mt-auto pt-2">
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Pencernaan</span>
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Imunitas</span>
+</div>
+<div class="pt-3 border-t border-white/10 mt-2 flex justify-between items-center opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="text-xs text-[#99c29b] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Zona A
+                            </span>
+<span class="text-xs text-primary font-bold flex items-center gap-1 group/btn">
+                                Detail <span class="material-symbols-outlined text-[14px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 hover:shadow-glow-hover transition-all duration-300 cursor-pointer">
+<div class="relative h-64 w-full overflow-hidden">
+<div class="absolute top-3 right-3 z-10">
+<button class="bg-black/40 hover:bg-primary backdrop-blur-md text-white rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<img alt="Snake plant leaves pointing upwards against a neutral background" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Sansevieria trifasciata snake plant leaves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUW2VYIdLG_PA3vyAYdMLKN4Fg_8j68Bp8pz4KHClm0lgVUeEFleP2k2Vj_Xetdrg421snQyMzcnYBsPrYvqtjn5JE345uLt1Jwp8Ab27r0eT3sSdsvjt-WxUtpIhgE2m7RhXoPhZUmyERnctx_7-baY83ViPvxdeTCBjjVGWUFSNkAYDkFH8r238TqB2Qm8bKDMEme0V06TNq851F8Uxge3aoh-IpHv316jY-2bIFHdN5-30uqDogoqSbDJgZHcNh6_332PZLfA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#132014] via-transparent to-transparent opacity-80"></div>
+</div>
+<div class="p-5 flex flex-col gap-3 flex-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="text-white text-xl font-bold leading-tight group-hover:text-primary transition-colors">Lidah Mertua</h3>
+<span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">Hias</span>
+</div>
+<p class="text-[#99c29b] text-sm italic mt-1 font-serif">Sansevieria trifasciata</p>
+</div>
+<div class="flex flex-wrap gap-2 mt-auto pt-2">
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Penyaring Udara</span>
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Indoor</span>
+</div>
+<div class="pt-3 border-t border-white/10 mt-2 flex justify-between items-center opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="text-xs text-[#99c29b] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Zona C
+                            </span>
+<span class="text-xs text-primary font-bold flex items-center gap-1 group/btn">
+                                Detail <span class="material-symbols-outlined text-[14px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 hover:shadow-glow-hover transition-all duration-300 cursor-pointer">
+<div class="relative h-64 w-full overflow-hidden">
+<div class="absolute top-3 right-3 z-10">
+<button class="bg-black/40 hover:bg-primary backdrop-blur-md text-white rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<img alt="Bright red hibiscus flower blooming in garden" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Red hibiscus flower in full bloom" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5oCxA2bPcJ9-N1Fi4vU8-aN-hps44v0bSKmYbLbbZ-qciiorbdi9w9ha31KGn6trnvJ8PJdc3BFODij3EQH4s5nJei3MYKMo-jp5jBSJMtTCdgoOjZYvUmmgMY-I5pHsc6gtW-j655DKnCQq05b4kPrTe6957617J8RYEnpvk7HeJJnnjU8qqTFV-thdwvrWRbT4vzG_tpss789BfEvV0JKZM9yYqyYCpwXKXBc0JAJhZ31xQJfIzZm2W6EG3zIX33Ee1OstHKg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#132014] via-transparent to-transparent opacity-80"></div>
+</div>
+<div class="p-5 flex flex-col gap-3 flex-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="text-white text-xl font-bold leading-tight group-hover:text-primary transition-colors">Kembang Sepatu</h3>
+<span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">Hias</span>
+</div>
+<p class="text-[#99c29b] text-sm italic mt-1 font-serif">Hibiscus rosa-sinensis</p>
+</div>
+<div class="flex flex-wrap gap-2 mt-auto pt-2">
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Hiasan</span>
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Teh Herbal</span>
+</div>
+<div class="pt-3 border-t border-white/10 mt-2 flex justify-between items-center opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="text-xs text-[#99c29b] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Zona B
+                            </span>
+<span class="text-xs text-primary font-bold flex items-center gap-1 group/btn">
+                                Detail <span class="material-symbols-outlined text-[14px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 hover:shadow-glow-hover transition-all duration-300 cursor-pointer">
+<div class="relative h-64 w-full overflow-hidden">
+<div class="absolute top-3 right-3 z-10">
+<button class="bg-black/40 hover:bg-primary backdrop-blur-md text-white rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<img alt="Monstera deliciosa leaf with holes texture" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Monstera deliciosa tropical leaf pattern" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByWjjYhGRV-z9WE2d09Qnj_zYpDtldsLMozGPNWfFYUrvqpDcbcgS7kzTJWoJfK2UuAedlMtkG4v1-EKLFxD13Afof9NQsvLG93V8fY9WElzpEWNn-IR2eZbSF0E_dKRWUVlQkmBXU8Cc0m2tYQeOa0aAzmeFz6Nt-xtvSatNv8H1k2ILDeG5Dk77pVt-1Wsicpt-v-eiKE_LVTDLaUH0fOFo2_h7H6lVrs5P8oTXuN1_T3zGtpS1dopdl1gp1iKJEqwJCjbMYew"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#132014] via-transparent to-transparent opacity-80"></div>
+</div>
+<div class="p-5 flex flex-col gap-3 flex-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="text-white text-xl font-bold leading-tight group-hover:text-primary transition-colors">Janda Bolong</h3>
+<span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">Hias</span>
+</div>
+<p class="text-[#99c29b] text-sm italic mt-1 font-serif">Monstera adansonii</p>
+</div>
+<div class="flex flex-wrap gap-2 mt-auto pt-2">
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Estetika</span>
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Tropis</span>
+</div>
+<div class="pt-3 border-t border-white/10 mt-2 flex justify-between items-center opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="text-xs text-[#99c29b] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Rumah Kaca
+                            </span>
+<span class="text-xs text-primary font-bold flex items-center gap-1 group/btn">
+                                Detail <span class="material-symbols-outlined text-[14px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 hover:shadow-glow-hover transition-all duration-300 cursor-pointer">
+<div class="relative h-64 w-full overflow-hidden">
+<div class="absolute top-3 right-3 z-10">
+<button class="bg-black/40 hover:bg-primary backdrop-blur-md text-white rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<img alt="Green turmeric plant leaves in garden" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Turmeric plant leaves and rhizome" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBc0DdWHUgkHAVUr4vXpm0qpDhpIkTImj-ZJgdCF_fOtbegqBY52vslEqOx61_t973Lb3YNvnPrPq_bqCz7ukTYF1M8ALOgKxJb_ePtJV8cM4l3BWJy4TrnbPlmRxV1nFw6SnbCkBBb2ZrLQkhE5YvMmL8NLzt2CgLv0Y7hfCISVKjHi2gSRA_oeTBs3XG0jsrOiXODLaDE4gW07c9uH05iUIqU_TaNXsbOiM7gcy-bUtem8dWC6Fubapo2Myq9KgsyNhhnkEangg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#132014] via-transparent to-transparent opacity-80"></div>
+</div>
+<div class="p-5 flex flex-col gap-3 flex-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="text-white text-xl font-bold leading-tight group-hover:text-primary transition-colors">Kunyit</h3>
+<span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">Obat</span>
+</div>
+<p class="text-[#99c29b] text-sm italic mt-1 font-serif">Curcuma longa</p>
+</div>
+<div class="flex flex-wrap gap-2 mt-auto pt-2">
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Anti-inflamasi</span>
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Bumbu</span>
+</div>
+<div class="pt-3 border-t border-white/10 mt-2 flex justify-between items-center opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="text-xs text-[#99c29b] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Zona A
+                            </span>
+<span class="text-xs text-primary font-bold flex items-center gap-1 group/btn">
+                                Detail <span class="material-symbols-outlined text-[14px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Card 7 -->
+<div class="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 hover:shadow-glow-hover transition-all duration-300 cursor-pointer">
+<div class="relative h-64 w-full overflow-hidden">
+<div class="absolute top-3 right-3 z-10">
+<button class="bg-black/40 hover:bg-primary backdrop-blur-md text-white rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<img alt="Large banyan tree with hanging roots" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Majestic banyan tree in a park" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL4Lld4jsk8BexRE8bZhOORm6TZtNNK3lJY32FcHmNldVGgu7UDM0u5_8HZ4YKnwEBAOf4HQX5u7IlJul5Iut0lvvg9qWJJEHoO00IrwCXoPk2XVblJTeC2YRVzFEZ2QPrcouMWdwnLtLUEUKF2oByqmluxpjDbksiRzkKYAnaeXQcGGDkXBfofZCGIeNvdmKAIUaygpxqS7Y3ral3NbXNdFkRojA1bBkcCi0NR5eezlc4iEZBk6JVGX_NU_z_9tJdG0e-KVWxrA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#132014] via-transparent to-transparent opacity-80"></div>
+</div>
+<div class="p-5 flex flex-col gap-3 flex-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="text-white text-xl font-bold leading-tight group-hover:text-primary transition-colors">Beringin</h3>
+<span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">Peneduh</span>
+</div>
+<p class="text-[#99c29b] text-sm italic mt-1 font-serif">Ficus benjamina</p>
+</div>
+<div class="flex flex-wrap gap-2 mt-auto pt-2">
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Rindang</span>
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Konservasi Air</span>
+</div>
+<div class="pt-3 border-t border-white/10 mt-2 flex justify-between items-center opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="text-xs text-[#99c29b] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Area Parkir
+                            </span>
+<span class="text-xs text-primary font-bold flex items-center gap-1 group/btn">
+                                Detail <span class="material-symbols-outlined text-[14px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Card 8 -->
+<div class="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 hover:shadow-glow-hover transition-all duration-300 cursor-pointer">
+<div class="relative h-64 w-full overflow-hidden">
+<div class="absolute top-3 right-3 z-10">
+<button class="bg-black/40 hover:bg-primary backdrop-blur-md text-white rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<img alt="Orchid flower purple and white" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Exotic purple orchid flower close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBevM5dmjfTlyBPBPuXPjG643U2SgPi3iB_r2zRI00t0fBCqUY-LcUmgZbQ-jfboqcq3tMGnN0GqDcjbWyLVIbig_JNVdqWZP7XXYQDUQUPOWzUNU9pawo2utkldidUDSQhWsRfdO9O8jWb1dFhc8YANmR8Is81l1-CdC5FKG9N7ooETESrDW2YMbmYmz_9NccCkTtAtXyABz9cKxajV8Hk9RpN-z3_7lrtAyUfNkaAQUywi8tXenK3PYP47Y3oSf7emq423b8SHw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#132014] via-transparent to-transparent opacity-80"></div>
+</div>
+<div class="p-5 flex flex-col gap-3 flex-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="text-white text-xl font-bold leading-tight group-hover:text-primary transition-colors">Anggrek Bulan</h3>
+<span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">Langka</span>
+</div>
+<p class="text-[#99c29b] text-sm italic mt-1 font-serif">Phalaenopsis amabilis</p>
+</div>
+<div class="flex flex-wrap gap-2 mt-auto pt-2">
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Nasional</span>
+<span class="px-3 py-1 bg-[#28432a] text-white/80 text-xs rounded-full border border-white/5">Hias</span>
+</div>
+<div class="pt-3 border-t border-white/10 mt-2 flex justify-between items-center opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="text-xs text-[#99c29b] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Rumah Kaca
+                            </span>
+<span class="text-xs text-primary font-bold flex items-center gap-1 group/btn">
+                                Detail <span class="material-symbols-outlined text-[14px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="flex justify-center mt-8 pb-10">
+<button class="flex items-center gap-2 rounded-full bg-[#28432a] px-8 py-4 text-white hover:bg-primary transition-all shadow-lg hover:shadow-glow">
+<span class="font-bold">Muat Lebih Banyak</span>
+<span class="material-symbols-outlined animate-bounce">expand_more</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full glass-card border-t border-[#28432a]/50 py-8">
+<div class="max-w-7xl mx-auto px-4 md:px-10 flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="text-[#99c29b] text-sm text-center md:text-left">
+                © 2024 Campus Botanical Garden. All rights reserved.
+            </div>
+<div class="flex gap-6">
+<a class="text-white hover:text-primary transition-colors text-sm font-medium" href="#">Privasi</a>
+<a class="text-white hover:text-primary transition-colors text-sm font-medium" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-primary hover:text-white transition-colors text-sm font-bold flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>
+                    Ajukan Tanaman Baru
+                </a>
+</div>
+</div>
+</footer>
+</body></html>

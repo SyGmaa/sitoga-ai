@@ -10,14 +10,15 @@ export function Navbar() {
           </div>
           <h2 className="text-white text-xl font-bold tracking-tight">AI SITOGA UP</h2>
         </div>
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex flex-wrap items-center gap-4 lg:gap-8">
           <Link href="/" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Home</Link>
+          <Link href="/tanaman" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Database</Link>
           <Link href="/peta" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Garden Map</Link>
           <Link href="/diagnosa" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Diagnosis</Link>
           <Link href="/admin" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Admin</Link>
         </nav>
         <div className="flex items-center gap-4">
-          <Link href="/diagnosa" className="hidden sm:flex items-center gap-2 cursor-pointer rounded-full h-10 px-5 bg-primary hover:bg-[#0fd630] transition-colors text-background-dark text-sm font-bold shadow-[0_0_15px_rgba(19,236,55,0.3)]">
+          <Link href="/scan" className="hidden sm:flex items-center gap-2 cursor-pointer rounded-full h-10 px-5 bg-primary hover:bg-[#0fd630] transition-colors text-background-dark text-sm font-bold shadow-[0_0_15px_rgba(19,236,55,0.3)]">
             <span className="material-symbols-outlined text-[20px]">qr_code_scanner</span>
             <span>Quick Scan</span>
           </Link>
