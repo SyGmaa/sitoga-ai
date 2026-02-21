@@ -49,6 +49,16 @@ export async function createTanaman(formData: FormData) {
     const lokasiTanam = formData.get("lokasiTanam") as string;
     const kandunganSenyawa = formData.get("kandunganSenyawa") as string;
     const khasiatUtama = formData.get("khasiatUtama") as string;
+    const resepPengolahanRaw = formData.get("resepPengolahan") as string;
+    
+    let resepPengolahan: string[] = [];
+    try {
+      if (resepPengolahanRaw) {
+        resepPengolahan = JSON.parse(resepPengolahanRaw);
+      }
+    } catch (e) {
+      console.error("Error parsing resepPengolahan:", e);
+    }
     
     let gambarUrl = null;
     const gambarFile = formData.get("gambar") as File;
@@ -78,7 +88,12 @@ export async function createTanaman(formData: FormData) {
         lokasiTanam,
         kandunganSenyawa,
         khasiatUtama,
-        gambarUrl
+        gambarUrl,
+        ...(resepPengolahan.length > 0 && {
+          resepPengolahan: {
+            create: resepPengolahan.map((langkah) => ({ langkah }))
+          }
+        })
       }
     });
   } catch (error) {
@@ -98,6 +113,16 @@ export async function updateTanaman(id: string, formData: FormData) {
     const lokasiTanam = formData.get("lokasiTanam") as string;
     const kandunganSenyawa = formData.get("kandunganSenyawa") as string;
     const khasiatUtama = formData.get("khasiatUtama") as string;
+    const resepPengolahanRaw = formData.get("resepPengolahan") as string;
+    
+    let resepPengolahan: string[] = [];
+    try {
+      if (resepPengolahanRaw) {
+        resepPengolahan = JSON.parse(resepPengolahanRaw);
+      }
+    } catch (e) {
+      console.error("Error parsing resepPengolahan:", e);
+    }
     
     let gambarUrl = undefined;
     const gambarFile = formData.get("gambar") as File;
@@ -130,7 +155,11 @@ export async function updateTanaman(id: string, formData: FormData) {
         lokasiTanam,
         kandunganSenyawa,
         khasiatUtama,
-        ...(gambarUrl !== undefined ? { gambarUrl } : {})
+        ...(gambarUrl !== undefined ? { gambarUrl } : {}),
+        resepPengolahan: {
+          deleteMany: {}, // Hapus langkah lama
+          create: resepPengolahan.map((langkah) => ({ langkah })) // Buat baru dari form
+        }
       }
     });
   } catch (error) {
