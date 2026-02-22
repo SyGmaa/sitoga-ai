@@ -3,6 +3,8 @@
 @plugin "tailwindcss-animate";
 @plugin "@tailwindcss/forms";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: var(--font-space-grotesk), "sans-serif";
   --font-display: var(--font-space-grotesk), "sans-serif";

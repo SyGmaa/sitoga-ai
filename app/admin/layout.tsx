@@ -4,10 +4,12 @@ import Link from "next/link";
 import { ReactNode, useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useTheme } from "@/components/ThemeProvider";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -126,6 +128,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </div>
         
         <div className="flex items-center gap-4 lg:gap-6">
+          <button 
+            onClick={toggleTheme}
+            className="relative p-3 rounded-xl hover:bg-white/40 dark:hover:bg-white/10 transition-all text-slate-600 dark:text-slate-300 group"
+            title={theme === 'dark' ? 'Ganti ke mode siang' : 'Ganti ke mode malam'}
+          >
+            <span className={`material-symbols-outlined transition-transform duration-500 ${theme === 'dark' ? 'rotate-0' : 'rotate-360'}`}>
+              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+            </span>
+          </button>
           <button className="relative p-3 rounded-xl hover:bg-white/40 dark:hover:bg-white/10 transition-all text-slate-600 dark:text-slate-300 group">
             <span className="material-symbols-outlined group-hover:animate-bounce">notifications</span>
             <span className="absolute top-2 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900 animate-ping"></span>
