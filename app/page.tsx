@@ -67,7 +67,7 @@ export default async function Home() {
                 <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">Top Medicinal Plants</h2>
                 <p className="text-slate-500 dark:text-slate-400 max-w-lg text-lg">Discover the healing power of nature growing right on our campus grounds.</p>
               </div>
-              <Link className="group flex items-center gap-2 text-primary font-bold hover:text-slate-900 dark:hover:text-white transition-colors" href="/admin">
+              <Link className="group flex items-center gap-2 text-primary font-bold hover:text-slate-900 dark:hover:text-white transition-colors" href="/tanaman">
                 View Collection
                 <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
               </Link>
