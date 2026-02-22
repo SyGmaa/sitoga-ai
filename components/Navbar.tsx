@@ -12,7 +12,7 @@ export function Navbar() {
         </div>
         <nav className="hidden md:flex flex-wrap items-center gap-4 lg:gap-8">
           <Link href="/" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Home</Link>
-          <Link href="/tanaman" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Database</Link>
+          <Link href="/tanaman" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Tanaman</Link>
           <Link href="/peta" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Garden Map</Link>
           <Link href="/diagnosa" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Diagnosis</Link>
           <Link href="/admin" className="text-slate-200 hover:text-primary transition-colors text-sm font-medium">Admin</Link>
