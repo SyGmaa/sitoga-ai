@@ -298,10 +298,11 @@ AI_MODEL=mistralai/mistral-small-3.1-24b-instruct:free
 
 #### Google AI Studio
 
-| Model                   | Keterangan                             | Harga    |
-| ----------------------- | -------------------------------------- | -------- |
-| `gemini-2.5-flash`      | Cepat, cocok untuk production          | Gratis\* |
-| `gemini-2.5-flash-lite` | Sangat cepat, cocok untuk tugas ringan | Gratis\* |
+| Model                    | Keterangan                             | Harga    |
+| ------------------------ | -------------------------------------- | -------- |
+| `gemini-3-flash-preview` | Canggih, serbaguna                     | Gratis\* |
+| `gemini-2.5-flash`       | Cepat, cocok untuk production          | Gratis\* |
+| `gemini-2.5-flash-lite`  | Sangat cepat, cocok untuk tugas ringan | Gratis\* |
 
 _\*gratis dengan kuota harian_
 
