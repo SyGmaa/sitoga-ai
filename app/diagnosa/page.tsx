@@ -6,6 +6,14 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { saveRiwayatDiagnosa } from "@/actions/riwayat";
 
+interface AiModel {
+  id: string;
+  provider: string;
+  modelId: string;
+  label: string;
+  badge: string;
+}
+
 // Define the expected schema structure for our Diagnosis Object
 const diagnosisSchema = z.object({
   nama_penyakit: z.string().optional(),
@@ -37,6 +45,34 @@ export default function DiagnosaPage() {
   const [input, setInput] = useState("");
   // Track the current user keluhan to save it later
   const [currentKeluhan, setCurrentKeluhan] = useState("");
+  // Model selection (Dynamic from DB)
+  const [aiModels, setAiModels] = useState<AiModel[]>([]);
+  const [selectedModelIdx, setSelectedModelIdx] = useState(0);
+  const [showModelPicker, setShowModelPicker] = useState(false);
+  const [isModelsLoading, setIsModelsLoading] = useState(true);
+
+  const selectedModel = aiModels[selectedModelIdx];
+
+  // Fetch models from database
+  useEffect(() => {
+    async function fetchModels() {
+      try {
+        const res = await fetch("/api/models");
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setAiModels(data);
+          // Auto-select default model if exists
+          const defaultIdx = data.findIndex(m => m.isDefault);
+          if (defaultIdx !== -1) setSelectedModelIdx(defaultIdx);
+        }
+      } catch (err) {
+        console.error("Failed to load AI models:", err);
+      } finally {
+        setIsModelsLoading(false);
+      }
+    }
+    fetchModels();
+  }, []);
 
   // useObject hook specifically designed for streaming structured JSON objects matching Zod schema
   const { object, submit, isLoading } = useObject({
@@ -64,8 +100,12 @@ export default function DiagnosaPage() {
     setMessages(newMessages);
     setInput("");
 
-    // Submit entire chat history to the API so LLM has context
-    submit({ messages: newMessages });
+    // Submit entire chat history to the API so LLM has context, with selected model
+    submit({
+      messages: newMessages,
+      provider: selectedModel?.provider,
+      model: selectedModel?.modelId,
+    });
   };
 
   // When object generation completes, we ideally want to append it to messages history
@@ -192,6 +232,62 @@ export default function DiagnosaPage() {
             <span className="text-sm">Start New Diagnosis</span>
           </button>
         </div>
+
+        {/* Model Selector - Desktop */}
+        <div className="px-4 pb-4 border-t border-[#234829]/50 pt-4">
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 block px-1">AI Model</label>
+          <div className="relative">
+            <button
+              onClick={() => setShowModelPicker(!showModelPicker)}
+              disabled={isModelsLoading || aiModels.length === 0}
+              className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-[#234829]/30 border border-[#234829] hover:border-primary/40 transition-colors text-left disabled:opacity-50"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="material-symbols-outlined text-primary text-lg">smart_toy</span>
+                <div className="min-w-0">
+                  {isModelsLoading ? (
+                    <p className="text-slate-500 text-sm italic">Loading models...</p>
+                  ) : selectedModel ? (
+                    <>
+                      <p className="text-white text-sm font-medium truncate">{selectedModel.label}</p>
+                      <p className="text-slate-500 text-[10px] truncate">{selectedModel.provider}</p>
+                    </>
+                  ) : (
+                    <p className="text-red-400 text-sm">No models available</p>
+                  )}
+                </div>
+              </div>
+              <span className={`material-symbols-outlined text-slate-400 text-lg transition-transform ${showModelPicker ? 'rotate-180' : ''}`}>expand_more</span>
+            </button>
+            {showModelPicker && (
+              <div className="absolute bottom-full left-0 w-full mb-2 bg-surface-dark border border-[#234829] rounded-xl shadow-2xl overflow-hidden z-50 animate-[fadeIn_0.15s_ease-out]">
+                {aiModels.map((m, idx) => (
+                  <button
+                    key={m.id}
+                    onClick={() => { setSelectedModelIdx(idx); setShowModelPicker(false); }}
+                    className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#234829]/40 transition-colors ${
+                      idx === selectedModelIdx ? 'bg-[#234829]/60 border-l-2 border-l-primary' : 'border-l-2 border-l-transparent'
+                    }`}
+                  >
+                    <div className="min-w-0">
+                      <p className={`text-sm font-medium truncate ${idx === selectedModelIdx ? 'text-primary' : 'text-white'}`}>{m.label}</p>
+                      <p className="text-slate-500 text-[10px]">{m.provider}</p>
+                    </div>
+                    {m.badge && (
+                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                        m.badge === 'Recommended' ? 'bg-primary/20 text-primary' :
+                        m.badge === 'New' ? 'bg-amber-500/20 text-amber-400' :
+                        m.badge === 'Fast' ? 'bg-sky-500/20 text-sky-400' :
+                        m.badge === 'Free' ? 'bg-slate-600/30 text-slate-400' :
+                        'bg-[#234829]/30 text-slate-400'
+                      }`}>{m.badge}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </nav>
 
       {/* Main Content Area */}
@@ -202,10 +298,51 @@ export default function DiagnosaPage() {
             <span className="material-symbols-outlined text-primary">eco</span>
             <span className="font-bold">HerbalAI</span>
           </div>
-          <Link href="/" className="text-white p-2">
-            <span className="material-symbols-outlined">close</span>
+          <div className="flex items-center gap-1">
+            {/* Mobile Model Selector */}
+            <button
+              onClick={() => setShowModelPicker(!showModelPicker)}
+              disabled={isModelsLoading || aiModels.length === 0}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#234829]/50 border border-[#234829] text-xs text-slate-300 hover:border-primary/40 transition-colors disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-primary text-sm">smart_toy</span>
+              <span className="max-w-[100px] truncate">
+                {isModelsLoading ? "Loading..." : selectedModel ? selectedModel.label : "Error"}
+              </span>
+              <span className={`material-symbols-outlined text-sm transition-transform ${showModelPicker ? 'rotate-180' : ''}`}>expand_more</span>
+            </button>
+            <Link href="/" className="text-white p-2">
+              <span className="material-symbols-outlined">close</span>
           </Link>
+          </div>
         </header>
+        {showModelPicker && (
+          <div className="md:hidden border-b border-[#234829]/50 bg-surface-dark/95 backdrop-blur-md z-20 animate-[fadeIn_0.15s_ease-out]">
+            {aiModels.map((m, idx) => (
+              <button
+                key={m.id}
+                onClick={() => { setSelectedModelIdx(idx); setShowModelPicker(false); }}
+                className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#234829]/40 transition-colors ${
+                  idx === selectedModelIdx ? 'bg-[#234829]/60 border-l-2 border-l-primary' : 'border-l-2 border-l-transparent'
+                }`}
+              >
+                <div className="min-w-0">
+                  <p className={`text-sm font-medium truncate ${idx === selectedModelIdx ? 'text-primary' : 'text-white'}`}>{m.label}</p>
+                  <p className="text-slate-500 text-[10px]">{m.provider}</p>
+                </div>
+                {m.badge && (
+                  <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                    m.badge === 'Recommended' ? 'bg-primary/20 text-primary' :
+                    m.badge === 'New' ? 'bg-amber-500/20 text-amber-400' :
+                    m.badge === 'Fast' ? 'bg-sky-500/20 text-sky-400' :
+                    m.badge === 'Free' ? 'bg-slate-600/30 text-slate-400' :
+                    'bg-[#234829]/30 text-slate-400'
+                  }`}>{m.badge}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Chat Stream */}
         <div className="flex-1 overflow-y-auto px-4 py-6 md:px-20 lg:px-40 pb-32 scroll-smooth" id="chat-container">

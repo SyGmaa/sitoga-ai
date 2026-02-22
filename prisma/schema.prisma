@@ -14,7 +14,7 @@ model Admin {
   id        String   @id @default(cuid())
   nama      String
   email     String   @unique
-  password  String   // Akan di-hash menggunakan bcrypt nanti
+  password  String // Akan di-hash menggunakan bcrypt nanti
   createdAt DateTime @default(now())
 }
 
@@ -22,51 +22,51 @@ model Admin {
 // 2. TABEL MASTER BOTANI (DATA TANAMAN)
 // ==========================================
 model Tanaman {
-  id               String   @id @default(cuid())
+  id               String  @id @default(cuid())
   namaLokal        String
   namaLatin        String
-  deskripsi        String   @db.Text
-  kandunganSenyawa String   @db.Text
-  khasiatUtama     String   @db.Text
-  lokasiTanam      String   @db.Text // Berupa teks deskriptif, misal: "Blok A Taman Herbal"
-  gambarUrl        String?  // URL gambar setelah di-upload
+  deskripsi        String  @db.Text
+  kandunganSenyawa String  @db.Text
+  khasiatUtama     String  @db.Text
+  lokasiTanam      String  @db.Text // Berupa teks deskriptif, misal: "Blok A Taman Herbal"
+  gambarUrl        String? // URL gambar setelah di-upload
 
   // Relasi
-  resepPengolahan  Resep[]
-  penyakitTerkait  TanamanPenyakit[]
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  resepPengolahan Resep[]
+  penyakitTerkait TanamanPenyakit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Tabel untuk menyimpan langkah-langkah racikan secara terstruktur
 model Resep {
-  id          String   @id @default(cuid())
-  tanamanId   String
-  langkah     String   @db.Text 
-  
-  tanaman     Tanaman  @relation(fields: [tanamanId], references: [id], onDelete: Cascade)
+  id        String @id @default(cuid())
+  tanamanId String
+  langkah   String @db.Text
+
+  tanaman Tanaman @relation(fields: [tanamanId], references: [id], onDelete: Cascade)
 }
 
 // ==========================================
 // 3. TABEL BASIS PENGETAHUAN MEDIS
 // ==========================================
 model Penyakit {
-  id          String   @id @default(cuid())
-  nama        String
-  deskripsi   String?  @db.Text
-  
+  id        String  @id @default(cuid())
+  nama      String
+  deskripsi String? @db.Text
+
   // Relasi
   gejala      PenyakitGejala[]
   tanamanObat TanamanPenyakit[]
 }
 
 model Gejala {
-  id          String   @id @default(cuid())
-  nama        String
-  
+  id   String @id @default(cuid())
+  nama String
+
   // Relasi
-  penyakit    PenyakitGejala[]
+  penyakit PenyakitGejala[]
 }
 
 // ==========================================
@@ -76,11 +76,11 @@ model Gejala {
 // Relasi Many-to-Many: Penyakit <-> Gejala
 // (Satu penyakit punya banyak gejala, satu gejala bisa merujuk ke banyak penyakit)
 model PenyakitGejala {
-  penyakitId  String
-  gejalaId    String
-  
-  penyakit    Penyakit @relation(fields: [penyakitId], references: [id], onDelete: Cascade)
-  gejala      Gejala   @relation(fields: [gejalaId], references: [id], onDelete: Cascade)
+  penyakitId String
+  gejalaId   String
+
+  penyakit Penyakit @relation(fields: [penyakitId], references: [id], onDelete: Cascade)
+  gejala   Gejala   @relation(fields: [gejalaId], references: [id], onDelete: Cascade)
 
   @@id([penyakitId, gejalaId])
 }
@@ -88,11 +88,11 @@ model PenyakitGejala {
 // Relasi Many-to-Many: Tanaman <-> Penyakit
 // (Satu tanaman bisa mengobati banyak penyakit, satu penyakit bisa diobati banyak tanaman)
 model TanamanPenyakit {
-  tanamanId   String
-  penyakitId  String
-  
-  tanaman     Tanaman  @relation(fields: [tanamanId], references: [id], onDelete: Cascade)
-  penyakit    Penyakit @relation(fields: [penyakitId], references: [id], onDelete: Cascade)
+  tanamanId  String
+  penyakitId String
+
+  tanaman  Tanaman  @relation(fields: [tanamanId], references: [id], onDelete: Cascade)
+  penyakit Penyakit @relation(fields: [penyakitId], references: [id], onDelete: Cascade)
 
   @@id([tanamanId, penyakitId])
 }
@@ -103,6 +103,18 @@ model TanamanPenyakit {
 model RiwayatDiagnosa {
   id              String   @id @default(cuid())
   keluhanPengguna String   @db.Text
-  hasilDiagnosa   Json     // Menyimpan output raw JSON dari AI
+  hasilDiagnosa   Json // Menyimpan output raw JSON dari AI
   createdAt       DateTime @default(now())
+}
+
+model AiModel {
+  id        String   @id @default(cuid())
+  provider  String // "google" atau "openrouter"
+  modelId   String   @unique
+  label     String
+  badge     String?
+  isActive  Boolean  @default(true)
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -6,10 +6,13 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Dynamic provider: pilih via AI_PROVIDER di .env ("google" atau "openrouter")
-function getModel() {
-  const provider = process.env.AI_PROVIDER || "google";
-  const modelName = process.env.AI_MODEL || "gemini-2.5-flash";
+// Dynamic provider: bisa di-override dari UI, fallback ke .env
+function getModel(clientProvider?: string, clientModel?: string) {
+  const validProviders = ["google", "openrouter"];
+  const provider = (clientProvider && validProviders.includes(clientProvider)) 
+    ? clientProvider 
+    : (process.env.AI_PROVIDER || "google");
+  const modelName = clientModel || process.env.AI_MODEL || "gemini-2.5-flash";
 
   if (provider === "openrouter") {
     const openrouter = createOpenRouter({
@@ -25,7 +28,7 @@ export const maxDuration = 600;
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    const { messages, provider, model } = await req.json();
     const latestMessage = messages[messages.length - 1].content;
 
     // 1. Fetch RAG Context from Prisma
@@ -79,7 +82,7 @@ Pesan pengguna saat ini: "${latestMessage}"`;
 
     // 2. Generate Structured Output with Vercel AI SDK
     const result = streamObject({
-      model: getModel(),
+      model: getModel(provider, model),
       system: systemPrompt,
       prompt: latestMessage,
       schema: z.object({

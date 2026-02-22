@@ -38,6 +38,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       href: "/admin/gejala",
       color: "red-500",
     },
+    {
+      label: "Kelola Model AI",
+      icon: "psychology",
+      href: "/admin/models",
+      color: "purple-500",
+    },
   ];
 
   const historyItems = [
