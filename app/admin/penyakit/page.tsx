@@ -13,7 +13,7 @@ export default async function AdminPenyakitPage() {
           <p className="text-slate-500 dark:text-slate-400 text-sm">Manage ailments that the AI can diagnose.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/admin/penyakit/baru" className="bg-primary hover:bg-[#0dbd2a] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-105 flex items-center gap-2">
+          <Link href="/admin/penyakit/baru" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-105 flex items-center gap-2">
             <span className="material-symbols-outlined text-base">add</span> New Ailment
           </Link>
         </div>

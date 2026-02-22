@@ -21,18 +21,18 @@ export default async function PlantListPage() {
       <main className="flex-1 flex flex-col items-center w-full bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
         <div className="w-full max-w-7xl px-4 md:px-10 py-8 flex flex-col gap-8">
           {/* Header Section */}
-          <div className="flex flex-col md:flex-row justify-between items-end gap-6 pb-4 border-b border-slate-200 dark:border-[#28432a]/50">
+          <div className="flex flex-col md:flex-row justify-between items-end gap-6 pb-4 border-b border-slate-200 dark:border-leaf-700/50">
             <div className="flex flex-col gap-2 max-w-2xl">
               <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 dark:text-white">
                 Database <span className="text-primary">Tanaman</span>
               </h1>
-              <p className="text-slate-600 dark:text-[#99c29b] text-lg font-light leading-relaxed">
+              <p className="text-slate-600 dark:text-leaf-400 text-lg font-light leading-relaxed">
                 Jelajahi koleksi flora di kampus kami. Temukan manfaat, spesies,
                 dan karakteristik unik dari setiap tanaman.
               </p>
             </div>
             <div className="flex gap-2">
-              <button className="group flex h-10 items-center justify-center gap-2 rounded-full border border-slate-300 dark:border-[#28432a] bg-white dark:bg-[#1e2b1f] px-4 text-sm font-medium text-slate-700 dark:text-white hover:border-primary dark:hover:border-primary hover:text-primary transition-all">
+              <button className="group flex h-10 items-center justify-center gap-2 rounded-full border border-slate-300 dark:border-leaf-700 bg-white dark:bg-leaf-800 px-4 text-sm font-medium text-slate-700 dark:text-white hover:border-primary dark:hover:border-primary hover:text-primary transition-all">
                 <span className="material-symbols-outlined text-[20px]">
                   tune
                 </span>
@@ -49,7 +49,7 @@ export default async function PlantListPage() {
                 <span className="material-symbols-outlined">search</span>
               </div>
               <input
-                className="block w-full rounded-full border border-slate-200 dark:border-none bg-white dark:bg-[#28432a]/50 py-4 pl-12 pr-4 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#99c29b] focus:ring-2 focus:ring-primary focus:border-transparent dark:focus:bg-[#28432a] transition-all shadow-md dark:shadow-lg dark:backdrop-blur-sm text-lg"
+                className="block w-full rounded-full border border-slate-200 dark:border-none bg-white dark:bg-leaf-700/50 py-4 pl-12 pr-4 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-leaf-400 focus:ring-2 focus:ring-primary focus:border-transparent dark:focus:bg-leaf-700 transition-all shadow-md dark:shadow-lg dark:backdrop-blur-sm text-lg"
                 placeholder="Cari nama tanaman, spesies latin, atau manfaat..."
                 type="text"
               />
@@ -70,25 +70,25 @@ export default async function PlantListPage() {
                 </span>
                 <span className="text-sm font-bold">Semua</span>
               </button>
-              <button className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-slate-100 dark:bg-[#28432a] text-slate-700 dark:text-white border border-slate-200 dark:border-transparent px-5 hover:bg-slate-200 dark:hover:bg-[#365738] transition-all hover:scale-105 active:scale-95">
+              <button className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-slate-100 dark:bg-leaf-700 text-slate-700 dark:text-white border border-slate-200 dark:border-transparent px-5 hover:bg-slate-200 dark:hover:bg-leaf-600 transition-all hover:scale-105 active:scale-95">
                 <span className="material-symbols-outlined text-[20px]">
                   prescriptions
                 </span>
                 <span className="text-sm font-medium">Tanaman Obat</span>
               </button>
-              <button className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-slate-100 dark:bg-[#28432a] text-slate-700 dark:text-white border border-slate-200 dark:border-transparent px-5 hover:bg-slate-200 dark:hover:bg-[#365738] transition-all hover:scale-105 active:scale-95">
+              <button className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-slate-100 dark:bg-leaf-700 text-slate-700 dark:text-white border border-slate-200 dark:border-transparent px-5 hover:bg-slate-200 dark:hover:bg-leaf-600 transition-all hover:scale-105 active:scale-95">
                 <span className="material-symbols-outlined text-[20px]">
                   potted_plant
                 </span>
                 <span className="text-sm font-medium">Tanaman Hias</span>
               </button>
-              <button className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-slate-100 dark:bg-[#28432a] text-slate-700 dark:text-white border border-slate-200 dark:border-transparent px-5 hover:bg-slate-200 dark:hover:bg-[#365738] transition-all hover:scale-105 active:scale-95">
+              <button className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-slate-100 dark:bg-leaf-700 text-slate-700 dark:text-white border border-slate-200 dark:border-transparent px-5 hover:bg-slate-200 dark:hover:bg-leaf-600 transition-all hover:scale-105 active:scale-95">
                 <span className="material-symbols-outlined text-[20px]">
                   park
                 </span>
                 <span className="text-sm font-medium">Pohon Peneduh</span>
               </button>
-              <button className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-slate-100 dark:bg-[#28432a] text-slate-700 dark:text-white border border-slate-200 dark:border-transparent px-5 hover:bg-slate-200 dark:hover:bg-[#365738] transition-all hover:scale-105 active:scale-95">
+              <button className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-slate-100 dark:bg-leaf-700 text-slate-700 dark:text-white border border-slate-200 dark:border-transparent px-5 hover:bg-slate-200 dark:hover:bg-leaf-600 transition-all hover:scale-105 active:scale-95">
                 <span className="material-symbols-outlined text-[20px]">
                   stars
                 </span>
@@ -111,7 +111,7 @@ export default async function PlantListPage() {
               return (
                 <div
                   key={plant.id}
-                  className="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 dark:hover:shadow-glow-hover hover:shadow-lg transition-all duration-300 cursor-pointer border border-slate-200 dark:border-[#28432a] bg-white dark:bg-transparent"
+                  className="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 dark:hover:shadow-glow-hover hover:shadow-lg transition-all duration-300 cursor-pointer border border-slate-200 dark:border-leaf-700 bg-white dark:bg-transparent"
                 >
                   <div className="relative h-64 w-full overflow-hidden">
                     <div className="absolute top-3 right-3 z-10">
@@ -128,16 +128,16 @@ export default async function PlantListPage() {
                         src={plant.gambarUrl}
                       />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 dark:bg-[#1e2b1f] transition-transform duration-500 group-hover:scale-110">
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 dark:bg-leaf-800 transition-transform duration-500 group-hover:scale-110">
                         <span className="material-symbols-outlined text-6xl text-primary/30">
                           local_florist
                         </span>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 dark:from-[#132014] via-transparent to-transparent opacity-80 z-0"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 dark:from-background-dark via-transparent to-transparent opacity-80 z-0"></div>
                   </div>
 
-                  <div className="p-5 flex flex-col gap-3 flex-1 bg-white dark:bg-[#1e2b1f]/60 dark:backdrop-blur-md z-10">
+                  <div className="p-5 flex flex-col gap-3 flex-1 bg-white dark:bg-leaf-800/60 dark:backdrop-blur-md z-10">
                     <div>
                       <div className="flex justify-between items-start">
                         <h3 className="text-slate-900 dark:text-white text-xl font-bold leading-tight group-hover:text-primary transition-colors">
@@ -147,7 +147,7 @@ export default async function PlantListPage() {
                           Tanaman
                         </span>
                       </div>
-                      <p className="text-slate-600 dark:text-[#99c29b] text-sm italic mt-1 font-serif">
+                      <p className="text-slate-600 dark:text-leaf-400 text-sm italic mt-1 font-serif">
                         {plant.namaLatin}
                       </p>
                     </div>
@@ -156,7 +156,7 @@ export default async function PlantListPage() {
                       {tags.map((tag, idx) => (
                         <span
                           key={idx}
-                          className="px-3 py-1 bg-slate-100 dark:bg-[#28432a] text-slate-700 dark:text-white/80 text-xs rounded-full border border-slate-200 dark:border-white/5"
+                          className="px-3 py-1 bg-slate-100 dark:bg-leaf-700 text-slate-700 dark:text-white/80 text-xs rounded-full border border-slate-200 dark:border-white/5"
                         >
                           {tag}
                         </span>
@@ -164,7 +164,7 @@ export default async function PlantListPage() {
                     </div>
 
                     <div className="pt-3 border-t border-slate-200 dark:border-white/10 mt-2 flex justify-between items-center opacity-80 group-hover:opacity-100 transition-opacity">
-                      <span className="text-xs text-slate-500 dark:text-[#99c29b] flex items-center gap-1">
+                      <span className="text-xs text-slate-500 dark:text-leaf-400 flex items-center gap-1">
                         <span className="material-symbols-outlined text-[14px]">
                           location_on
                         </span>{" "}
@@ -195,7 +195,7 @@ export default async function PlantListPage() {
           {/* Pagination */}
           {plants.length > 0 && (
             <div className="flex justify-center mt-8 pb-10">
-              <button className="flex items-center gap-2 rounded-full bg-slate-100 dark:bg-[#28432a] px-8 py-4 text-slate-800 dark:text-white hover:bg-primary dark:hover:bg-primary hover:text-white transition-all shadow-md dark:shadow-lg dark:hover:shadow-glow">
+              <button className="flex items-center gap-2 rounded-full bg-slate-100 dark:bg-leaf-700 px-8 py-4 text-slate-800 dark:text-white hover:bg-primary dark:hover:bg-primary hover:text-white transition-all shadow-md dark:shadow-lg dark:hover:shadow-glow">
                 <span className="font-bold">Muat Lebih Banyak</span>
                 <span className="material-symbols-outlined animate-bounce">
                   expand_more

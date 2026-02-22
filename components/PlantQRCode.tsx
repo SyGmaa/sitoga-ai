@@ -121,14 +121,14 @@ export function PlantQRCode({
         <div className="flex items-center gap-2">
           <button
             onClick={handleDownload}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-dark border border-[#234829] text-white text-xs font-medium hover:border-primary hover:text-primary transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-dark border border-leaf-700 text-white text-xs font-medium hover:border-primary hover:text-primary transition-all"
           >
             <span className="material-symbols-outlined text-[16px]">download</span>
             Download
           </button>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-dark border border-[#234829] text-white text-xs font-medium hover:border-primary hover:text-primary transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-dark border border-leaf-700 text-white text-xs font-medium hover:border-primary hover:text-primary transition-all"
           >
             <span className="material-symbols-outlined text-[16px]">print</span>
             Print
@@ -168,7 +168,7 @@ export function QRCodeModal({ isOpen, onClose, plantId, plantName }: QRCodeModal
       />
 
       {/* Modal */}
-      <div className="relative bg-[#0a1e0f] border border-white/10 rounded-2xl p-6 shadow-2xl w-full max-w-xs overflow-hidden">
+      <div className="relative bg-background-dark border border-white/10 rounded-2xl p-6 shadow-2xl w-full max-w-xs overflow-hidden">
         {/* Close button */}
         <button
           onClick={onClose}

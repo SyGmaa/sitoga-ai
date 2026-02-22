@@ -11,6 +11,14 @@
   --color-background-dark: #131f13;
   --color-surface-dark: #1a331d;
 
+  /* Dark-theme accent palette */
+  --color-primary-hover: #0dbd2a;
+  --color-leaf-900: #112214;
+  --color-leaf-800: #1e2b1f;
+  --color-leaf-700: #234829;
+  --color-leaf-600: #365738;
+  --color-leaf-400: #92c99b;
+
   --animate-slow-zoom: zoom 20s infinite alternate;
   --animate-pulse-glow: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 

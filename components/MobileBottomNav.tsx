@@ -20,7 +20,7 @@ export function MobileBottomNav() {
       <div className="h-6 bg-linear-to-t from-[rgba(26,51,29,0.9)] to-transparent pointer-events-none" />
       
       {/* Nav bar */}
-      <div className="bg-[rgba(26,51,29,0.85)] backdrop-blur-xl border-t border-[#234829]/80 px-2 pb-[env(safe-area-inset-bottom)]">
+      <div className="bg-[rgba(26,51,29,0.85)] backdrop-blur-xl border-t border-leaf-700/80 px-2 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around h-16 max-w-md mx-auto">
           {navItems.map((item) => {
             const isActive =

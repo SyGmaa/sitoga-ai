@@ -40,7 +40,7 @@ export function TambahGejalaForm() {
       <div className="h-px bg-linear-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent w-full my-2"></div>
 
       <div className="flex justify-end pt-4">
-        <button disabled={isPending} type="submit" className="w-full md:w-auto px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-[#0dbd2a] hover:shadow-[0_10px_20px_-5px_rgba(19,236,55,0.4)] transition-all flex items-center justify-center gap-2 text-lg active:scale-95 disabled:opacity-50">
+        <button disabled={isPending} type="submit" className="w-full md:w-auto px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover hover:shadow-[0_10px_20px_-5px_rgba(19,236,55,0.4)] transition-all flex items-center justify-center gap-2 text-lg active:scale-95 disabled:opacity-50">
           <span className="material-symbols-outlined">
             {isPending ? 'progress_activity' : 'save'}
           </span>

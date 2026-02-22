@@ -30,7 +30,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
           <div className="w-full max-w-7xl px-4 md:px-10 py-8">
             
             {/* Breadcrumbs */}
-            <div className="flex items-center gap-2 text-sm text-[#92c99b] mb-6">
+            <div className="flex items-center gap-2 text-sm text-leaf-400 mb-6">
               <Link className="hover:text-primary" href="/">Library</Link>
               <span className="material-symbols-outlined text-[16px]">chevron_right</span>
               <span className="text-white font-medium">{tanaman.namaLatin}</span>
@@ -73,10 +73,10 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
                 </div>
                 
                 <h1 className="text-5xl md:text-6xl font-bold text-white mb-2 tracking-tight">{tanaman.namaLokal}</h1>
-                <h2 className="text-xl md:text-2xl text-[#92c99b] italic font-light mb-6">{tanaman.namaLatin}</h2>
+                <h2 className="text-xl md:text-2xl text-leaf-400 italic font-light mb-6">{tanaman.namaLatin}</h2>
                 
                 <div className="flex flex-wrap items-center gap-4 mb-8">
-                  <div className="flex items-center gap-2 bg-surface-dark px-4 py-2 rounded-full border border-[#234829] text-white">
+                  <div className="flex items-center gap-2 bg-surface-dark px-4 py-2 rounded-full border border-leaf-700 text-white">
                     <span className="material-symbols-outlined text-primary text-[20px]">location_on</span>
                     <span className="text-sm">{tanaman.lokasiTanam}</span>
                   </div>
@@ -87,11 +87,11 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
                 </p>
                 
                 <div className="flex flex-wrap gap-4">
-                  <Link href="/peta" className="flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-primary text-[#112214] text-base font-bold hover:bg-[#0fd630] transition-all shadow-[0_0_20px_rgba(19,236,55,0.3)] hover:shadow-[0_0_30px_rgba(19,236,55,0.5)]">
+                  <Link href="/peta" className="flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-primary text-leaf-900 text-base font-bold hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(19,236,55,0.3)] hover:shadow-[0_0_30px_rgba(19,236,55,0.5)]">
                     <span className="material-symbols-outlined">map</span>
                     Locate in Garden
                   </Link>
-                  <button className="flex items-center justify-center gap-2 h-12 w-12 rounded-full bg-surface-dark border border-[#234829] text-white hover:border-primary hover:text-primary transition-all">
+                  <button className="flex items-center justify-center gap-2 h-12 w-12 rounded-full bg-surface-dark border border-leaf-700 text-white hover:border-primary hover:text-primary transition-all">
                     <span className="material-symbols-outlined">share</span>
                   </button>
                 </div>
@@ -106,47 +106,47 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
               <div className="lg:col-span-7 flex flex-col gap-4">
                 <h3 className="text-2xl font-bold text-white mb-2">Botanical Details</h3>
                 
-                <details className="group bg-surface-dark border border-[#234829] rounded-xl open:border-primary/50 transition-all duration-300" open>
+                <details className="group bg-surface-dark border border-leaf-700 rounded-xl open:border-primary/50 transition-all duration-300" open>
                   <summary className="flex cursor-pointer items-center justify-between p-6 list-none [&::-webkit-details-marker]:hidden">
                     <div className="flex items-center gap-4">
-                      <div className="p-2 bg-[#234829] rounded-full text-primary group-open:bg-primary group-open:text-[#112214] transition-colors">
+                      <div className="p-2 bg-leaf-700 rounded-full text-primary group-open:bg-primary group-open:text-leaf-900 transition-colors">
                         <span className="material-symbols-outlined text-[24px]">spa</span>
                       </div>
                       <h4 className="text-lg font-bold text-white">Deskripsi</h4>
                     </div>
                     <span className="material-symbols-outlined text-slate-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
                   </summary>
-                  <div className="px-6 pb-6 pt-0 text-slate-300 leading-relaxed border-t border-[#234829]/50 mt-2">
+                  <div className="px-6 pb-6 pt-0 text-slate-300 leading-relaxed border-t border-leaf-700/50 mt-2">
                     <p className="mb-4 pt-4 whitespace-pre-wrap">{tanaman.deskripsi}</p>
                   </div>
                 </details>
 
-                <details className="group bg-surface-dark border border-[#234829] rounded-xl open:border-primary/50 transition-all duration-300">
+                <details className="group bg-surface-dark border border-leaf-700 rounded-xl open:border-primary/50 transition-all duration-300">
                   <summary className="flex cursor-pointer items-center justify-between p-6 list-none [&::-webkit-details-marker]:hidden">
                     <div className="flex items-center gap-4">
-                      <div className="p-2 bg-[#234829] rounded-full text-primary group-open:bg-primary group-open:text-[#112214] transition-colors">
+                      <div className="p-2 bg-leaf-700 rounded-full text-primary group-open:bg-primary group-open:text-leaf-900 transition-colors">
                         <span className="material-symbols-outlined text-[24px]">science</span>
                       </div>
                       <h4 className="text-lg font-bold text-white">Kandungan Senyawa</h4>
                     </div>
                     <span className="material-symbols-outlined text-slate-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
                   </summary>
-                  <div className="px-6 pb-6 pt-0 text-slate-300 leading-relaxed border-t border-[#234829]/50 mt-2">
+                  <div className="px-6 pb-6 pt-0 text-slate-300 leading-relaxed border-t border-leaf-700/50 mt-2">
                     <p className="mb-4 pt-4 whitespace-pre-wrap">{tanaman.kandunganSenyawa}</p>
                   </div>
                 </details>
 
-                <details className="group bg-surface-dark border border-[#234829] rounded-xl open:border-primary/50 transition-all duration-300">
+                <details className="group bg-surface-dark border border-leaf-700 rounded-xl open:border-primary/50 transition-all duration-300">
                   <summary className="flex cursor-pointer items-center justify-between p-6 list-none [&::-webkit-details-marker]:hidden">
                     <div className="flex items-center gap-4">
-                      <div className="p-2 bg-[#234829] rounded-full text-primary group-open:bg-primary group-open:text-[#112214] transition-colors">
+                      <div className="p-2 bg-leaf-700 rounded-full text-primary group-open:bg-primary group-open:text-leaf-900 transition-colors">
                         <span className="material-symbols-outlined text-[24px]">healing</span>
                       </div>
                       <h4 className="text-lg font-bold text-white">Khasiat Utama</h4>
                     </div>
                     <span className="material-symbols-outlined text-slate-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
                   </summary>
-                  <div className="px-6 pb-6 pt-0 text-slate-300 leading-relaxed border-t border-[#234829]/50 mt-2">
+                  <div className="px-6 pb-6 pt-0 text-slate-300 leading-relaxed border-t border-leaf-700/50 mt-2">
                     <p className="pt-4 whitespace-pre-wrap">{tanaman.khasiatUtama}</p>
                   </div>
                 </details>
@@ -155,21 +155,21 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
 
               {/* Right Column: Recipe Checklist */}
               <div className="lg:col-span-5">
-                <div className="sticky top-24 bg-surface-dark rounded-2xl p-6 border border-[#234829] shadow-xl">
+                <div className="sticky top-24 bg-surface-dark rounded-2xl p-6 border border-leaf-700 shadow-xl">
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <h3 className="text-xl font-bold text-white">Cara Pengolahan</h3>
-                      <p className="text-sm text-[#92c99b]">Resep Pengobatan Tradisional</p>
+                      <p className="text-sm text-leaf-400">Resep Pengobatan Tradisional</p>
                     </div>
-                    <div className="p-2 bg-[#234829] rounded-lg text-white">
+                    <div className="p-2 bg-leaf-700 rounded-lg text-white">
                       <span className="material-symbols-outlined text-[24px]">local_cafe</span>
                     </div>
                   </div>
                   
                   <div className="space-y-3">
                     {tanaman.resepPengolahan.length > 0 ? tanaman.resepPengolahan.map((resep, idx) => (
-                      <label key={resep.id} className="group flex items-start gap-4 p-4 rounded-xl bg-background-dark/50 border border-transparent hover:border-primary/30 cursor-pointer transition-all has-[:checked]:bg-[#13ec37]/10 has-[:checked]:border-primary/50">
-                        <input className="peer h-5 w-5 mt-0.5 rounded border-2 border-[#234829] bg-transparent text-primary focus:ring-0 focus:ring-offset-0 checked:border-primary checked:bg-primary transition-all cursor-pointer appearance-none checked:after:content-['✓'] checked:after:text-background-dark checked:after:font-bold checked:after:flex checked:after:items-center checked:after:justify-center checked:after:text-xs" type="checkbox"/>
+                      <label key={resep.id} className="group flex items-start gap-4 p-4 rounded-xl bg-background-dark/50 border border-transparent hover:border-primary/30 cursor-pointer transition-all has-[:checked]:bg-primary/10 has-[:checked]:border-primary/50">
+                        <input className="peer h-5 w-5 mt-0.5 rounded border-2 border-leaf-700 bg-transparent text-primary focus:ring-0 focus:ring-offset-0 checked:border-primary checked:bg-primary transition-all cursor-pointer appearance-none checked:after:content-['✓'] checked:after:text-background-dark checked:after:font-bold checked:after:flex checked:after:items-center checked:after:justify-center checked:after:text-xs" type="checkbox"/>
                         <div className="flex flex-col">
                           <span className="text-white font-medium peer-checked:text-primary peer-checked:line-through transition-colors">Langkah {idx + 1}</span>
                           <span className="text-xs text-slate-400 mt-1 whitespace-pre-wrap">{resep.langkah}</span>
@@ -186,11 +186,11 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
 
             {/* Related Plants */}
             {relatedPlants.length > 0 && (
-              <div className="mt-16 pt-10 border-t border-[#234829]">
+              <div className="mt-16 pt-10 border-t border-leaf-700">
                 <h3 className="text-xl font-bold text-white mb-6">Related Medicinal Plants</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {relatedPlants.map(related => (
-                    <Link key={related.id} href={`/tanaman/${related.id}`} className="group block relative rounded-2xl overflow-hidden aspect-[3/4] border border-[#234829]">
+                    <Link key={related.id} href={`/tanaman/${related.id}`} className="group block relative rounded-2xl overflow-hidden aspect-[3/4] border border-leaf-700">
                       {related.gambarUrl ? (
                         <img 
                           alt={related.namaLokal} 

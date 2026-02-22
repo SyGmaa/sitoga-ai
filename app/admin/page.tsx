@@ -26,7 +26,7 @@ export default async function AdminDashboardPage() {
           <button className="bg-white/45 dark:bg-[#1e3223]/40 backdrop-blur-sm border border-white/30 dark:border-white/5 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-white/80 dark:hover:bg-white/10 transition-colors flex items-center gap-2">
             <span className="material-symbols-outlined text-base">calendar_today</span> {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </button>
-          <Link href="/admin/tanaman/baru" className="bg-primary hover:bg-[#0dbd2a] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-105 flex items-center gap-2">
+          <Link href="/admin/tanaman/baru" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-105 flex items-center gap-2">
             <span className="material-symbols-outlined text-base">add</span> New Entry
           </Link>
         </div>

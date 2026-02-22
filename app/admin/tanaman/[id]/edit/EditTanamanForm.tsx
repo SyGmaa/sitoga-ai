@@ -153,7 +153,7 @@ export function EditTanamanForm({ initialData }: { initialData: TanamanInitialDa
           <button 
             type="button" 
             onClick={handleNextStep}
-            className="w-full md:w-auto px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-[#0dbd2a] hover:shadow-[0_10px_20px_-5px_rgba(19,236,55,0.4)] transition-all flex items-center justify-center gap-2 text-lg active:scale-95"
+            className="w-full md:w-auto px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover hover:shadow-[0_10px_20px_-5px_rgba(19,236,55,0.4)] transition-all flex items-center justify-center gap-2 text-lg active:scale-95"
           >
             Next Step
             <span className="material-symbols-outlined">arrow_forward</span>
@@ -193,7 +193,7 @@ export function EditTanamanForm({ initialData }: { initialData: TanamanInitialDa
             <button 
               type="button" 
               onClick={handleAddLangkah}
-              className="text-primary text-sm font-bold hover:text-[#0dbd2a] transition-colors flex items-center gap-1"
+              className="text-primary text-sm font-bold hover:text-primary-hover transition-colors flex items-center gap-1"
             >
               <span className="material-symbols-outlined text-lg">playlist_add</span>
               Tambah Langkah
@@ -242,7 +242,7 @@ export function EditTanamanForm({ initialData }: { initialData: TanamanInitialDa
             Back
           </button>
           
-          <button disabled={isPending} type="submit" className="w-full sm:w-auto px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-[#0dbd2a] hover:shadow-[0_10px_20px_-5px_rgba(19,236,55,0.4)] transition-all flex items-center justify-center gap-2 text-lg active:scale-95 disabled:opacity-50">
+          <button disabled={isPending} type="submit" className="w-full sm:w-auto px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover hover:shadow-[0_10px_20px_-5px_rgba(19,236,55,0.4)] transition-all flex items-center justify-center gap-2 text-lg active:scale-95 disabled:opacity-50">
             <span className="material-symbols-outlined">
               {isPending ? 'progress_activity' : 'save'}
             </span>

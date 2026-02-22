@@ -15,7 +15,7 @@ export default async function AdminTanamanPage() {
           <p className="text-slate-500 dark:text-slate-400 text-sm">Manage entries and update existing medicinal plants.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/admin/tanaman/baru" className="bg-primary hover:bg-[#0dbd2a] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-105 flex items-center gap-2">
+          <Link href="/admin/tanaman/baru" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-105 flex items-center gap-2">
             <span className="material-symbols-outlined text-base">add</span> New Plant
           </Link>
         </div>
