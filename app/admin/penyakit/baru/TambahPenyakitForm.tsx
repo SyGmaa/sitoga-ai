@@ -222,7 +222,7 @@ export function TambahPenyakitForm({ gejalaList, tanamanList }: TambahPenyakitFo
     });
   };
 
-  const inputClass = "w-full bg-white/50 dark:bg-white/5 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#1f8825]/50 focus:border-[#1f8825] transition-all text-slate-900 dark:text-white placeholder:text-slate-400";
+  const inputClass = "w-full bg-white/50 dark:bg-white/5 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-slate-900 dark:text-white placeholder:text-slate-400";
 
   return (
     <>
@@ -248,7 +248,7 @@ export function TambahPenyakitForm({ gejalaList, tanamanList }: TambahPenyakitFo
 
         {/* ===== SECTION 1: Ailment Details ===== */}
         <div className="flex flex-col gap-6">
-          <div className="flex items-center gap-2 text-[#1f8825]">
+          <div className="flex items-center gap-2 text-primary">
             <span className="material-symbols-outlined text-2xl">healing</span>
             <span className="text-sm font-bold uppercase tracking-wider">Detail Penyakit</span>
           </div>
@@ -273,7 +273,7 @@ export function TambahPenyakitForm({ gejalaList, tanamanList }: TambahPenyakitFo
         {/* ===== SECTION 2: Gejala (Symptoms) ===== */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[#1f8825]">
+            <div className="flex items-center gap-2 text-primary">
               <span className="material-symbols-outlined text-2xl">symptoms</span>
               <span className="text-sm font-bold uppercase tracking-wider">Gejala Terkait</span>
             </div>
@@ -298,7 +298,7 @@ export function TambahPenyakitForm({ gejalaList, tanamanList }: TambahPenyakitFo
         {/* ===== SECTION 3: Tanaman Obat (Medicinal Plants) ===== */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[#1f8825]">
+            <div className="flex items-center gap-2 text-primary">
               <span className="material-symbols-outlined text-2xl">local_florist</span>
               <span className="text-sm font-bold uppercase tracking-wider">Tanaman Obat Terkait</span>
             </div>
@@ -325,7 +325,7 @@ export function TambahPenyakitForm({ gejalaList, tanamanList }: TambahPenyakitFo
           <button
             disabled={isPending}
             type="submit"
-            className="w-full md:w-auto px-8 py-4 bg-[#1f8825] text-white rounded-xl font-bold hover:bg-[#0dbd2a] hover:shadow-[0_10px_20px_-5px_rgba(19,236,55,0.4)] transition-all flex items-center justify-center gap-2 text-lg active:scale-95 disabled:opacity-50"
+            className="w-full md:w-auto px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-[#0dbd2a] hover:shadow-[0_10px_20px_-5px_rgba(19,236,55,0.4)] transition-all flex items-center justify-center gap-2 text-lg active:scale-95 disabled:opacity-50"
           >
             <span className={`material-symbols-outlined ${isPending ? 'animate-spin' : ''}`}>
               {isPending ? 'progress_activity' : 'save'}

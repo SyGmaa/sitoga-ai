@@ -7,7 +7,6 @@
   --font-sans: var(--font-space-grotesk), "sans-serif";
   --font-display: var(--font-space-grotesk), "sans-serif";
 
-  --color-primary: #1f8825;
   --color-background-light: #f6f8f6;
   --color-background-dark: #131f13;
   --color-surface-dark: #1a331d;
@@ -76,8 +75,8 @@
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 133 63% 33%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 96.1%;
@@ -103,8 +102,8 @@
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
+    --primary: 133 63% 33%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 14.9%;
