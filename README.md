@@ -102,27 +102,27 @@ Bukan lagi hardcoded! Sekarang pengguna bisa memilih model AI langsung dari hala
 │                        FRONTEND                             │
 │  Next.js 16 (App Router) + Tailwind CSS + Framer Motion     │
 │                                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐  │
-│  │ Landing  │  │ Diagnosa │  │ Scan QR  │  │  Katalog   │  │
-│  │  Page    │  │ AI Chat  │  │  Code    │  │  Tanaman   │  │
-│  └──────────┘  └────┬─────┘  └──────────┘  └────────────┘  │
-│                     │ useObject() streaming                  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐   │
+│  │ Landing  │  │ Diagnosa │  │ Scan QR  │  │  Katalog   │   │
+│  │  Page    │  │ AI Chat  │  │  Code    │  │  Tanaman   │   │
+│  └──────────┘  └────┬─────┘  └──────────┘  └────────────┘   │
+│                     │ useObject() streaming                 │
 ├─────────────────────┼───────────────────────────────────────┤
 │                     ▼           BACKEND                     │
 │  ┌─────────────────────────────────────────────────────┐    │
 │  │              API Route: /api/chat                   │    │
-│  │  ┌─────────┐  ┌────────────┐  ┌──────────────────┐ │    │
-│  │  │  RAG    │  │  Provider  │  │   streamObject()  │ │    │
-│  │  │ Context │──│  Selector  │──│   Zod Schema      │ │    │
-│  │  │(Prisma) │  │(Google/OR) │  │   Structured Out  │ │    │
-│  │  └─────────┘  └────────────┘  └──────────────────┘ │    │
+│  │  ┌─────────┐  ┌────────────┐  ┌──────────────────┐  │    │
+│  │  │  RAG    │  │  Provider  │  │   streamObject() │  │    │
+│  │  │ Context │──│  Selector  │──│   Zod Schema     │  │    │
+│  │  │(Prisma) │  │(Google/OR) │  │   Structured Out │  │    │
+│  │  └─────────┘  └────────────┘  └──────────────────┘  │    │
 │  └─────────────────────────────────────────────────────┘    │
 │                     │                                       │
 ├─────────────────────┼───────────────────────────────────────┤
 │                     ▼          DATABASE                     │
 │  ┌─────────────────────────────────────────────────────┐    │
 │  │              PostgreSQL + Prisma ORM                │    │
-│  │  Tanaman ↔ Penyakit ↔ Gejala ↔ Resep              │    │
+│  │  Tanaman ↔ Penyakit ↔ Gejala ↔ Resep                │    │
 │  └─────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
 ```
