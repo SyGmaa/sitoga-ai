@@ -400,7 +400,7 @@ Diagram relasi antar tabel dalam database:
 
 ```
 ┌──────────────┐       ┌───────────────────┐       ┌──────────────┐
-│    Tanaman    │       │  TanamanPenyakit   │       │   Penyakit   │
+│    Tanaman   │       │  TanamanPenyakit  │       │   Penyakit   │
 ├──────────────┤       ├───────────────────┤       ├──────────────┤
 │ id           │◄──────│ tanamanId         │       │ id           │
 │ namaLokal    │       │ penyakitId        │──────►│ nama         │
@@ -421,7 +421,7 @@ Diagram relasi antar tabel dalam database:
 │ langkah      │       │ keluhanPengguna   │
 └──────────────┘       │ hasilDiagnosa     │
                        │ createdAt         │
-                       │                       └───────────────────┘
+                       └───────────────────┘
 │
 │       ┌───────────────────┐
 │       │      AiModel      │
