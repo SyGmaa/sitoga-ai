@@ -82,14 +82,16 @@ Panel admin lengkap dengan fitur CRUD untuk:
 - 📋 Data Tanaman (tambah, edit, hapus, lihat detail)
 - 🦠 Data Penyakit
 - 💊 Data Gejala
+- 🤖 **Kelola Model AI** (tambah model baru, ganti ID model, set default, toggle aktif/nonaktif)
 - 📊 Dashboard statistik dan riwayat diagnosa
 
-### 🔄 Multi-Provider AI
+### 🔄 Dynamic AI Model Management
 
-Ganti provider AI hanya lewat file `.env` — **tanpa mengubah kode sedikit pun**:
+Bukan lagi hardcoded! Sekarang pengguna bisa memilih model AI langsung dari halaman diagnosa, dan admin bisa mengelolanya dari dashboard:
 
 - ✅ Google AI Studio (Gemini)
 - ✅ OpenRouter (Mistral, DeepSeek, dll.)
+- ✅ Tambah/hapus model tanpa menyentuh kode
 
 ---
 
@@ -187,12 +189,13 @@ Edit file `.env`:
 # ───────────── DATABASE ─────────────
 DATABASE_URL="postgresql://username:password@localhost:5432/sitoga_ai_db"
 
-# ───────────── AI CONFIG ─────────────
-# Pilih provider: "google" atau "openrouter"
+# ───────────── AI CONFIG (FALLBACK) ─────────────
+# Note: Utama diatur via Database Admin. Isi ini hanya sebagai cadangan.
+# Pilih provider default: "google" atau "openrouter"
 AI_PROVIDER=google
 
-# Nama model yang dipakai (lihat daftar di bawah)
-AI_MODEL=gemini-2.5-flash
+# Nama model default yang dipakai (Fallback)
+AI_MODEL=gemini-1.5-flash
 
 # ───────────── API KEYS ─────────────
 # Dapatkan di: https://aistudio.google.com/app/apikey
@@ -233,11 +236,16 @@ Buka **[http://localhost:3000](http://localhost:3000)** di browser. 🎉
 
 ---
 
-## 🔄 Panduan Ganti Provider AI
+Salah satu fitur unggulan proyek ini — **Manajemen model secara dinamis via Database**. Namun, Anda masih bisa menetapkan nilai default di `.env` sebagai cadangan (_fallback_).
 
-Salah satu fitur unggulan proyek ini — **ganti AI provider hanya dengan mengubah 2 baris** di file `.env`. Tidak perlu ubah kode apapun.
+### Cara Kerja (Prioritas)
 
-### Cara Kerja
+```
+1. Request UI ──→ 2. Ambil Pilihan di Database (Admin) ──→ 3. Jika Kosong, ambil .env (Fallback)
+                                     │
+                                     ▼
+                      getModel() ──→ Vercel AI SDK ──→ Chat AI
+```
 
 ```
 .env (AI_PROVIDER) ──→ getModel() function ──→ Vercel AI SDK ──→ streamObject()
@@ -246,7 +254,7 @@ Salah satu fitur unggulan proyek ini — **ganti AI provider hanya dengan mengub
         └─ "openrouter" ──→ @openrouter/ai-sdk-provider
 ```
 
-File `app/api/chat/route.ts` secara otomatis membaca `AI_PROVIDER` dan `AI_MODEL` dari `.env`, lalu memilih SDK yang tepat.
+File `app/api/chat/route.ts` secara otomatis prioritaskan model dari database, lalu membaca `AI_PROVIDER` dan `AI_MODEL` dari `.env` hanya jika data database tidak ditemukan.
 
 ---
 
@@ -363,6 +371,7 @@ sitoga-ai/
 │   ├── tanaman.ts                   # CRUD operations tanaman
 │   ├── penyakit.ts                  # CRUD operations penyakit
 │   ├── gejala.ts                    # CRUD operations gejala
+│   ├── models.ts                    # ⭐ CRUD operations AI Models
 │   └── riwayat.ts                   # Logging riwayat diagnosa
 │
 ├── 📂 components/                   # Komponen UI reusable
@@ -412,7 +421,19 @@ Diagram relasi antar tabel dalam database:
 │ langkah      │       │ keluhanPengguna   │
 └──────────────┘       │ hasilDiagnosa     │
                        │ createdAt         │
-                       └───────────────────┘
+                       │                       └───────────────────┘
+│
+│       ┌───────────────────┐
+│       │      AiModel      │
+│       ├───────────────────┤
+│       │ id                │
+│       │ provider          │
+│       │ modelId           │
+│       │ label             │
+│       │ badge             │
+│       │ isActive          │
+│       │ isDefault         │
+│       └───────────────────┘
 ```
 
 **Relasi utama:**
@@ -428,7 +449,7 @@ Diagram relasi antar tabel dalam database:
 
 ### `POST /api/chat`
 
-Endpoint utama untuk diagnosa AI. Menerima riwayat chat dan mengembalikan streaming structured output.
+Endpoint utama untuk diagnosa AI. Menerima riwayat chat dan mengembalikan streaming structured output. Mendukung pemilihan model secara dinamis via request body.
 
 **Request Body:**
 
@@ -436,7 +457,9 @@ Endpoint utama untuk diagnosa AI. Menerima riwayat chat dan mengembalikan stream
 {
   "messages": [
     { "role": "user", "content": "Saya sakit kepala dan mual sejak pagi" }
-  ]
+  ],
+  "provider": "google", // Opsional, default dari .env
+  "model": "gemini-3-flash-preview" // Opsional, default dari .env
 }
 ```
 
