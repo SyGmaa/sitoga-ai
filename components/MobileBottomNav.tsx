@@ -17,10 +17,10 @@ export function MobileBottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
       {/* Gradient fade above the bar */}
-      <div className="h-6 bg-linear-to-t from-[rgba(26,51,29,0.9)] to-transparent pointer-events-none" />
+      <div className="h-6 bg-linear-to-t from-[rgba(245,245,245,0.9)] dark:from-[rgba(26,51,29,0.9)] to-transparent pointer-events-none" />
       
       {/* Nav bar */}
-      <div className="bg-[rgba(26,51,29,0.85)] backdrop-blur-xl border-t border-leaf-700/80 px-2 pb-[env(safe-area-inset-bottom)]">
+      <div className="bg-white/90 dark:bg-[rgba(26,51,29,0.85)] backdrop-blur-xl border-t border-slate-200 dark:border-leaf-700/80 px-2 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around h-16 max-w-md mx-auto">
           {navItems.map((item) => {
             const isActive =
@@ -35,7 +35,7 @@ export function MobileBottomNav() {
                 className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-2xl transition-all duration-300 ${
                   isActive
                     ? "text-primary"
-                    : "text-slate-400 hover:text-slate-200 active:scale-95"
+                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 active:scale-95"
                 }`}
               >
                 {/* Active indicator glow */}
@@ -52,7 +52,7 @@ export function MobileBottomNav() {
                 </span>
                 <span
                   className={`text-[10px] font-semibold tracking-wide transition-colors duration-300 ${
-                    isActive ? "text-primary" : "text-slate-500"
+                    isActive ? "text-primary" : "text-slate-400 dark:text-slate-500"
                   }`}
                 >
                   {item.label}
@@ -65,3 +65,4 @@ export function MobileBottomNav() {
     </nav>
   );
 }
+
