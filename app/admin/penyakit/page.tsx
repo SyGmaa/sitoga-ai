@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getAllPenyakit } from '@/actions/penyakit';
+import { DeletePenyakitButton } from '@/components/DeletePenyakitButton';
 
 export default async function AdminPenyakitPage() {
   const result = await getAllPenyakit();
@@ -43,7 +44,7 @@ export default async function AdminPenyakitPage() {
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
-                      {penyakit._count.tanamanObat}
+                      {penyakit._count.gejala}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -51,9 +52,7 @@ export default async function AdminPenyakitPage() {
                       <Link href={`/admin/penyakit/${penyakit.id}/edit`} className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 hover:shadow-sm transition-all inline-flex items-center justify-center">
                         <span className="material-symbols-outlined text-lg">edit</span>
                       </Link>
-                      <button className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-red-500 hover:shadow-sm transition-all inline-flex items-center justify-center">
-                        <span className="material-symbols-outlined text-lg">delete</span>
-                      </button>
+                      <DeletePenyakitButton id={penyakit.id} />
                     </div>
                   </td>
                 </tr>

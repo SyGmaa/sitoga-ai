@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getAllGejala } from '@/actions/gejala';
+import { DeleteGejalaButton } from '@/components/DeleteGejalaButton';
 
 export default async function AdminGejalaPage() {
   const result = await getAllGejala();
@@ -47,9 +48,7 @@ export default async function AdminGejalaPage() {
                       <Link href={`/admin/gejala/${gejala.id}/edit`} className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 hover:shadow-sm transition-all inline-flex items-center justify-center">
                         <span className="material-symbols-outlined text-lg">edit</span>
                       </Link>
-                      <button className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-red-500 hover:shadow-sm transition-all inline-flex items-center justify-center">
-                        <span className="material-symbols-outlined text-lg">delete</span>
-                      </button>
+                      <DeleteGejalaButton id={gejala.id} />
                     </div>
                   </td>
                 </tr>
