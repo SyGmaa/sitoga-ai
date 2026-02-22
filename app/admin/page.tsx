@@ -86,7 +86,7 @@ export default async function AdminDashboardPage() {
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-3xl p-6 animate-[slide-up_0.5s_ease-out_forwards] [animation-delay:0.2s]">
+          <div className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-3xl p-6 animate-[slide-up_0.5s_ease-out_forwards] [animation-delay:0.2s] overflow-hidden">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-bold text-slate-800 dark:text-white">Diagnoses Activity</h3>
               <Link href="/admin/riwayat" className="text-sm text-primary font-bold hover:underline">View All</Link>
@@ -98,19 +98,19 @@ export default async function AdminDashboardPage() {
                   <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-xl">medical_services</span>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start gap-2">
                       <p className="text-sm font-bold text-slate-800 dark:text-white">
                         {
                           // Cast hasilDiagnosa appropriately. Assume its an object mapping to our output format
                           (riwayat.hasilDiagnosa as any)?.nama_penyakit || "Penyakit Tidak Diketahui"
                         }
                       </p>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-slate-400 whitespace-nowrap shrink-0">
                         {riwayat.createdAt.toLocaleDateString('id-ID', { dateStyle: 'medium' })}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 max-w-lg truncate">User searched recommendation for <span className="text-slate-700 dark:text-slate-300 font-medium">"{riwayat.keluhanPengguna}"</span>.</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 truncate">User searched recommendation for <span className="text-slate-700 dark:text-slate-300 font-medium">"{riwayat.keluhanPengguna}"</span>.</p>
                   </div>
                 </div>
               ))}
