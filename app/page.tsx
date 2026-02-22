@@ -16,7 +16,7 @@ export default async function Home() {
 
       <main className="flex-1 flex flex-col">
         {/* Hero Section */}
-        <section className="relative h-[85vh] w-full overflow-hidden flex items-center justify-center">
+        <section className="relative h-[85vh] md:h-[90vh] w-full overflow-hidden flex items-center justify-center">
           <div
             className="absolute inset-0 w-full h-full bg-cover bg-center animate-slow-zoom"
             style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCMp6BXMzmd_VAUg-meCYBH7Lzy6Uo0eqBX2EdpwfrrIlzJ8gbh4BQbrFqhtbLmgfBC4DGD-3lFXTFeAL88LUtkafI8V9aBl3cz4aeAm_o6WDo0Nq7RgwZjEEkGKG8Ta2DwnG71tnZZy3-cOPhCL9dr5r3XjTFWDPlw7nO9pgj8lYHAvstj2YCFZ-9EoqVfrI5zhOjuItsAapZtZ2y365s9AvFeh6qA0LwQMhKHSq9e0Tj6fFModUB_N7g7aPsSrQqr-MAKCH8I1A')" }}
@@ -50,7 +50,7 @@ export default async function Home() {
             </div>
           </div>
           
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-70 animate-bounce">
+          <div className="absolute bottom-10 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-70 animate-bounce">
             <span className="text-xs uppercase tracking-widest text-slate-400 dark:text-white/60">Scroll</span>
             <span className="material-symbols-outlined text-slate-500 dark:text-white">keyboard_arrow_down</span>
           </div>
