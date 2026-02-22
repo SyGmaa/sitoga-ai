@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.30",
+    "@ai-sdk/openai": "^3.0.30",
     "@ai-sdk/react": "^3.0.96",
     "@hookform/resolvers": "^5.2.2",
+    "@openrouter/ai-sdk-provider": "^2.2.3",
     "@prisma/client": "^6.19.2",
     "@tailwindcss/forms": "^0.5.11",
     "ai": "^6.0.94",
