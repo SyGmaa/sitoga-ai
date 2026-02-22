@@ -1,7 +1,17 @@
 import Link from 'next/link';
 import { TambahPenyakitForm } from './TambahPenyakitForm';
+import { getAllGejala } from '@/actions/gejala';
+import { getAllTanaman } from '@/actions/tanaman';
 
-export default function TambahPenyakitPage() {
+export default async function TambahPenyakitPage() {
+  const [gejalaRes, tanamanRes] = await Promise.all([
+    getAllGejala(),
+    getAllTanaman(),
+  ]);
+
+  const gejalaList = gejalaRes.success && gejalaRes.data ? gejalaRes.data : [];
+  const tanamanList = tanamanRes.success && tanamanRes.data ? tanamanRes.data : [];
+
   return (
     <div className="flex flex-col gap-8 animate-[slide-up_0.5s_ease-out_forwards]">
       
@@ -23,7 +33,10 @@ export default function TambahPenyakitPage() {
         {/* Form Container */}
         <div className="w-full xl:w-2/3 flex flex-col gap-8">
           <div className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-3xl p-6 md:p-10 relative transition-all">
-            <TambahPenyakitForm />
+            <TambahPenyakitForm
+              gejalaList={gejalaList.map((g: { id: string; nama: string }) => ({ id: g.id, nama: g.nama }))}
+              tanamanList={tanamanList.map((t: { id: string; namaLokal: string }) => ({ id: t.id, nama: t.namaLokal }))}
+            />
           </div>
         </div>
 
@@ -41,7 +54,7 @@ export default function TambahPenyakitPage() {
                </li>
                <li className="flex gap-2">
                  <span className="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
-                 To associate Plants with Gejla and Penyakit, use the Plant edit screen.
+                 Pilih gejala dan tanaman obat yang terkait, atau bisa ditambahkan nanti.
                </li>
              </ul>
           </div>

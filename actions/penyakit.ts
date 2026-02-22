@@ -25,11 +25,22 @@ export async function createPenyakit(formData: FormData) {
   try {
     const nama = formData.get("nama") as string;
     const deskripsi = formData.get("deskripsi") as string;
-    
+    const gejalaIdsRaw = formData.get("gejalaIds") as string;
+    const tanamanIdsRaw = formData.get("tanamanIds") as string;
+
+    const gejalaIds: string[] = gejalaIdsRaw ? JSON.parse(gejalaIdsRaw) : [];
+    const tanamanIds: string[] = tanamanIdsRaw ? JSON.parse(tanamanIdsRaw) : [];
+
     await prisma.penyakit.create({
       data: {
         nama,
         deskripsi,
+        gejala: {
+          create: gejalaIds.map((id) => ({ gejalaId: id })),
+        },
+        tanamanObat: {
+          create: tanamanIds.map((id) => ({ tanamanId: id })),
+        },
       }
     });
 
