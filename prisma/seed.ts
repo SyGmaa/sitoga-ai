@@ -1,9 +1,26 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Seeding data...');
+
+  // 0. Data Admin (Bawaan)
+  const adminEmail = 'admin@sitoga.com';
+  const existingAdmin = await prisma.admin.findUnique({ where: { email: adminEmail } });
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    await prisma.admin.create({
+      data: {
+        nama: 'Administrator',
+        email: adminEmail,
+        password: hashedPassword,
+      },
+    });
+    console.log(`Admin created: ${adminEmail}`);
+  }
+
 
   // 1. Data Master Gejala
   const gejalaData = [

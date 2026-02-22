@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ReactNode, useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -172,11 +173,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
           {historyItems.map(renderLink)}
           
-          <div className="mt-auto pt-6">
-            <Link href="/" className="w-full py-2 flex items-center justify-center gap-2 text-sm text-primary font-bold border border-primary/30 rounded-xl hover:bg-primary hover:text-white transition-all">
+          <div className="mt-8 pt-6">
+            <Link href="/" className="w-full py-2 flex items-center justify-center gap-2 text-sm text-primary font-bold border border-primary/30 rounded-xl hover:bg-primary hover:text-white transition-all mb-3">
               <span className="material-symbols-outlined text-lg">public</span>
               Back to Public Site
             </Link>
+            <button 
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="w-full py-2 flex items-center justify-center gap-2 text-sm text-red-500 font-bold border border-red-500/30 rounded-xl hover:bg-red-500 hover:text-white transition-all"
+            >
+              <span className="material-symbols-outlined text-lg">logout</span>
+              Sign Out
+            </button>
           </div>
           
         </aside>
