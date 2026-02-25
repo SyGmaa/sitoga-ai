@@ -17,7 +17,11 @@ export function Navbar() {
           <Link href="/" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Home</Link>
           <Link href="/tanaman" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Tanaman</Link>
           <Link href="/peta" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Garden Map</Link>
-          <Link href="/diagnosa" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Diagnosis</Link>
+          <Link href="/diagnosa" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Diagnosis V1/V2</Link>
+          <Link href="/diagnosa-v3" className="text-primary hover:text-leaf-400 transition-colors text-sm font-bold flex items-center gap-1">
+            <span className="material-symbols-outlined text-[16px]">device_hub</span>
+            GraphRAG
+          </Link>
           <Link href="/admin" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Admin</Link>
         </nav>
         <div className="flex items-center gap-3">
