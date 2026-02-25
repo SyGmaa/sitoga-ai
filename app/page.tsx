@@ -43,6 +43,10 @@ export default async function Home() {
                 <span className="material-symbols-outlined">medical_services</span>
                 <span>Mulai Konsultasi</span>
               </Link>
+              <Link href="/diagnosa-v2" className="flex items-center justify-center gap-3 cursor-pointer rounded-full h-14 px-8 bg-blue-600 hover:bg-blue-500 text-white text-base font-bold transition-all transform hover:scale-105">
+                <span className="material-symbols-outlined">psychiatry</span>
+                <span>Diagnosa v2</span>
+              </Link>
               <Link href="/diagnosa-0.5" className="flex items-center justify-center gap-3 cursor-pointer rounded-full h-14 px-8 bg-emerald-600 hover:bg-emerald-500 text-white text-base font-bold transition-all transform hover:scale-105">
                 <span className="material-symbols-outlined">science</span>
                 <span>Diagnosa 0.5 (Old)</span>
@@ -136,6 +140,10 @@ export default async function Home() {
                 <Link href="/diagnosa" className="flex items-center justify-center gap-2 cursor-pointer rounded-full h-12 px-6 bg-primary hover:bg-[#0fd630] text-background-dark font-bold transition-all shadow-lg shadow-primary/20">
                   <span className="material-symbols-outlined">shutter_speed</span>
                   <span>Start Diagnosis</span>
+                </Link>
+                <Link href="/diagnosa-v2" className="flex items-center justify-center gap-2 cursor-pointer rounded-full h-12 px-6 bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all shadow-lg shadow-blue-500/20">
+                  <span className="material-symbols-outlined">psychiatry</span>
+                  <span>Diagnosa v2</span>
                 </Link>
                 <Link href="/diagnosa-0.5" className="flex items-center justify-center gap-2 cursor-pointer rounded-full h-12 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all shadow-lg shadow-emerald-500/20">
                   <span className="material-symbols-outlined">science</span>
