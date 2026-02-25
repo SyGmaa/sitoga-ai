@@ -10,20 +10,34 @@ export const EkstrakDanCariGejala = tool({
     "Mencari rekam data gejala di database menggunakan kata kunci (keywords) yang diekstrak dari keluhan user.",
   parameters: z.object({
     keywords: z
-      .array(z.string())
+      .string()
       .describe(
-        "Daftar kata kunci gejala (contoh: ['mual', 'pusing', 'panas'])",
+        "WAJIB DIISI! Daftar kata kunci gejala medis dipisahkan koma. Jika user memakai bahasa awam (misal: 'kencing'), sertakan kata aslinya dan sinonim medisnya (misal: 'kencing, buang air kecil')."
       ),
   }),
   // @ts-ignore
-  execute: async ({ keywords }: { keywords: string[] }) => {
+  execute: async ({ keywords }: { keywords: string }) => {
     try {
-      if (!keywords || keywords.length === 0)
+      console.log("[EkstrakDanCariGejala] Keywords received:", keywords);
+      if (!keywords || keywords.trim() === "")
         return { message: "Tidak ada kata kunci yang diberikan." };
 
+      const keywordArray = keywords.split(',').map(k => k.trim());
       const allResults: any[] = [];
 
-      for (const keyword of keywords) {
+      // Pecah kalimat menjadi kata-kata individu agar pencarian contains lebih fleksibel, 
+      // tapi TETAP PERTAHANKAN frasa aslinya agar pencarian spesifik (seperti 'buang air kecil') tetap jalan.
+      const processedKeywords = Array.from(new Set(
+        keywordArray.flatMap((k: string) => {
+          const words = k.split(/[\s,]+/).map((w: string) => w.trim()).filter((w: string) => w.length > 3 && !['saya', 'aku', 'kami', 'kita', 'dia', 'mereka', 'anda', 'kamu', 'ingin', 'tolong', 'bantu', 'dengan', 'yang', 'dan', 'di', 'ke', 'dari', 'atau', 'pada', 'juga'].includes(w.toLowerCase()));
+          return [k.trim(), ...words]; 
+        })
+      ));
+
+      // Fallback jika semua kata terfilter tapi ada keyword asli
+      const finalKeywords = processedKeywords.length > 0 ? processedKeywords : keywordArray;
+
+      for (const keyword of finalKeywords as string[]) {
         // Melakukan penelusuran string toleran (Full-Text Search) menggunakan contains dan insensitive
         const hasil = await prisma.gejala.findMany({
           where: {
@@ -58,15 +72,17 @@ export const TelusuriGrafPenyakit = tool({
   description:
     "Menelusuri relasi kandidat penyakit yang cocok dengan node-node Gejala yang ditemukan.",
   parameters: z.object({
-    gejalaIds: z
+    id_gejala_array: z
       .array(z.string())
-      .describe("Daftar ID Gejala (didapatkan dari tool EkstrakDanCariGejala)"),
+      .describe("WAJIB DIISI! Daftar ID Gejala (didapatkan dari tool EkstrakDanCariGejala)"),
   }),
   // @ts-ignore
-  execute: async ({ gejalaIds }: { gejalaIds: string[] }) => {
+  execute: async ({ id_gejala_array }: { id_gejala_array: string[] }) => {
     try {
-      if (!gejalaIds || gejalaIds.length === 0)
+      if (!id_gejala_array || id_gejala_array.length === 0)
         return { message: "Data ID Gejala kosong." };
+
+      const gejalaIdArray = id_gejala_array;
 
       // Cari Penyakit yang terhubung (melalui Pivot PenyakitGejala) ke ID-ID Gejala input
       const penyakitTerkait = await prisma.penyakit.findMany({
@@ -74,7 +90,7 @@ export const TelusuriGrafPenyakit = tool({
           gejala: {
             some: {
               gejalaId: {
-                in: gejalaIds,
+                in: gejalaIdArray,
               },
             },
           },
@@ -85,19 +101,35 @@ export const TelusuriGrafPenyakit = tool({
               gejalaId: true,
             },
           },
+          tanamanObat: {
+            include: {
+              tanaman: {
+                select: {
+                  id: true,
+                  namaLokal: true,
+                  khasiatUtama: true,
+                },
+              },
+            },
+          },
         },
       });
 
       // Hitung skor kecocokan: jumlah gejala yang overlap antara database dan input LLM
       const penyakitDenganSkor = penyakitTerkait.map((p) => {
         const matchingGejalaIds = p.gejala.filter((g) =>
-          gejalaIds.includes(g.gejalaId),
+          gejalaIdArray.includes(g.gejalaId),
         );
         return {
           id: p.id,
           nama: p.nama,
           skor: matchingGejalaIds.length,
-          // Kembalikan nama saja, jangan pulangkan deskripsi yang panjang
+          // Mengembalikan relasi tanaman obat agar AI bisa melanjutkan proses FilterKontraindikasiMurni
+          tanamanObat: p.tanamanObat.map((t) => ({
+            id: t.tanaman.id,
+            nama: t.tanaman.namaLokal,
+            khasiatUtama: t.tanaman.khasiatUtama,
+          })),
         };
       });
 
