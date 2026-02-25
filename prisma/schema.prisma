@@ -22,20 +22,19 @@ model Admin {
 // 2. TABEL MASTER BOTANI (DATA TANAMAN)
 // ==========================================
 model Tanaman {
-  id                String  @id @default(cuid())
-  namaLokal         String
-  namaLatin         String
-  deskripsi         String  @db.Text
-  kandunganSenyawa  String  @db.Text
-  khasiatUtama      String  @db.Text
-  lokasiTanam       String  @db.Text // Berupa teks deskriptif, misal: "Blok A Taman Herbal"
-  gambarUrl         String? // URL gambar setelah di-upload
-  amanUntukIbuHamil Boolean @default(true)
-  pantanganKondisi  String? @db.Text // Kondisi medis/obat yang tidak boleh dicampur
+  id               String  @id @default(cuid())
+  namaLokal        String
+  namaLatin        String
+  deskripsi        String  @db.Text
+  kandunganSenyawa String  @db.Text
+  khasiatUtama     String  @db.Text
+  lokasiTanam      String  @db.Text // Berupa teks deskriptif, misal: "Blok A Taman Herbal"
+  gambarUrl        String? // URL gambar setelah di-upload
 
   // Relasi
-  resepPengolahan Resep[]
-  penyakitTerkait TanamanPenyakit[]
+  resepPengolahan  Resep[]
+  penyakitTerkait  TanamanPenyakit[]
+  pantanganTanaman PantanganTanaman[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -122,4 +121,31 @@ model AiModel {
   isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ==========================================
+// 6. TABEL BARU (HIBRIDA)
+// ==========================================
+model KondisiMedis {
+  id        String  @id @default(cuid())
+  nama      String  @unique // Contoh: "Hamil", "Darah Tinggi", "Maag"
+  deskripsi String? @db.Text
+
+  // Relasi ke tabel perantara
+  pantanganTanaman PantanganTanaman[]
+}
+
+// Tabel Perantara (Explicit Many-to-Many)
+model PantanganTanaman {
+  tanamanId      String
+  kondisiMedisId String
+
+  // Kolom Pengetahuan Medis
+  tingkatRisiko String? // Contoh enum string: "BERBAHAYA", "HATI-HATI"
+  alasan        String? @db.Text // Penjelasan rasional larangan.
+
+  tanaman      Tanaman      @relation(fields: [tanamanId], references: [id], onDelete: Cascade)
+  kondisiMedis KondisiMedis @relation(fields: [kondisiMedisId], references: [id], onDelete: Cascade)
+
+  @@id([tanamanId, kondisiMedisId]) // Composite Key
 }
