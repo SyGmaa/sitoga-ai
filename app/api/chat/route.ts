@@ -1,8 +1,9 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { google } from "@ai-sdk/google";
-import { streamObject } from "ai";
+import { streamText, tool, convertToModelMessages } from "ai";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
+import { getDiagnosticContext } from "@/lib/diagnosticService";
 
 const prisma = new PrismaClient();
 
@@ -29,92 +30,96 @@ export const maxDuration = 600;
 export async function POST(req: Request) {
   try {
     const { messages, provider, model } = await req.json();
-    const latestMessage = messages[messages.length - 1].content;
-
-    // 1. Fetch RAG Context from Prisma
-    // Fetch Penyakit and Gejala relations
-    const penyakitData = await prisma.penyakit.findMany({
-      include: {
-        gejala: {
-          include: {
-            gejala: true,
-          },
-        },
-        tanamanObat: {
-          include: {
-            tanaman: {
-              select: {
-                id: true,
-                namaLokal: true,
-                namaLatin: true,
-                khasiatUtama: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Format the knowledge base into a clear string for the LLM prompt
-    const knowledgeBase = penyakitData
-      .map((p) => {
-        const gejalaList = p.gejala.map((g) => g.gejala.nama).join(", ");
-        const tanamanList = p.tanamanObat
-          .map((t) => `${t.tanaman.namaLokal} (ID: ${t.tanaman.id})`)
-          .join(", ");
-        return `Penyakit: ${p.nama}\nGejala: ${gejalaList}\nTanaman Pengobatan yang direkomendasikan beserta ID-nya: ${tanamanList || "Belum ada data tanaman"}`;
-      })
-      .join("\n\n---\n\n");
 
     const systemPrompt = `Anda adalah HerbalAI, seorang ahli botani dan pengobatan herbal profesional.
-Tugas Anda adalah mendiagnosa potensi masalah kesehatan pengguna berdasarkan gejala yang disebutkan, dan **HANYA** mencocokkannya dengan database penyakit berikut.
+Tugas Anda adalah mendiagnosa potensi masalah kesehatan pengguna menggunakan interaksi multi-turn.
+ATURAN WAJIB (System Instructions):
+1. Panggil tool 'cariDataPenyakit' SETIAP KALI user menyebutkan keluhan/gejala baru. LANGSUNG EKSEKUSI TOOL BERSAMAAN DENGAN TEKS BALASAN ANDA! JANGAN PERNAH menunda panggilan tool ke pesan berikutnya. (Misalnya: Jangan hanya membalas "Bentar ya, saya carikan..." lalu berhenti. Anda HARUS memanggil tool di balasan yang sama!).
+2. Jika tool 'cariDataPenyakit' menghasilkan data KOSONG (tidak ada penyakit di database), JANGAN katakan Anda mengalami kendala teknis. Langsung panggil tool 'rujukKeDokter' dan katakan gejala tersebut mungkin di luar database herbal.
+3. JIKA menemukan penyakit potensial namun GEJALA WAJIB BELUM TERPENUHI, tanyakan secara langsung kepada pengguna menggunakan tool 'tanyaTambahanKondisi'.
+4. JIKA GEJALA SUDAH JELAS (dari keluhan atau jawaban pertanyaan spesifik Anda sebelumnya), ANDA DIHARUSKAN LANGSUNG MEMANGGIL TOOL 'sajikanDiagnosaFinal' untuk mengakhiri konsultasi.
+5. Panggil 'rujukKeDokter' JIKA DAN HANYA JIKA kondisinya kritis atau diluar database.
 
-DATABASE PENGETAHUAN KAMI HARI INI:
-${knowledgeBase}
+INGAT: Setiap balasan Anda WAJIB berisi teks sapaan DAN eksekusi tool jika diperlukan. JANGAN SEKADAR MENGEKSEKUSI TOOL LALU KOSONG. DAN JANGAN HANYA MEMBALAS TEKS TAPI LUPA MEMANGGIL TOOL.`;
 
-INSTRUKSI PENTING:
-1. Analisis gejala yang diberikan pengguna.
-2. Cari "Penyakit" dalam database di atas yang memiliki "Gejala" paling cocok.
-3. Kembalikan array objek berisi ID dan nama tanaman dari bidang "Tanaman Pengobatan yang direkomendasikan beserta ID-nya". HANYA GUNAKAN DATA YANG TERDAPAT PADA TEKS DI ATAS! Jangan mengarang ID atau nama tanaman.
-4. Jika gejala tidak cocok dengan penyakit apapun di database, kembalikan nama_penyakit "Tidak Diketahui/Di luar basis data kami", gejala_terdeteksi dengan gejala yang disebutkan, dan rekomendasi_tanaman kosong [].
-
-Pesan pengguna saat ini: "${latestMessage}"`;
-
-    // 2. Generate Structured Output with Vercel AI SDK
-    const result = streamObject({
+    const result = streamText({
       model: getModel(provider, model),
       system: systemPrompt,
-      prompt: latestMessage,
-      schema: z.object({
-        nama_penyakit: z
-          .string()
-          .describe(
-            'Nama penyakit yang paling cocok dengan gejala dari database, atau "Tidak Diketahui"',
-          ),
-        gejala_terdeteksi: z
-          .array(z.string())
-          .describe(
-            "Daftar gejala spesifik yang berhasil dianalisis dari input pengguna",
-          ),
-        rekomendasi_tanaman: z
-          .array(
-            z.object({
-              id: z.string().describe("ID unik tanaman (cuid)"),
-              nama: z.string().describe("Nama lokal tanaman"),
-            }),
-          )
-          .describe(
-            "Array berisi objek tanaman yang terkait dengan penyakit tersebut BERDASARKAN SYSTEM PROMPT.",
-          ),
-        penjelasan_singkat: z
-          .string()
-          .describe(
-            "Penjelasan singkat dan ramah (max 2 kalimat) menyapa pengguna dan menjelaskan diagnosis awal.",
-          ),
-      }),
+      messages: await convertToModelMessages(messages),
+      // @ts-ignore
+      maxSteps: 5,
+      onFinish: (event) => {
+         console.log("[DEBUG] Stream Finished:", { 
+             finishReason: event.finishReason, 
+             text: event.text,
+             toolCalls: event.toolCalls?.map(t => t.toolName)
+         });
+      },
+      tools: {
+        cariDataPenyakit: tool({
+          description: "Mencari data penyakit, gejala wajib, dan rekomendasi tanaman dari database berdasarkan sekumpulan gejala.",
+          parameters: z.object({
+            gejala_disebutkan: z.array(z.string()).describe("Daftar gejala yang disebutkan oleh pengguna (contoh: ['mual', 'pusing'])."),
+            isHamil: z.boolean().optional().describe("Set true jika pengguna sudah mengkonfirmasi sedang hamil. Default false jika belum ditanyakan."),
+          }),
+          // @ts-ignore - Bypass AI SDK inference issue with Zod
+          execute: async (args: { gejala_disebutkan: string[], isHamil?: boolean }) => {
+            const data = await getDiagnosticContext(args.gejala_disebutkan, args.isHamil || false);
+            return data;
+          }
+        }),
+        rujukKeDokter: tool({
+          description: "Rujuk pengguna ke dokter jika gejala terlalu tidak jelas, berbahaya, atau di luar database AI.",
+          parameters: z.object({
+            alasan: z.string().describe("Alasan medis singkat mengapa pengguna harus ke dokter.")
+          }),
+          // @ts-ignore
+          execute: async (args: { alasan: string }) => {
+             return { message: "Pengguna telah dirujuk ke dokter", alasan: args.alasan };
+          }
+        }),
+        sajikanDiagnosaFinal: tool({
+          description: "Menyajikan hasil diagnosa akhir beserta resep herbal. Panggil fungsi ini SAAT ANDA 100% YAKIN, dan akhiri sesi.",
+          parameters: z.object({
+            nama_penyakit: z.string().describe("Nama penyakit dari database"),
+            gejala_terdeteksi: z.array(z.string()).describe("Daftar gejala yang dicocokkan"),
+            rekomendasi_tanaman: z.array(z.object({
+              id: z.string(),
+              nama: z.string()
+            })).describe("Daftar tanaman pengobatan (id dan nama lokal)."),
+            penjelasan_singkat: z.string().describe("Penjelasan diagnosis dan pengobatan secara ramah"),
+          }),
+          // @ts-ignore
+          execute: async (data: any) => {
+             // Audit Trail logging (Phase 5)
+             const lastUserMsg = messages.reverse().find((m: any) => m.role === "user");
+             if (lastUserMsg && lastUserMsg.content) {
+                try {
+                  await prisma.riwayatDiagnosa.create({
+                    data: {
+                      keluhanPengguna: lastUserMsg.content,
+                      hasilDiagnosa: data
+                    }
+                  });
+                } catch(e) { console.error("Gagal simpan log:", e) }
+             }
+             return data;
+          }
+        }),
+        tanyaTambahanKondisi: tool({
+          description: "[OPSIONAL] Minta saya untuk bertanya kepada pengguna secara interaktif tentang suatu kondisi medis",
+          parameters: z.object({
+            pertanyaan: z.string().describe("Pertanyaan klarifikasi (misal: 'Apakah ibu hamil?').")
+          }),
+          // @ts-ignore
+          execute: async (args: { pertanyaan: string }) => {
+            return { aksi: "Sudah diinstruksikan. Sampaikan pertanyaan ini ke user dengan pesan teksmu sendiri." };
+          }
+        })
+      }
     });
 
-    return result.toTextStreamResponse();
+    return result.toUIMessageStreamResponse();
   } catch (error) {
     console.error("Diagnosis Error:", error);
     return Response.json(

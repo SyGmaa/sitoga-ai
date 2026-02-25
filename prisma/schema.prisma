@@ -22,14 +22,16 @@ model Admin {
 // 2. TABEL MASTER BOTANI (DATA TANAMAN)
 // ==========================================
 model Tanaman {
-  id               String  @id @default(cuid())
-  namaLokal        String
-  namaLatin        String
-  deskripsi        String  @db.Text
-  kandunganSenyawa String  @db.Text
-  khasiatUtama     String  @db.Text
-  lokasiTanam      String  @db.Text // Berupa teks deskriptif, misal: "Blok A Taman Herbal"
-  gambarUrl        String? // URL gambar setelah di-upload
+  id                String  @id @default(cuid())
+  namaLokal         String
+  namaLatin         String
+  deskripsi         String  @db.Text
+  kandunganSenyawa  String  @db.Text
+  khasiatUtama      String  @db.Text
+  lokasiTanam       String  @db.Text // Berupa teks deskriptif, misal: "Blok A Taman Herbal"
+  gambarUrl         String? // URL gambar setelah di-upload
+  amanUntukIbuHamil Boolean @default(true)
+  pantanganKondisi  String? @db.Text // Kondisi medis/obat yang tidak boleh dicampur
 
   // Relasi
   resepPengolahan Resep[]
@@ -81,6 +83,9 @@ model PenyakitGejala {
 
   penyakit Penyakit @relation(fields: [penyakitId], references: [id], onDelete: Cascade)
   gejala   Gejala   @relation(fields: [gejalaId], references: [id], onDelete: Cascade)
+
+  isGejalaWajib Boolean @default(false) // Wajib ada agar diagnosis sah
+  bobotGejala   Int     @default(1) // Skala 1 - 5 (seberapa lekat gejala ini dengan penyakitnya)
 
   @@id([penyakitId, gejalaId])
 }
