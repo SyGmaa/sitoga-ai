@@ -43,6 +43,10 @@ export default async function Home() {
                 <span className="material-symbols-outlined">medical_services</span>
                 <span>Mulai Konsultasi</span>
               </Link>
+              <Link href="/diagnosa-0.5" className="flex items-center justify-center gap-3 cursor-pointer rounded-full h-14 px-8 bg-emerald-600 hover:bg-emerald-500 text-white text-base font-bold transition-all transform hover:scale-105">
+                <span className="material-symbols-outlined">science</span>
+                <span>Diagnosa 0.5 (Old)</span>
+              </Link>
               <Link href="/peta" className="flex items-center justify-center gap-3 cursor-pointer rounded-full h-14 px-8 glass-card hover:bg-black/5 dark:hover:bg-white/10 text-slate-700 dark:text-white text-base font-bold transition-all border border-slate-300 dark:border-white/20">
                 <span className="material-symbols-outlined">map</span>
                 <span>View Garden Map</span>
@@ -132,6 +136,10 @@ export default async function Home() {
                 <Link href="/diagnosa" className="flex items-center justify-center gap-2 cursor-pointer rounded-full h-12 px-6 bg-primary hover:bg-[#0fd630] text-background-dark font-bold transition-all shadow-lg shadow-primary/20">
                   <span className="material-symbols-outlined">shutter_speed</span>
                   <span>Start Diagnosis</span>
+                </Link>
+                <Link href="/diagnosa-0.5" className="flex items-center justify-center gap-2 cursor-pointer rounded-full h-12 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all shadow-lg shadow-emerald-500/20">
+                  <span className="material-symbols-outlined">science</span>
+                  <span>Diagnosa 0.5 (Old)</span>
                 </Link>
                 <button className="flex items-center justify-center gap-2 cursor-pointer rounded-full h-12 px-6 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 border border-slate-300 dark:border-white/20 text-slate-700 dark:text-white font-medium transition-all">
                   <span>How it works</span>
