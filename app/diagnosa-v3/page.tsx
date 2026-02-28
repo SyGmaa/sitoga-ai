@@ -44,16 +44,11 @@ export default function DiagnosaV3Page() {
   }, []);
 
   const transport = new DefaultChatTransport({
-    api: "/api/diagnosa-v3", // Poin ke route V3 yang baru
-    body: {
-      provider: selectedModel?.provider,
-      model: selectedModel?.modelId,
-    }
+    api: "/api/diagnosa-v3",
   });
 
   const { messages, setMessages, sendMessage, status, addToolResult } = useChat({
     transport,
-    maxSteps: 7, // Coba paksa client-side orchestration ulang
     messages: [{
       id: "system-v3",
       role: "assistant",
@@ -75,7 +70,12 @@ export default function DiagnosaV3Page() {
 
     setCurrentKeluhan(finalInput);
     setInput("");
-    sendMessage({ text: finalInput });
+    sendMessage({ text: finalInput }, {
+      body: {
+        provider: selectedModel?.provider,
+        model: selectedModel?.modelId,
+      }
+    });
   };
 
   const getToolDisplayName = (toolName: string) => {

@@ -45,10 +45,6 @@ export default function DiagnosaPage() {
 
   const transport = new DefaultChatTransport({
     api: "/api/chat",
-    body: {
-      provider: selectedModel?.provider,
-      model: selectedModel?.modelId,
-    }
   });
 
   const { messages, setMessages, sendMessage, status } = useChat({
@@ -80,7 +76,12 @@ export default function DiagnosaPage() {
     setCurrentKeluhan(finalInput);
     setInput("");
 
-    sendMessage({ text: finalInput });
+    sendMessage({ text: finalInput }, {
+      body: {
+        provider: selectedModel?.provider,
+        model: selectedModel?.modelId,
+      }
+    });
   };
 
   const renderDiagnosisCard = (toolCallId: string, data: any) => {
