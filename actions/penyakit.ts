@@ -7,12 +7,12 @@ const prisma = new PrismaClient();
 export async function getAllPenyakit() {
   try {
     const penyakitList = await prisma.penyakit.findMany({
-      orderBy: { nama: 'asc' },
+      orderBy: { nama: "asc" },
       include: {
         _count: {
-          select: { gejala: true, tanamanObat: true }
-        }
-      }
+          select: { gejala: true, tanamanObat: true },
+        },
+      },
     });
     return { success: true, data: penyakitList };
   } catch (error) {
@@ -21,14 +21,22 @@ export async function getAllPenyakit() {
   }
 }
 
+interface GejalaEntry {
+  id: string;
+  isWajib: boolean;
+  bobot: number;
+}
+
 export async function createPenyakit(formData: FormData) {
   try {
     const nama = formData.get("nama") as string;
     const deskripsi = formData.get("deskripsi") as string;
-    const gejalaIdsRaw = formData.get("gejalaIds") as string;
+    const gejalaDataRaw = formData.get("gejalaData") as string;
     const tanamanIdsRaw = formData.get("tanamanIds") as string;
 
-    const gejalaIds: string[] = gejalaIdsRaw ? JSON.parse(gejalaIdsRaw) : [];
+    const gejalaData: GejalaEntry[] = gejalaDataRaw
+      ? JSON.parse(gejalaDataRaw)
+      : [];
     const tanamanIds: string[] = tanamanIdsRaw ? JSON.parse(tanamanIdsRaw) : [];
 
     await prisma.penyakit.create({
@@ -36,12 +44,16 @@ export async function createPenyakit(formData: FormData) {
         nama,
         deskripsi,
         gejala: {
-          create: gejalaIds.map((id) => ({ gejalaId: id })),
+          create: gejalaData.map((g) => ({
+            gejalaId: g.id,
+            isGejalaWajib: g.isWajib,
+            bobotGejala: g.bobot,
+          })),
         },
         tanamanObat: {
           create: tanamanIds.map((id) => ({ tanamanId: id })),
         },
-      }
+      },
     });
 
     return { success: true };
@@ -56,12 +68,12 @@ export async function getPenyakitById(id: string) {
       where: { id },
       include: {
         gejala: {
-          select: { gejalaId: true }
+          select: { gejalaId: true, isGejalaWajib: true, bobotGejala: true },
         },
         tanamanObat: {
-          select: { tanamanId: true }
-        }
-      }
+          select: { tanamanId: true },
+        },
+      },
     });
     return { success: true, data: penyakit };
   } catch (error) {
@@ -74,17 +86,19 @@ export async function updatePenyakit(id: string, formData: FormData) {
   try {
     const nama = formData.get("nama") as string;
     const deskripsi = formData.get("deskripsi") as string;
-    const gejalaIdsRaw = formData.get("gejalaIds") as string;
+    const gejalaDataRaw = formData.get("gejalaData") as string;
     const tanamanIdsRaw = formData.get("tanamanIds") as string;
 
-    const gejalaIds: string[] = gejalaIdsRaw ? JSON.parse(gejalaIdsRaw) : [];
+    const gejalaData: GejalaEntry[] = gejalaDataRaw
+      ? JSON.parse(gejalaDataRaw)
+      : [];
     const tanamanIds: string[] = tanamanIdsRaw ? JSON.parse(tanamanIdsRaw) : [];
 
     await prisma.$transaction([
       // Hapus relasi lama
       prisma.penyakitGejala.deleteMany({ where: { penyakitId: id } }),
       prisma.tanamanPenyakit.deleteMany({ where: { penyakitId: id } }),
-      
+
       // Update data penyakit
       prisma.penyakit.update({
         where: { id },
@@ -92,13 +106,17 @@ export async function updatePenyakit(id: string, formData: FormData) {
           nama,
           deskripsi,
           gejala: {
-            create: gejalaIds.map((gId) => ({ gejalaId: gId })),
+            create: gejalaData.map((g) => ({
+              gejalaId: g.id,
+              isGejalaWajib: g.isWajib,
+              bobotGejala: g.bobot,
+            })),
           },
           tanamanObat: {
             create: tanamanIds.map((tId) => ({ tanamanId: tId })),
           },
-        }
-      })
+        },
+      }),
     ]);
 
     return { success: true };
@@ -111,7 +129,7 @@ export async function updatePenyakit(id: string, formData: FormData) {
 export async function deletePenyakit(id: string) {
   try {
     await prisma.penyakit.delete({
-      where: { id }
+      where: { id },
     });
     return { success: true };
   } catch (error) {
