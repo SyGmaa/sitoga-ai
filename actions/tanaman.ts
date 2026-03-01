@@ -50,6 +50,7 @@ export async function createTanaman(formData: FormData) {
     const kandunganSenyawa = formData.get("kandunganSenyawa") as string;
     const khasiatUtama = formData.get("khasiatUtama") as string;
     const resepPengolahanRaw = formData.get("resepPengolahan") as string;
+    const pantanganDataRaw = formData.get("pantanganData") as string;
     
     let resepPengolahan: string[] = [];
     try {
@@ -58,6 +59,15 @@ export async function createTanaman(formData: FormData) {
       }
     } catch (e) {
       console.error("Error parsing resepPengolahan:", e);
+    }
+
+    let pantanganData: { kondisiMedisId: string; tingkatRisiko: string; alasan: string }[] = [];
+    try {
+      if (pantanganDataRaw) {
+        pantanganData = JSON.parse(pantanganDataRaw);
+      }
+    } catch (e) {
+      console.error("Error parsing pantanganData:", e);
     }
     
     let gambarUrl = null;
@@ -92,6 +102,15 @@ export async function createTanaman(formData: FormData) {
         ...(resepPengolahan.length > 0 && {
           resepPengolahan: {
             create: resepPengolahan.map((langkah) => ({ langkah }))
+          }
+        }),
+        ...(pantanganData.length > 0 && {
+          pantanganTanaman: {
+            create: pantanganData.map((p) => ({
+              kondisiMedisId: p.kondisiMedisId,
+              tingkatRisiko: p.tingkatRisiko || null,
+              alasan: p.alasan || null,
+            }))
           }
         })
       }
