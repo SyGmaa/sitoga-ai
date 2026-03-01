@@ -42,6 +42,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       color: "red-500",
     },
     {
+      label: "Kondisi Medis",
+      icon: "emergency",
+      href: "/admin/kondisi-medis",
+      color: "amber-500",
+    },
+    {
       label: "Kelola Model AI",
       icon: "psychology",
       href: "/admin/models",
@@ -67,6 +73,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       "emerald-500": "group-hover:text-emerald-500",
       "orange-500": "group-hover:text-orange-500",
       "red-500": "group-hover:text-red-500",
+      "amber-500": "group-hover:text-amber-500",
       "blue-500": "group-hover:text-blue-500",
     };
 
