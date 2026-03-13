@@ -22,6 +22,10 @@ export function Navbar() {
             <span className="material-symbols-outlined text-[16px]">device_hub</span>
             GraphRAG
           </Link>
+          <a href="/graphrag-visualization.html" target="_blank" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium flex items-center gap-1">
+            <span className="material-symbols-outlined text-[16px]">hub</span>
+            Knowledge Graph
+          </a>
           <Link href="/admin" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Admin</Link>
         </nav>
         <div className="flex items-center gap-3">
