@@ -377,6 +377,9 @@
 
         renderGraph(data.nodes, data.links, data.stats);
 
+        // Apply URL highlight params (from Diagnosa V3 links)
+        setTimeout(() => applyUrlHighlight(), 1200);
+
         // Hide loading
         setTimeout(() => loadingEl.classList.add('hidden'), 400);
       } catch (err) {
@@ -645,6 +648,63 @@
     window.addEventListener('resize', () => {
       if (svg) svg.attr('width', window.innerWidth).attr('height', window.innerHeight);
     });
+
+    // ======================================================================
+    // URL QUERY PARAMETER HIGHLIGHTING (from Diagnosa V3)
+    // ======================================================================
+    function applyUrlHighlight() {
+      const params = new URLSearchParams(window.location.search);
+      const gejalaParam = params.get('gejala');
+      const penyakitParam = params.get('penyakit');
+      const tanamanParam = params.get('tanaman');
+
+      if (!gejalaParam && !penyakitParam && !tanamanParam) return;
+
+      // Parse DB IDs from URL
+      const gejalaDbIds = gejalaParam ? gejalaParam.split(',').filter(Boolean) : [];
+      const penyakitDbIds = penyakitParam ? penyakitParam.split(',').filter(Boolean) : [];
+      const tanamanDbIds = tanamanParam ? tanamanParam.split(',').filter(Boolean) : [];
+
+      // Find matching graph node IDs by database ID
+      const matchIds = new Set();
+      currentNodes.forEach(n => {
+        if (n.type === 'gejala' && gejalaDbIds.some(id => n.id.includes(id))) matchIds.add(n.id);
+        if (n.type === 'penyakit' && penyakitDbIds.some(id => n.id.includes(id))) matchIds.add(n.id);
+        if (n.type === 'tanaman' && tanamanDbIds.some(id => n.id.includes(id))) matchIds.add(n.id);
+      });
+
+      if (matchIds.size === 0) return;
+
+      // Also include connected neighbors
+      const connectedIds = new Set(matchIds);
+      currentLinks.forEach(l => {
+        const sid = typeof l.source === 'object' ? l.source.id : l.source;
+        const tid = typeof l.target === 'object' ? l.target.id : l.target;
+        if (matchIds.has(sid)) connectedIds.add(tid);
+        if (matchIds.has(tid)) connectedIds.add(sid);
+      });
+
+      // Apply dimming/highlighting
+      node.classed('dimmed', n => !connectedIds.has(n.id));
+      node.classed('highlighted', n => matchIds.has(n.id));
+      link.classed('dimmed', l => {
+        const sid = typeof l.source === 'object' ? l.source.id : l.source;
+        const tid = typeof l.target === 'object' ? l.target.id : l.target;
+        return !connectedIds.has(sid) || !connectedIds.has(tid);
+      });
+      link.classed('highlighted', l => {
+        const sid = typeof l.source === 'object' ? l.source.id : l.source;
+        const tid = typeof l.target === 'object' ? l.target.id : l.target;
+        return connectedIds.has(sid) && connectedIds.has(tid);
+      });
+
+      // Update header subtitle to show focused mode
+      const subtitle = document.querySelector('.header-subtitle');
+      if (subtitle) {
+        subtitle.textContent = `Fokus: ${gejalaDbIds.length} gejala, ${penyakitDbIds.length} penyakit, ${tanamanDbIds.length} tanaman`;
+        subtitle.style.color = '#60a5fa';
+      }
+    }
 
     // ======================================================================
     // BOOT

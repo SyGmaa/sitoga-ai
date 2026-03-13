@@ -78,6 +78,78 @@ export default function DiagnosaV3Page() {
     });
   };
 
+  // Helper: Extract tanaman, gejala, and penyakit data from tool results in a message
+  const extractGraphDataFromMessage = (msg: UIMessage) => {
+    const tanaman: { id: string; nama: string; khasiatUtama?: string }[] = [];
+    const gejalaIds: string[] = [];
+    const penyakitIds: string[] = [];
+    const tanamanIds: string[] = [];
+
+    if (!msg.parts) return { tanaman, gejalaIds, penyakitIds, tanamanIds };
+
+    for (const part of msg.parts as any[]) {
+      // Accept any tool-related part type (matches the rendering logic exactly)
+      const isToolPart = part.type === 'tool-invocation' || 
+                         part.type?.startsWith('tool-') || 
+                         part.type === 'dynamic-tool';
+      if (!isToolPart) continue;
+
+      // Determine tool name (same logic as rendering code)
+      const toolName = part.type === 'dynamic-tool' 
+        ? part.toolName 
+        : (part.toolInvocation?.toolName || part.toolName || part.type?.replace('tool-', '') || '');
+      
+      // Determine if this part has a result
+      const state = part.toolInvocation?.state || part.state;
+      const isResult = state === 'result' || 
+                       state === 'output-available' || 
+                       part.type === 'tool-result';
+      if (!isResult) continue;
+
+      // Try to get result data from multiple possible locations
+      let result = part.toolInvocation?.result || part.output || (part as any).result || part.args;
+      if (!result) continue;
+
+      // Parse if stringified JSON
+      if (typeof result === 'string') {
+        try { result = JSON.parse(result); } catch { continue; }
+      }
+
+      // EkstrakDanCariGejala -> collect gejala IDs
+      if (toolName === 'EkstrakDanCariGejala' && result.gejala) {
+        for (const g of result.gejala) {
+          if (g.id && !gejalaIds.includes(g.id)) gejalaIds.push(g.id);
+        }
+      }
+
+      // TelusuriGrafPenyakit -> collect penyakit IDs and tanaman data
+      if (toolName === 'TelusuriGrafPenyakit' && result.kandidat) {
+        for (const k of result.kandidat) {
+          if (k.id && !penyakitIds.includes(k.id)) penyakitIds.push(k.id);
+          if (k.tanamanObat) {
+            for (const t of k.tanamanObat) {
+              if (t.id && !tanamanIds.includes(t.id)) {
+                tanamanIds.push(t.id);
+                tanaman.push({ id: t.id, nama: t.nama, khasiatUtama: t.khasiatUtama });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return { tanaman, gejalaIds, penyakitIds, tanamanIds };
+  };
+
+  // Build graph visualization URL with highlight params
+  const buildGraphUrl = (gejalaIds: string[], penyakitIds: string[], tanamanIds: string[]) => {
+    const params = new URLSearchParams();
+    if (gejalaIds.length) params.set('gejala', gejalaIds.join(','));
+    if (penyakitIds.length) params.set('penyakit', penyakitIds.join(','));
+    if (tanamanIds.length) params.set('tanaman', tanamanIds.join(','));
+    return `/graphrag-visualization.html?${params.toString()}`;
+  };
+
   const getToolDisplayName = (toolName: string) => {
     switch (toolName) {
       case "EkstrakDanCariGejala": return "Agen sedang mencari keyword gejala di database...";
@@ -303,6 +375,69 @@ export default function DiagnosaV3Page() {
                       </button>
                     </div>
                   )}
+
+                  {/* Tanaman Recommendation Cards & Graph Link */}
+                  {m.role === 'assistant' && index > 0 && status !== 'streaming' && status !== 'submitted' && (() => {
+                    const { tanaman: extractedTanaman, gejalaIds, penyakitIds, tanamanIds } = extractGraphDataFromMessage(m);
+                    console.log('[V3 UI] extractGraphData for msg', index, ':', { extractedTanaman, gejalaIds, penyakitIds, tanamanIds, partsCount: m.parts?.length, partTypes: (m.parts as any[])?.map((p: any) => `${p.type}:${p.toolInvocation?.toolName || p.toolName || ''}:${p.toolInvocation?.state || p.state || ''}`) });
+                    if (extractedTanaman.length === 0 && gejalaIds.length === 0) return null;
+                    
+                    return (
+                      <div className="mt-3 w-full space-y-3 animate-[fadeIn_0.6s_ease-out]">
+                        {/* Tanaman Links */}
+                        {extractedTanaman.length > 0 && (
+                          <div className="bg-surface-dark/80 border border-[#234829] rounded-2xl p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="material-symbols-outlined text-primary text-[18px]">eco</span>
+                              <span className="text-sm font-bold text-white">Rekomendasi Tanaman Obat</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {extractedTanaman.map(t => (
+                                <Link
+                                  key={t.id}
+                                  href={`/tanaman/${t.id}`}
+                                  target="_blank"
+                                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#234829]/30 border border-[#234829] hover:border-primary/50 hover:bg-[#234829]/50 transition-all group"
+                                >
+                                  <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/25 transition-colors">
+                                    <span className="material-symbols-outlined text-primary text-[18px]">local_florist</span>
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-white text-sm font-semibold truncate group-hover:text-primary transition-colors">{t.nama}</p>
+                                    {t.khasiatUtama && (
+                                      <p className="text-slate-400 text-[10px] truncate mt-0.5">{t.khasiatUtama}</p>
+                                    )}
+                                  </div>
+                                  <span className="material-symbols-outlined text-slate-500 text-[16px] group-hover:text-primary transition-colors">open_in_new</span>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Graph Visualization Link */}
+                        {(gejalaIds.length > 0 || penyakitIds.length > 0) && (
+                          <a
+                            href={buildGraphUrl(gejalaIds, penyakitIds, tanamanIds)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#1a1a3e]/60 border border-[#3b3b8b]/40 hover:border-[#60a5fa]/50 hover:bg-[#1a1a3e]/80 transition-all group w-full"
+                          >
+                            <div className="w-9 h-9 rounded-full bg-[#60a5fa]/15 flex items-center justify-center flex-shrink-0 group-hover:bg-[#60a5fa]/25 transition-colors">
+                              <span className="material-symbols-outlined text-[#60a5fa] text-[18px]">hub</span>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-white text-sm font-semibold group-hover:text-[#60a5fa] transition-colors">Lihat Knowledge Graph</p>
+                              <p className="text-slate-400 text-[10px] mt-0.5">
+                                Visualisasi relasi {gejalaIds.length} gejala, {penyakitIds.length} penyakit{tanamanIds.length > 0 ? `, ${tanamanIds.length} tanaman` : ''}
+                              </p>
+                            </div>
+                            <span className="material-symbols-outlined text-slate-500 text-[16px] group-hover:text-[#60a5fa] transition-colors">arrow_outward</span>
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {m.role === 'user' && (
