@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { DiagnosaDropdown } from "@/components/DiagnosaDropdown";
 import { getAllTanaman } from "@/actions/tanaman";
 
 export default async function Home() {
@@ -38,19 +39,8 @@ export default async function Home() {
             <p className="text-slate-600 dark:text-slate-200 text-lg md:text-xl font-light max-w-2xl leading-relaxed dark:hero-text-shadow">
               Explore our campus collection and identify herbal remedies instantly. Just snap a photo to unlock centuries of botanical wisdom.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 mt-4">
-              <Link href="/diagnosa" className="animate-pulse-glow flex items-center justify-center gap-3 cursor-pointer rounded-full h-14 px-8 bg-primary hover:bg-[#0fd630] text-background-dark text-base font-bold transition-all transform hover:scale-105">
-                <span className="material-symbols-outlined">medical_services</span>
-                <span>Mulai Konsultasi</span>
-              </Link>
-              <Link href="/diagnosa-v2" className="flex items-center justify-center gap-3 cursor-pointer rounded-full h-14 px-8 bg-blue-600 hover:bg-blue-500 text-white text-base font-bold transition-all transform hover:scale-105">
-                <span className="material-symbols-outlined">psychiatry</span>
-                <span>Diagnosa v2</span>
-              </Link>
-              <Link href="/diagnosa-0.5" className="flex items-center justify-center gap-3 cursor-pointer rounded-full h-14 px-8 bg-emerald-600 hover:bg-emerald-500 text-white text-base font-bold transition-all transform hover:scale-105">
-                <span className="material-symbols-outlined">science</span>
-                <span>Diagnosa 0.5 (Old)</span>
-              </Link>
+            <div className="flex flex-col sm:flex-row gap-4 mt-4 items-center">
+              <DiagnosaDropdown variant="hero" />
               <Link href="/peta" className="flex items-center justify-center gap-3 cursor-pointer rounded-full h-14 px-8 glass-card hover:bg-black/5 dark:hover:bg-white/10 text-slate-700 dark:text-white text-base font-bold transition-all border border-slate-300 dark:border-white/20">
                 <span className="material-symbols-outlined">map</span>
                 <span>View Garden Map</span>
@@ -136,19 +126,8 @@ export default async function Home() {
             <div className="flex-1 z-10 text-center md:text-left">
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">Ready to diagnose?</h2>
               <p className="text-slate-600 dark:text-slate-300 text-lg mb-8">Use our advanced AI tool to describe symptoms or scan any plant on campus and instantly retrieve its medicinal properties and usage guides.</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <Link href="/diagnosa" className="flex items-center justify-center gap-2 cursor-pointer rounded-full h-12 px-6 bg-primary hover:bg-[#0fd630] text-background-dark font-bold transition-all shadow-lg shadow-primary/20">
-                  <span className="material-symbols-outlined">shutter_speed</span>
-                  <span>Start Diagnosis</span>
-                </Link>
-                <Link href="/diagnosa-v2" className="flex items-center justify-center gap-2 cursor-pointer rounded-full h-12 px-6 bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all shadow-lg shadow-blue-500/20">
-                  <span className="material-symbols-outlined">psychiatry</span>
-                  <span>Diagnosa v2</span>
-                </Link>
-                <Link href="/diagnosa-0.5" className="flex items-center justify-center gap-2 cursor-pointer rounded-full h-12 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all shadow-lg shadow-emerald-500/20">
-                  <span className="material-symbols-outlined">science</span>
-                  <span>Diagnosa 0.5 (Old)</span>
-                </Link>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start items-center">
+                <DiagnosaDropdown variant="cta" />
                 <button className="flex items-center justify-center gap-2 cursor-pointer rounded-full h-12 px-6 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 border border-slate-300 dark:border-white/20 text-slate-700 dark:text-white font-medium transition-all">
                   <span>How it works</span>
                 </button>
