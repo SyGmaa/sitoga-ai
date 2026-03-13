@@ -17,14 +17,18 @@ export default async function Home() {
 
       <main className="flex-1 flex flex-col">
         {/* Hero Section */}
-        <section className="relative h-[85vh] md:h-[90vh] w-full overflow-hidden flex items-center justify-center">
-          <div
-            className="absolute inset-0 w-full h-full bg-cover bg-center animate-slow-zoom"
-            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCMp6BXMzmd_VAUg-meCYBH7Lzy6Uo0eqBX2EdpwfrrIlzJ8gbh4BQbrFqhtbLmgfBC4DGD-3lFXTFeAL88LUtkafI8V9aBl3cz4aeAm_o6WDo0Nq7RgwZjEEkGKG8Ta2DwnG71tnZZy3-cOPhCL9dr5r3XjTFWDPlw7nO9pgj8lYHAvstj2YCFZ-9EoqVfrI5zhOjuItsAapZtZ2y365s9AvFeh6qA0LwQMhKHSq9e0Tj6fFModUB_N7g7aPsSrQqr-MAKCH8I1A')" }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background-light/80 via-background-light/50 to-background-light dark:from-background-dark/80 dark:via-background-dark/50 dark:to-background-dark"></div>
+        <section className="relative min-h-[85vh] md:min-h-[90vh] w-full flex flex-col items-center justify-between pt-24 pb-8 md:pb-12 bg-background-light dark:bg-background-dark">
+          {/* Backgrounds wrapper to ensure full consistent coverage */}
+          <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
+            <div
+              className="absolute inset-0 w-full h-full bg-cover bg-center animate-slow-zoom"
+              style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCMp6BXMzmd_VAUg-meCYBH7Lzy6Uo0eqBX2EdpwfrrIlzJ8gbh4BQbrFqhtbLmgfBC4DGD-3lFXTFeAL88LUtkafI8V9aBl3cz4aeAm_o6WDo0Nq7RgwZjEEkGKG8Ta2DwnG71tnZZy3-cOPhCL9dr5r3XjTFWDPlw7nO9pgj8lYHAvstj2YCFZ-9EoqVfrI5zhOjuItsAapZtZ2y365s9AvFeh6qA0LwQMhKHSq9e0Tj6fFModUB_N7g7aPsSrQqr-MAKCH8I1A')" }}
+            />
+            {/* Dark/Light mode gradient overlays that fade into the solid background color at the very bottom */}
+            <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-transparent via-background-light/50 to-background-light dark:from-transparent dark:via-background-dark/50 dark:to-background-dark"></div>
+          </div>
           
-          <div className="relative z-10 px-4 max-w-4xl mx-auto text-center flex flex-col items-center gap-6 md:gap-8">
+          <div className="relative z-10 flex-1 flex flex-col justify-center px-4 max-w-4xl mx-auto text-center items-center gap-6 md:gap-8 my-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card border-primary/30 text-primary text-xs font-bold tracking-wider uppercase mb-2">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -48,7 +52,7 @@ export default async function Home() {
             </div>
           </div>
           
-          <div className="absolute bottom-10 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-70 animate-bounce">
+          <div className="relative z-10 flex flex-col items-center gap-2 opacity-70 animate-bounce mt-auto pt-16 md:pt-20 pb-4">
             <span className="text-xs uppercase tracking-widest text-slate-400 dark:text-white/60">Scroll</span>
             <span className="material-symbols-outlined text-slate-500 dark:text-white">keyboard_arrow_down</span>
           </div>
