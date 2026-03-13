@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { DiagnosaDropdown } from "@/components/DiagnosaDropdown";
 
 export function Navbar() {
   return (
@@ -17,11 +18,7 @@ export function Navbar() {
           <Link href="/" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Home</Link>
           <Link href="/tanaman" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Tanaman</Link>
           <Link href="/peta" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Garden Map</Link>
-          <Link href="/diagnosa" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Diagnosis V1/V2</Link>
-          <Link href="/diagnosa-v3" className="text-primary hover:text-leaf-400 transition-colors text-sm font-bold flex items-center gap-1">
-            <span className="material-symbols-outlined text-[16px]">device_hub</span>
-            GraphRAG
-          </Link>
+          <DiagnosaDropdown variant="navbar" />
           <a href="/graphrag-visualization.html" target="_blank" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium flex items-center gap-1">
             <span className="material-symbols-outlined text-[16px]">hub</span>
             Knowledge Graph

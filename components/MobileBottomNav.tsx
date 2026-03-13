@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { DiagnosaDropdown } from "@/components/DiagnosaDropdown";
 
 const navItems = [
   { href: "/", icon: "home", label: "Home" },
@@ -27,6 +28,14 @@ export function MobileBottomNav() {
               item.href === "/"
                 ? pathname === "/"
                 : pathname.startsWith(item.href);
+
+            if (item.label === "Diagnosa") {
+              return (
+                <div key={item.href} className="relative flex flex-col items-center justify-center">
+                  <DiagnosaDropdown variant="mobilenav" isActive={isActive} />
+                </div>
+              );
+            }
 
             return (
               <Link

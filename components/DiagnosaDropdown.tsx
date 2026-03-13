@@ -49,10 +49,12 @@ const diagnosaOptions: DiagnosaOption[] = [
 
 interface DiagnosaDropdownProps {
   /** Visual variant */
-  variant?: "hero" | "cta";
+  variant?: "hero" | "cta" | "navbar" | "mobilenav";
+  /** Override active state for mobilenav */
+  isActive?: boolean;
 }
 
-export function DiagnosaDropdown({ variant = "hero" }: DiagnosaDropdownProps) {
+export function DiagnosaDropdown({ variant = "hero", isActive = false }: DiagnosaDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -67,33 +69,83 @@ export function DiagnosaDropdown({ variant = "hero" }: DiagnosaDropdownProps) {
   }, []);
 
   const isHero = variant === "hero";
+  const isCta = variant === "cta";
+  const isNavbar = variant === "navbar";
+  const isMobile = variant === "mobilenav";
 
   return (
-    <div ref={ref} className="relative inline-block">
-      <button
-        onClick={() => setOpen(!open)}
-        className={`flex items-center justify-center gap-3 cursor-pointer rounded-full font-bold transition-all transform hover:scale-105 ${
-          isHero
-            ? "animate-pulse-glow h-14 px-8 bg-primary hover:bg-[#0fd630] text-background-dark text-base"
-            : "h-12 px-6 bg-primary hover:bg-[#0fd630] text-background-dark shadow-lg shadow-primary/20"
-        }`}
-      >
-        <span className="material-symbols-outlined">medical_services</span>
-        <span>Mulai Diagnosa</span>
-        <span
-          className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${
-            open ? "rotate-180" : ""
+    <div ref={ref} className={`relative ${isMobile ? "flex justify-center" : "inline-block"}`}>
+      {/* Button Render Based on Variant */}
+      {isMobile ? (
+        <button
+          onClick={() => setOpen(!open)}
+          className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-2xl transition-all duration-300 ${
+            isActive || open
+              ? "text-primary"
+              : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 active:scale-95"
           }`}
         >
-          expand_more
-        </span>
-      </button>
+          {/* Active indicator glow */}
+          {(isActive || open) && (
+            <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-primary shadow-[0_0_12px_rgba(19,236,55,0.6)]" />
+          )}
+          <span
+            className={`material-symbols-outlined text-[24px] transition-all duration-300 ${
+              isActive || open ? "scale-110" : ""
+            }`}
+            style={isActive || open ? { fontVariationSettings: "'FILL' 1" } : {}}
+          >
+            medical_services
+          </span>
+          <span
+            className={`text-[10px] font-semibold tracking-wide transition-colors duration-300 ${
+              isActive || open ? "text-primary" : "text-slate-400 dark:text-slate-500"
+            }`}
+          >
+            Diagnosa
+          </span>
+        </button>
+      ) : isNavbar ? (
+        <button
+          onClick={() => setOpen(!open)}
+          className={`text-sm font-medium flex items-center gap-1 transition-colors ${
+            open ? "text-primary" : "text-slate-600 dark:text-slate-200 hover:text-primary"
+          }`}
+        >
+          Diagnosis
+          <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${open ? "rotate-180" : ""}`}>
+            expand_more
+          </span>
+        </button>
+      ) : (
+        <button
+          onClick={() => setOpen(!open)}
+          className={`flex items-center justify-center gap-3 cursor-pointer rounded-full font-bold transition-all transform hover:scale-105 ${
+            isHero
+              ? "animate-pulse-glow h-14 px-8 bg-primary hover:bg-[#0fd630] text-background-dark text-base"
+              : "h-12 px-6 bg-primary hover:bg-[#0fd630] text-background-dark shadow-lg shadow-primary/20"
+          }`}
+        >
+          <span className="material-symbols-outlined">medical_services</span>
+          <span>Mulai Diagnosa</span>
+          <span
+            className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${
+              open ? "rotate-180" : ""
+            }`}
+          >
+            expand_more
+          </span>
+        </button>
+      )}
 
+      {/* Dropdown Container */}
       {open && (
         <div
-          className={`absolute z-50 w-72 rounded-2xl border overflow-hidden shadow-2xl animate-[fadeInDrop_0.2s_ease-out] ${
-            isHero
-              ? "bottom-full mb-3 left-1/2 -ml-36 bg-white/95 dark:bg-surface-dark/95 backdrop-blur-xl border-slate-200 dark:border-leaf-700"
+          className={`absolute z-[100] w-72 rounded-2xl border overflow-hidden shadow-2xl animate-[fadeInDrop_0.2s_ease-out] ${
+            isNavbar
+              ? "top-full mt-4 left-1/2 -ml-36 bg-white/95 dark:bg-surface-dark/95 backdrop-blur-xl border-slate-200 dark:border-leaf-700"
+              : isMobile
+              ? "bottom-full mb-4 left-1/2 -ml-36 bg-white/95 dark:bg-surface-dark/95 backdrop-blur-xl border-slate-200 dark:border-leaf-700"
               : "bottom-full mb-3 left-1/2 -ml-36 bg-white/95 dark:bg-surface-dark/95 backdrop-blur-xl border-slate-200 dark:border-leaf-700"
           }`}
         >
@@ -133,7 +185,7 @@ export function DiagnosaDropdown({ variant = "hero" }: DiagnosaDropdownProps) {
 
       <style>{`
         @keyframes fadeInDrop {
-          from { opacity: 0; transform: translateY(-6px); }
+          from { opacity: 0; transform: translateY(${isNavbar ? "-6px" : "6px"}); }
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
