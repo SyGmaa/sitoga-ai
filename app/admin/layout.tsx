@@ -124,7 +124,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               </div>
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight hidden sm:block">
-              Sitoga<span className="bg-clip-text text-transparent bg-gradient-to-r from-[#13ec37] to-[#0ea5e9]">Admin</span>
+              SITOBAT AI <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#13ec37] to-[#0ea5e9]">Admin</span>
             </h1>
           </Link>
           

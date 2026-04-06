@@ -12,7 +12,7 @@ export function Navbar() {
           <div className="flex items-center justify-center size-10 rounded-full bg-primary/10 text-primary">
             <span className="material-symbols-outlined text-3xl">eco</span>
           </div>
-          <h2 className="text-slate-800 dark:text-white text-xl font-bold tracking-tight">AI SITOGA UP</h2>
+          <h2 className="text-slate-800 dark:text-white text-xl font-bold tracking-tight">SITOBAT-AI UP</h2>
         </div>
         <nav className="hidden md:flex flex-wrap items-center gap-4 lg:gap-8">
           <Link href="/" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Home</Link>

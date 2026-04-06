@@ -38,7 +38,7 @@ export default async function Home() {
             </div>
             <h1 className="text-slate-900 dark:text-white text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight dark:hero-text-shadow">
               Proyek Skripsi,<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">AI SITOGA UP</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">SITOBAT-AI UP</span>
             </h1>
             <p className="text-slate-600 dark:text-slate-200 text-lg md:text-xl font-light max-w-2xl leading-relaxed dark:hero-text-shadow">
               Explore our campus collection and identify herbal remedies instantly. Just snap a photo to unlock centuries of botanical wisdom.

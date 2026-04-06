@@ -158,7 +158,7 @@ export default function DiagnosaPage() {
             <p className="text-red-300 text-sm font-semibold">{data.alasan}</p>
           </div>
           <p className="text-slate-400 text-xs mt-4">
-            *Sitoga AI bukan pengganti diagnosis medis resmi. Silakan hubungi klinik/RS terdekat.
+            *SITOBAT-AI bukan pengganti diagnosis medis resmi. Silakan hubungi klinik/RS terdekat.
           </p>
         </div>
       </div>

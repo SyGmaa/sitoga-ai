@@ -60,7 +60,7 @@ export default function LoginPage() {
             <span className="material-symbols-outlined text-4xl">eco</span>
           </div>
           <div>
-            <h1 className="text-lg font-bold leading-none tracking-tight text-slate-100">SITOGA AI</h1>
+            <h1 className="text-lg font-bold leading-none tracking-tight text-slate-100">SITOBAT-AI UP</h1>
             <p className="text-xs text-[#1f8825] font-medium tracking-widest uppercase mt-1">Admin Portal</p>
           </div>
         </div>
@@ -165,7 +165,7 @@ export default function LoginPage() {
 
       <footer className="relative z-10 p-6 text-center">
         <p className="text-[10px] text-slate-600 font-medium tracking-widest uppercase">
-            © 2024 SITOGA AI. All Rights Reserved.
+            © 2026 SITOBAT-AI. All Rights Reserved.
         </p>
       </footer>
 
@@ -246,7 +246,7 @@ export default function LoginPage() {
                   <div className="size-8 text-[#f042f0]">
                     <span className="material-symbols-outlined text-3xl">spa</span>
                   </div>
-                  <h2 className="text-white text-lg font-bold tracking-wide">SITOGA Admin</h2>
+                  <h2 className="text-white text-lg font-bold tracking-wide">SITOBAT-AI Admin</h2>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-xs text-slate-400 font-mono">SECURE CONNECTION ESTABLISHED</div>

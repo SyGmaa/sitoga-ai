@@ -1,715 +1,1331 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sitoga AI — GraphRAG Knowledge Graph Visualization</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg-primary: #0a0e1a;
-      --bg-secondary: #111827;
-      --bg-card: rgba(17, 24, 39, 0.85);
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --accent-gejala: #f472b6;
-      --accent-penyakit: #60a5fa;
-      --accent-tanaman: #34d399;
-      --accent-kondisi: #fbbf24;
-      --glass-border: rgba(255, 255, 255, 0.08);
-    }
-
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      overflow: hidden;
-      height: 100vh;
-      width: 100vw;
-    }
-
-    .bg-mesh {
-      position: fixed; inset: 0; z-index: 0;
-      background:
-        radial-gradient(ellipse 80% 50% at 20% 80%, rgba(96,165,250,0.08) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(244,114,182,0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 60% at 50% 50%, rgba(52,211,153,0.05) 0%, transparent 60%);
-      animation: meshDrift 20s ease-in-out infinite alternate;
-    }
-    @keyframes meshDrift { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(20deg); } }
-
-    .grid-pattern {
-      position: fixed; inset: 0; z-index: 0;
-      background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
-    }
-
-    /* Header */
-    .header {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 16px 28px; display: flex; align-items: center; justify-content: space-between;
-      background: linear-gradient(180deg, rgba(10,14,26,0.95) 0%, rgba(10,14,26,0.6) 100%);
-      backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);
-    }
-    .header-left { display: flex; align-items: center; gap: 14px; }
-    .logo-icon {
-      width: 38px; height: 38px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent-tanaman) 0%, var(--accent-penyakit) 100%);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 800; color: #0a0e1a;
-      box-shadow: 0 0 20px rgba(52,211,153,0.3);
-    }
-    .header-title { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
-    .header-title span { background: linear-gradient(135deg, var(--accent-tanaman), var(--accent-penyakit)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .header-subtitle { font-size: 12px; color: var(--text-secondary); }
-    .header-right { display: flex; gap: 10px; align-items: center; }
-
-    .live-badge {
-      display: flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: 8px;
-      background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.2);
-      font-size: 11px; font-weight: 600; color: var(--accent-tanaman);
-    }
-    .live-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--accent-tanaman);
-      animation: livePulse 2s ease-in-out infinite;
-    }
-    @keyframes livePulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-    /* Filter Bar */
-    .filter-bar {
-      position: fixed; top: 78px; left: 50%; transform: translateX(-50%); z-index: 90;
-      display: flex; gap: 8px; padding: 8px 12px;
-      background: var(--bg-card); border: 1px solid var(--glass-border);
-      border-radius: 16px; backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-    .filter-pill {
-      padding: 7px 16px; border-radius: 10px; border: 1px solid var(--glass-border);
-      background: transparent; color: var(--text-secondary);
-      font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 500;
-      cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px; white-space: nowrap;
-    }
-    .filter-pill .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .filter-pill.active { background: rgba(255,255,255,0.08); color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
-    .filter-pill[data-type="all"] .dot { background: linear-gradient(135deg, var(--accent-gejala), var(--accent-tanaman)); }
-    .filter-pill[data-type="gejala"] .dot { background: var(--accent-gejala); }
-    .filter-pill[data-type="penyakit"] .dot { background: var(--accent-penyakit); }
-    .filter-pill[data-type="tanaman"] .dot { background: var(--accent-tanaman); }
-    .filter-pill[data-type="kondisi"] .dot { background: var(--accent-kondisi); }
-    .filter-pill:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
-
-    /* SVG */
-    #graph-container { position: fixed; inset: 0; z-index: 1; }
-    svg { width: 100%; height: 100%; }
-
-    /* Nodes */
-    .node { cursor: pointer; }
-    .node circle { stroke-width: 2; transition: r 0.3s cubic-bezier(0.4,0,0.2,1); }
-    .node:hover circle { filter: brightness(1.3); }
-    .node text { fill: var(--text-primary); font-family: 'Inter', sans-serif; font-weight: 500; pointer-events: none; text-shadow: 0 1px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6); }
-    .link { stroke-opacity: 0.2; transition: stroke-opacity 0.3s; }
-    .link-wajib { stroke-dasharray: none; stroke-opacity: 0.35; }
-
-    /* Tooltip */
-    .tooltip {
-      position: fixed; z-index: 200; background: var(--bg-card); border: 1px solid var(--glass-border);
-      border-radius: 16px; padding: 20px; backdrop-filter: blur(24px);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6); max-width: 360px; pointer-events: none;
-      opacity: 0; transform: translateY(8px) scale(0.96);
-      transition: opacity 0.25s, transform 0.25s cubic-bezier(0.4,0,0.2,1);
-    }
-    .tooltip.show { opacity: 1; transform: translateY(0) scale(1); }
-    .tooltip-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .tooltip-type-badge { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
-    .tooltip-name { font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
-    .tooltip-desc { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
-    .tooltip-connections { font-size: 11px; color: var(--text-secondary); border-top: 1px solid var(--glass-border); padding-top: 10px; }
-    .tooltip-connections strong { color: var(--text-primary); }
-    .tooltip-extra { font-size: 11px; color: var(--text-secondary); margin-top: 6px; }
-    .tooltip-extra .wajib-tag { color: var(--accent-kondisi); font-weight: 600; }
-
-    /* Stats */
-    .stats-panel { position: fixed; bottom: 24px; left: 24px; z-index: 90; display: flex; gap: 8px; }
-    .stat-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px 18px; backdrop-filter: blur(16px); min-width: 90px; text-align: center; }
-    .stat-value { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
-    .stat-label { font-size: 10.5px; color: var(--text-secondary); margin-top: 4px; font-weight: 500; }
-
-    /* Legend */
-    .legend-panel { position: fixed; bottom: 24px; right: 24px; z-index: 90; background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 14px; padding: 16px 20px; backdrop-filter: blur(16px); }
-    .legend-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: 10px; }
-    .legend-items { display: flex; flex-direction: column; gap: 7px; }
-    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
-    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-
-    /* Search */
-    .search-box { position: relative; }
-    .search-box input {
-      width: 220px; padding: 8px 14px 8px 36px; border-radius: 10px;
-      border: 1px solid var(--glass-border); background: rgba(255,255,255,0.04);
-      color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 13px;
-      outline: none; transition: all 0.3s;
-    }
-    .search-box input:focus { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); width: 280px; }
-    .search-box input::placeholder { color: var(--text-secondary); }
-    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 13px; }
-
-    /* Agent Flow */
-    .agent-flow {
-      position: fixed; top: 78px; right: 24px; z-index: 90;
-      background: var(--bg-card); border: 1px solid var(--glass-border);
-      border-radius: 16px; padding: 18px 20px; backdrop-filter: blur(16px);
-      max-width: 260px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-    .agent-flow-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: 14px; }
-    .agent-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; position: relative; }
-    .agent-step:not(:last-child)::after { content: ''; position: absolute; left: 12px; top: 26px; width: 1px; bottom: -10px; background: linear-gradient(180deg, rgba(255,255,255,0.15), transparent); }
-    .step-number { width: 24px; height: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; color: #0a0e1a; }
-    .step-tool { font-size: 11.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
-    .step-desc { font-size: 10.5px; color: var(--text-secondary); line-height: 1.4; }
-
-    /* Dimmed / Highlighted */
-    .node.dimmed circle { opacity: 0.1; }
-    .node.dimmed text { opacity: 0.1; }
-    .link.dimmed { stroke-opacity: 0.02 !important; }
-    .node.highlighted circle { filter: brightness(1.3) drop-shadow(0 0 8px currentColor); }
-    .link.highlighted { stroke-opacity: 0.6 !important; stroke-width: 2.5 !important; }
-
-    /* Zoom */
-    .zoom-controls { position: fixed; bottom: 100px; right: 24px; z-index: 90; display: flex; flex-direction: column; gap: 4px; }
-    .zoom-btn {
-      width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--glass-border);
-      background: var(--bg-card); backdrop-filter: blur(16px); color: var(--text-primary);
-      font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;
-    }
-    .zoom-btn:hover { background: rgba(255,255,255,0.08); }
-
-    /* Loading Overlay */
-    .loading-overlay {
-      position: fixed; inset: 0; z-index: 500;
-      background: var(--bg-primary);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
-      transition: opacity 0.6s, visibility 0.6s;
-    }
-    .loading-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    .loading-spinner {
-      width: 48px; height: 48px; border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.1);
-      border-top-color: var(--accent-tanaman);
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
-    .loading-sub { font-size: 11px; color: rgba(148,163,184,0.6); }
-
-    /* Error State */
-    .error-overlay {
-      position: fixed; inset: 0; z-index: 500; background: var(--bg-primary);
-      display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
-    }
-    .error-overlay.show { display: flex; }
-    .error-icon { font-size: 48px; }
-    .error-msg { font-size: 14px; color: var(--text-secondary); text-align: center; max-width: 400px; line-height: 1.6; }
-    .retry-btn {
-      padding: 10px 24px; border-radius: 10px; border: 1px solid var(--glass-border);
-      background: rgba(255,255,255,0.06); color: var(--text-primary);
-      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
-      cursor: pointer; transition: background 0.2s;
-    }
-    .retry-btn:hover { background: rgba(255,255,255,0.12); }
-  </style>
-</head>
-<body>
-  <div class="bg-mesh"></div>
-  <div class="grid-pattern"></div>
-
-  <!-- Loading overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Memuat Knowledge Graph...</div>
-    <div class="loading-sub">Mengambil data dari database</div>
-  </div>
-
-  <!-- Error overlay -->
-  <div class="error-overlay" id="errorOverlay">
-    <div class="error-icon">⚠️</div>
-    <div class="error-msg" id="errorMsg">Gagal memuat data graph dari database.</div>
-    <button class="retry-btn" onclick="loadGraphData()">↻ Coba Lagi</button>
-  </div>
-
-  <!-- Header -->
-  <header class="header">
-    <div class="header-left">
-      <div class="logo-icon">S</div>
-      <div>
-        <div class="header-title"><span>Sitoga AI</span> — Knowledge Graph</div>
-        <div class="header-subtitle">Relational GraphRAG Visualization</div>
-      </div>
-    </div>
-    <div class="header-right">
-      <div class="live-badge"><div class="live-dot"></div> LIVE DATABASE</div>
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Cari node..." />
-      </div>
-    </div>
-  </header>
-
-  <!-- Filter Bar -->
-  <div class="filter-bar">
-    <button class="filter-pill active" data-type="all"><span class="dot"></span> Semua</button>
-    <button class="filter-pill" data-type="gejala"><span class="dot"></span> Gejala</button>
-    <button class="filter-pill" data-type="penyakit"><span class="dot"></span> Penyakit</button>
-    <button class="filter-pill" data-type="tanaman"><span class="dot"></span> Tanaman</button>
-    <button class="filter-pill" data-type="kondisi"><span class="dot"></span> Kondisi Medis</button>
-  </div>
-
-  <!-- Agent Flow Panel -->
-  <div class="agent-flow">
-    <div class="agent-flow-title">⚡ ReAct Agent Flow</div>
-    <div class="agent-step">
-      <div class="step-number" style="background:var(--accent-gejala)">1</div>
-      <div class="step-info">
-        <div class="step-tool">EkstrakDanCariGejala</div>
-        <div class="step-desc">Ekstrak keyword → cari node Gejala</div>
-      </div>
-    </div>
-    <div class="agent-step">
-      <div class="step-number" style="background:var(--accent-penyakit)">2</div>
-      <div class="step-info">
-        <div class="step-tool">TelusuriGrafPenyakit</div>
-        <div class="step-desc">Traverse edge → kandidat Penyakit</div>
-      </div>
-    </div>
-    <div class="agent-step">
-      <div class="step-number" style="background:var(--accent-penyakit)">3</div>
-      <div class="step-info">
-        <div class="step-tool">ValidasiGejalaWajib</div>
-        <div class="step-desc">Cek constraint gejala wajib</div>
-      </div>
-    </div>
-    <div class="agent-step">
-      <div class="step-number" style="background:var(--accent-tanaman)">4</div>
-      <div class="step-info">
-        <div class="step-tool">FilterKontraindikasi</div>
-        <div class="step-desc">Safety filter → resep aman</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Graph Container -->
-  <div id="graph-container"></div>
-
-  <!-- Tooltip -->
-  <div class="tooltip" id="tooltip"></div>
-
-  <!-- Stats Panel -->
-  <div class="stats-panel" id="statsPanel"></div>
-
-  <!-- Legend -->
-  <div class="legend-panel">
-    <div class="legend-title">Node Types</div>
-    <div class="legend-items">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-gejala)"></div> Gejala (Symptom)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-penyakit)"></div> Penyakit (Disease)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-tanaman)"></div> Tanaman Obat (Plant)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-kondisi)"></div> Kondisi Medis</div>
-    </div>
-    <div style="margin-top:12px; font-size:10px; color:var(--text-secondary);">
-      <div>─── Gejala ↔ Penyakit</div>
-      <div style="margin-top:2px;">─── Tanaman ↔ Penyakit</div>
-      <div style="margin-top:2px;">─── Tanaman ↔ Kontraindikasi</div>
-    </div>
-  </div>
-
-  <!-- Zoom Controls -->
-  <div class="zoom-controls">
-    <button class="zoom-btn" id="zoomIn">+</button>
-    <button class="zoom-btn" id="zoomOut">−</button>
-    <button class="zoom-btn" id="zoomReset" style="font-size:12px;">⟳</button>
-  </div>
-
-  <script>
-    // ======================================================================
-    // DYNAMIC DATA LOADING
-    // ======================================================================
-
-    const colorMap = {
-      gejala: '#f472b6',
-      penyakit: '#60a5fa',
-      tanaman: '#34d399',
-      kondisi: '#fbbf24',
-    };
-
-    const linkColorMap = {
-      'gejala-penyakit': '#8b5cf6',
-      'tanaman-penyakit': '#34d399',
-      'tanaman-kondisi': '#fbbf24',
-    };
-
-    const typeLabels = { gejala: 'Gejala', penyakit: 'Penyakit', tanaman: 'Tanaman Obat', kondisi: 'Kondisi Medis' };
-    const bgColors = { gejala: 'rgba(244,114,182,0.15)', penyakit: 'rgba(96,165,250,0.15)', tanaman: 'rgba(52,211,153,0.15)', kondisi: 'rgba(251,191,36,0.15)' };
-    const fgColors = { gejala: '#f472b6', penyakit: '#60a5fa', tanaman: '#34d399', kondisi: '#fbbf24' };
-
-    let simulation, node, link, svg, g, zoom, initialTransform;
-    let currentNodes = [];
-    let currentLinks = [];
-
-    async function loadGraphData() {
-      const loadingEl = document.getElementById('loadingOverlay');
-      const errorEl = document.getElementById('errorOverlay');
-      loadingEl.classList.remove('hidden');
-      errorEl.classList.remove('show');
-
-      try {
-        const res = await fetch('/api/graph-data');
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-        const data = await res.json();
-
-        if (data.error) throw new Error(data.error);
-
-        currentNodes = data.nodes;
-        currentLinks = data.links;
-
-        renderGraph(data.nodes, data.links, data.stats);
-
-        // Apply URL highlight params (from Diagnosa V3 links)
-        setTimeout(() => applyUrlHighlight(), 1200);
-
-        // Hide loading
-        setTimeout(() => loadingEl.classList.add('hidden'), 400);
-      } catch (err) {
-        console.error('Failed to load graph data:', err);
-        loadingEl.classList.add('hidden');
-        document.getElementById('errorMsg').textContent =
-          `Gagal memuat data graph: ${err.message}. Pastikan server Next.js berjalan dan database terhubung.`;
-        errorEl.classList.add('show');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SITOBAT-AI — GraphRAG Knowledge Graph Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-    }
 
-    function renderGraph(nodes, links, stats) {
-      // Clear previous graph
-      d3.select('#graph-container').selectAll('*').remove();
+      :root {
+        --bg-primary: #0a0e1a;
+        --bg-secondary: #111827;
+        --bg-card: rgba(17, 24, 39, 0.85);
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --accent-gejala: #f472b6;
+        --accent-penyakit: #60a5fa;
+        --accent-tanaman: #34d399;
+        --accent-kondisi: #fbbf24;
+        --glass-border: rgba(255, 255, 255, 0.08);
+      }
 
-      const width = window.innerWidth;
-      const height = window.innerHeight;
+      body {
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+      }
 
-      svg = d3.select('#graph-container')
-        .append('svg')
-        .attr('width', width)
-        .attr('height', height);
+      .bg-mesh {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background:
+          radial-gradient(
+            ellipse 80% 50% at 20% 80%,
+            rgba(96, 165, 250, 0.08) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 60% 40% at 80% 20%,
+            rgba(244, 114, 182, 0.06) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 50% 60% at 50% 50%,
+            rgba(52, 211, 153, 0.05) 0%,
+            transparent 60%
+          );
+        animation: meshDrift 20s ease-in-out infinite alternate;
+      }
+      @keyframes meshDrift {
+        from {
+          filter: hue-rotate(0deg);
+        }
+        to {
+          filter: hue-rotate(20deg);
+        }
+      }
 
-      const defs = svg.append('defs');
+      .grid-pattern {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 60px 60px;
+      }
 
-      // Glow filters
-      ['gejala','penyakit','tanaman','kondisi'].forEach(type => {
-        const filter = defs.append('filter').attr('id', `glow-${type}`).attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
-        filter.append('feGaussianBlur').attr('stdDeviation','4').attr('result','blur');
-        filter.append('feMerge').selectAll('feMergeNode').data(['blur','SourceGraphic']).enter().append('feMergeNode').attr('in', d=>d);
-      });
+      /* Header */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 16px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(
+          180deg,
+          rgba(10, 14, 26, 0.95) 0%,
+          rgba(10, 14, 26, 0.6) 100%
+        );
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--glass-border);
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .logo-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-tanaman) 0%,
+          var(--accent-penyakit) 100%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 800;
+        color: #0a0e1a;
+        box-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+      }
+      .header-title {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .header-title span {
+        background: linear-gradient(
+          135deg,
+          var(--accent-tanaman),
+          var(--accent-penyakit)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .header-subtitle {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .header-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
 
-      g = svg.append('g');
+      .live-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 8px;
+        background: rgba(52, 211, 153, 0.1);
+        border: 1px solid rgba(52, 211, 153, 0.2);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--accent-tanaman);
+      }
+      .live-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent-tanaman);
+        animation: livePulse 2s ease-in-out infinite;
+      }
+      @keyframes livePulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
 
-      zoom = d3.zoom()
-        .scaleExtent([0.1, 5])
-        .on('zoom', (event) => g.attr('transform', event.transform));
+      /* Filter Bar */
+      .filter-bar {
+        position: fixed;
+        top: 78px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 90;
+        display: flex;
+        gap: 8px;
+        padding: 8px 12px;
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+      .filter-pill {
+        padding: 7px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+        background: transparent;
+        color: var(--text-secondary);
+        font-family: "Inter", sans-serif;
+        font-size: 12.5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+      .filter-pill .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .filter-pill.active {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.15);
+      }
+      .filter-pill[data-type="all"] .dot {
+        background: linear-gradient(
+          135deg,
+          var(--accent-gejala),
+          var(--accent-tanaman)
+        );
+      }
+      .filter-pill[data-type="gejala"] .dot {
+        background: var(--accent-gejala);
+      }
+      .filter-pill[data-type="penyakit"] .dot {
+        background: var(--accent-penyakit);
+      }
+      .filter-pill[data-type="tanaman"] .dot {
+        background: var(--accent-tanaman);
+      }
+      .filter-pill[data-type="kondisi"] .dot {
+        background: var(--accent-kondisi);
+      }
+      .filter-pill:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-primary);
+      }
 
-      svg.call(zoom);
+      /* SVG */
+      #graph-container {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+      }
+      svg {
+        width: 100%;
+        height: 100%;
+      }
 
-      initialTransform = d3.zoomIdentity.translate(width/2, height/2).scale(0.55).translate(-width/2, -height/2);
-      svg.call(zoom.transform, initialTransform);
+      /* Nodes */
+      .node {
+        cursor: pointer;
+      }
+      .node circle {
+        stroke-width: 2;
+        transition: r 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .node:hover circle {
+        filter: brightness(1.3);
+      }
+      .node text {
+        fill: var(--text-primary);
+        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        pointer-events: none;
+        text-shadow:
+          0 1px 4px rgba(0, 0, 0, 0.8),
+          0 0 8px rgba(0, 0, 0, 0.6);
+      }
+      .link {
+        stroke-opacity: 0.2;
+        transition: stroke-opacity 0.3s;
+      }
+      .link-wajib {
+        stroke-dasharray: none;
+        stroke-opacity: 0.35;
+      }
 
-      const radiusScale = d3.scaleSqrt().domain([0, d3.max(nodes, d => d.connections) || 15]).range([5, 24]);
+      /* Tooltip */
+      .tooltip {
+        position: fixed;
+        z-index: 200;
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 20px;
+        backdrop-filter: blur(24px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        max-width: 360px;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(8px) scale(0.96);
+        transition:
+          opacity 0.25s,
+          transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .tooltip.show {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      .tooltip-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .tooltip-type-badge {
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .tooltip-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.3;
+      }
+      .tooltip-desc {
+        font-size: 12.5px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        margin-bottom: 10px;
+      }
+      .tooltip-connections {
+        font-size: 11px;
+        color: var(--text-secondary);
+        border-top: 1px solid var(--glass-border);
+        padding-top: 10px;
+      }
+      .tooltip-connections strong {
+        color: var(--text-primary);
+      }
+      .tooltip-extra {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: 6px;
+      }
+      .tooltip-extra .wajib-tag {
+        color: var(--accent-kondisi);
+        font-weight: 600;
+      }
 
-      // Links
-      const linkGroup = g.append('g').attr('class', 'links');
-      link = linkGroup.selectAll('line')
-        .data(links)
-        .enter().append('line')
-        .attr('class', d => 'link' + (d.isWajib ? ' link-wajib' : ''))
-        .attr('stroke', d => linkColorMap[d.type] || '#475569')
-        .attr('stroke-width', d => d.isWajib ? 2 : 1);
+      /* Stats */
+      .stats-panel {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        z-index: 90;
+        display: flex;
+        gap: 8px;
+      }
+      .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        padding: 14px 18px;
+        backdrop-filter: blur(16px);
+        min-width: 90px;
+        text-align: center;
+      }
+      .stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1;
+      }
+      .stat-label {
+        font-size: 10.5px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+        font-weight: 500;
+      }
 
-      // Nodes
-      const nodeGroup = g.append('g').attr('class', 'nodes');
-      node = nodeGroup.selectAll('g')
-        .data(nodes)
-        .enter().append('g')
-        .attr('class', 'node')
-        .call(d3.drag()
-          .on('start', dragStart)
-          .on('drag', dragging)
-          .on('end', dragEnd));
+      /* Legend */
+      .legend-panel {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 90;
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        padding: 16px 20px;
+        backdrop-filter: blur(16px);
+      }
+      .legend-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-secondary);
+        margin-bottom: 10px;
+      }
+      .legend-items {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
 
-      node.append('circle')
-        .attr('r', d => radiusScale(d.connections))
-        .attr('fill', d => colorMap[d.type])
-        .attr('stroke', d => colorMap[d.type])
-        .attr('stroke-opacity', 0.4)
-        .attr('filter', d => `url(#glow-${d.type})`);
+      /* Search */
+      .search-box {
+        position: relative;
+      }
+      .search-box input {
+        width: 220px;
+        padding: 8px 14px 8px 36px;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text-primary);
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        outline: none;
+        transition: all 0.3s;
+      }
+      .search-box input:focus {
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.06);
+        width: 280px;
+      }
+      .search-box input::placeholder {
+        color: var(--text-secondary);
+      }
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        font-size: 13px;
+      }
 
-      node.append('text')
-        .text(d => {
-          const maxLen = d.type === 'tanaman' ? 18 : d.type === 'penyakit' ? 16 : 14;
-          return d.label.length > maxLen ? d.label.substring(0, maxLen) + '…' : d.label;
-        })
-        .attr('dy', d => radiusScale(d.connections) + 14)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', d => d.type === 'tanaman' ? '10.5px' : '9.5px')
-        .attr('fill-opacity', 0.85);
+      /* Agent Flow */
+      .agent-flow {
+        position: fixed;
+        top: 78px;
+        right: 24px;
+        z-index: 90;
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 18px 20px;
+        backdrop-filter: blur(16px);
+        max-width: 260px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+      .agent-flow-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-secondary);
+        margin-bottom: 14px;
+      }
+      .agent-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 10px;
+        position: relative;
+      }
+      .agent-step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        left: 12px;
+        top: 26px;
+        width: 1px;
+        bottom: -10px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.15),
+          transparent
+        );
+      }
+      .step-number {
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        flex-shrink: 0;
+        color: #0a0e1a;
+      }
+      .step-tool {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 2px;
+      }
+      .step-desc {
+        font-size: 10.5px;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
 
-      // Simulation
-      simulation = d3.forceSimulation(nodes)
-        .force('link', d3.forceLink(links).id(d => d.id).distance(80).strength(0.3))
-        .force('charge', d3.forceManyBody().strength(-180))
-        .force('center', d3.forceCenter(width/2, height/2))
-        .force('collision', d3.forceCollide().radius(d => radiusScale(d.connections) + 12))
-        .force('x', d3.forceX(width/2).strength(0.03))
-        .force('y', d3.forceY(height/2).strength(0.03))
-        .on('tick', () => {
-          link
-            .attr('x1', d => d.source.x)
-            .attr('y1', d => d.source.y)
-            .attr('x2', d => d.target.x)
-            .attr('y2', d => d.target.y);
-          node.attr('transform', d => `translate(${d.x},${d.y})`);
+      /* Dimmed / Highlighted */
+      .node.dimmed circle {
+        opacity: 0.1;
+      }
+      .node.dimmed text {
+        opacity: 0.1;
+      }
+      .link.dimmed {
+        stroke-opacity: 0.02 !important;
+      }
+      .node.highlighted circle {
+        filter: brightness(1.3) drop-shadow(0 0 8px currentColor);
+      }
+      .link.highlighted {
+        stroke-opacity: 0.6 !important;
+        stroke-width: 2.5 !important;
+      }
+
+      /* Zoom */
+      .zoom-controls {
+        position: fixed;
+        bottom: 100px;
+        right: 24px;
+        z-index: 90;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .zoom-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+        background: var(--bg-card);
+        backdrop-filter: blur(16px);
+        color: var(--text-primary);
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+      .zoom-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      /* Loading Overlay */
+      .loading-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 500;
+        background: var(--bg-primary);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        transition:
+          opacity 0.6s,
+          visibility 0.6s;
+      }
+      .loading-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .loading-spinner {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: var(--accent-tanaman);
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .loading-text {
+        font-size: 14px;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+      .loading-sub {
+        font-size: 11px;
+        color: rgba(148, 163, 184, 0.6);
+      }
+
+      /* Error State */
+      .error-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 500;
+        background: var(--bg-primary);
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+      }
+      .error-overlay.show {
+        display: flex;
+      }
+      .error-icon {
+        font-size: 48px;
+      }
+      .error-msg {
+        font-size: 14px;
+        color: var(--text-secondary);
+        text-align: center;
+        max-width: 400px;
+        line-height: 1.6;
+      }
+      .retry-btn {
+        padding: 10px 24px;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-primary);
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .retry-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-mesh"></div>
+    <div class="grid-pattern"></div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Memuat Knowledge Graph...</div>
+      <div class="loading-sub">Mengambil data dari database</div>
+    </div>
+
+    <!-- Error overlay -->
+    <div class="error-overlay" id="errorOverlay">
+      <div class="error-icon">⚠️</div>
+      <div class="error-msg" id="errorMsg">
+        Gagal memuat data graph dari database.
+      </div>
+      <button class="retry-btn" onclick="loadGraphData()">↻ Coba Lagi</button>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo-icon">S</div>
+        <div>
+          <div class="header-title">
+            <span>SITOBAT-AI</span> — Knowledge Graph
+          </div>
+          <div class="header-subtitle">Relational GraphRAG Visualization</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          LIVE DATABASE
+        </div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Cari node..." />
+        </div>
+      </div>
+    </header>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <button class="filter-pill active" data-type="all">
+        <span class="dot"></span> Semua
+      </button>
+      <button class="filter-pill" data-type="gejala">
+        <span class="dot"></span> Gejala
+      </button>
+      <button class="filter-pill" data-type="penyakit">
+        <span class="dot"></span> Penyakit
+      </button>
+      <button class="filter-pill" data-type="tanaman">
+        <span class="dot"></span> Tanaman
+      </button>
+      <button class="filter-pill" data-type="kondisi">
+        <span class="dot"></span> Kondisi Medis
+      </button>
+    </div>
+
+    <!-- Agent Flow Panel -->
+    <div class="agent-flow">
+      <div class="agent-flow-title">⚡ ReAct Agent Flow</div>
+      <div class="agent-step">
+        <div class="step-number" style="background: var(--accent-gejala)">
+          1
+        </div>
+        <div class="step-info">
+          <div class="step-tool">EkstrakDanCariGejala</div>
+          <div class="step-desc">Ekstrak keyword → cari node Gejala</div>
+        </div>
+      </div>
+      <div class="agent-step">
+        <div class="step-number" style="background: var(--accent-penyakit)">
+          2
+        </div>
+        <div class="step-info">
+          <div class="step-tool">TelusuriGrafPenyakit</div>
+          <div class="step-desc">Traverse edge → kandidat Penyakit</div>
+        </div>
+      </div>
+      <div class="agent-step">
+        <div class="step-number" style="background: var(--accent-penyakit)">
+          3
+        </div>
+        <div class="step-info">
+          <div class="step-tool">ValidasiGejalaWajib</div>
+          <div class="step-desc">Cek constraint gejala wajib</div>
+        </div>
+      </div>
+      <div class="agent-step">
+        <div class="step-number" style="background: var(--accent-tanaman)">
+          4
+        </div>
+        <div class="step-info">
+          <div class="step-tool">FilterKontraindikasi</div>
+          <div class="step-desc">Safety filter → resep aman</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graph Container -->
+    <div id="graph-container"></div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- Stats Panel -->
+    <div class="stats-panel" id="statsPanel"></div>
+
+    <!-- Legend -->
+    <div class="legend-panel">
+      <div class="legend-title">Node Types</div>
+      <div class="legend-items">
+        <div class="legend-item">
+          <div
+            class="legend-dot"
+            style="background: var(--accent-gejala)"
+          ></div>
+          Gejala (Symptom)
+        </div>
+        <div class="legend-item">
+          <div
+            class="legend-dot"
+            style="background: var(--accent-penyakit)"
+          ></div>
+          Penyakit (Disease)
+        </div>
+        <div class="legend-item">
+          <div
+            class="legend-dot"
+            style="background: var(--accent-tanaman)"
+          ></div>
+          Tanaman Obat (Plant)
+        </div>
+        <div class="legend-item">
+          <div
+            class="legend-dot"
+            style="background: var(--accent-kondisi)"
+          ></div>
+          Kondisi Medis
+        </div>
+      </div>
+      <div
+        style="margin-top: 12px; font-size: 10px; color: var(--text-secondary)"
+      >
+        <div>─── Gejala ↔ Penyakit</div>
+        <div style="margin-top: 2px">─── Tanaman ↔ Penyakit</div>
+        <div style="margin-top: 2px">─── Tanaman ↔ Kontraindikasi</div>
+      </div>
+    </div>
+
+    <!-- Zoom Controls -->
+    <div class="zoom-controls">
+      <button class="zoom-btn" id="zoomIn">+</button>
+      <button class="zoom-btn" id="zoomOut">−</button>
+      <button class="zoom-btn" id="zoomReset" style="font-size: 12px">⟳</button>
+    </div>
+
+    <script>
+      // ======================================================================
+      // DYNAMIC DATA LOADING
+      // ======================================================================
+
+      const colorMap = {
+        gejala: "#f472b6",
+        penyakit: "#60a5fa",
+        tanaman: "#34d399",
+        kondisi: "#fbbf24",
+      };
+
+      const linkColorMap = {
+        "gejala-penyakit": "#8b5cf6",
+        "tanaman-penyakit": "#34d399",
+        "tanaman-kondisi": "#fbbf24",
+      };
+
+      const typeLabels = {
+        gejala: "Gejala",
+        penyakit: "Penyakit",
+        tanaman: "Tanaman Obat",
+        kondisi: "Kondisi Medis",
+      };
+      const bgColors = {
+        gejala: "rgba(244,114,182,0.15)",
+        penyakit: "rgba(96,165,250,0.15)",
+        tanaman: "rgba(52,211,153,0.15)",
+        kondisi: "rgba(251,191,36,0.15)",
+      };
+      const fgColors = {
+        gejala: "#f472b6",
+        penyakit: "#60a5fa",
+        tanaman: "#34d399",
+        kondisi: "#fbbf24",
+      };
+
+      let simulation, node, link, svg, g, zoom, initialTransform;
+      let currentNodes = [];
+      let currentLinks = [];
+
+      async function loadGraphData() {
+        const loadingEl = document.getElementById("loadingOverlay");
+        const errorEl = document.getElementById("errorOverlay");
+        loadingEl.classList.remove("hidden");
+        errorEl.classList.remove("show");
+
+        try {
+          const res = await fetch("/api/graph-data");
+          if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          const data = await res.json();
+
+          if (data.error) throw new Error(data.error);
+
+          currentNodes = data.nodes;
+          currentLinks = data.links;
+
+          renderGraph(data.nodes, data.links, data.stats);
+
+          // Apply URL highlight params (from Diagnosa V3 links)
+          setTimeout(() => applyUrlHighlight(), 1200);
+
+          // Hide loading
+          setTimeout(() => loadingEl.classList.add("hidden"), 400);
+        } catch (err) {
+          console.error("Failed to load graph data:", err);
+          loadingEl.classList.add("hidden");
+          document.getElementById("errorMsg").textContent =
+            `Gagal memuat data graph: ${err.message}. Pastikan server Next.js berjalan dan database terhubung.`;
+          errorEl.classList.add("show");
+        }
+      }
+
+      function renderGraph(nodes, links, stats) {
+        // Clear previous graph
+        d3.select("#graph-container").selectAll("*").remove();
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        svg = d3
+          .select("#graph-container")
+          .append("svg")
+          .attr("width", width)
+          .attr("height", height);
+
+        const defs = svg.append("defs");
+
+        // Glow filters
+        ["gejala", "penyakit", "tanaman", "kondisi"].forEach((type) => {
+          const filter = defs
+            .append("filter")
+            .attr("id", `glow-${type}`)
+            .attr("x", "-50%")
+            .attr("y", "-50%")
+            .attr("width", "200%")
+            .attr("height", "200%");
+          filter
+            .append("feGaussianBlur")
+            .attr("stdDeviation", "4")
+            .attr("result", "blur");
+          filter
+            .append("feMerge")
+            .selectAll("feMergeNode")
+            .data(["blur", "SourceGraphic"])
+            .enter()
+            .append("feMergeNode")
+            .attr("in", (d) => d);
         });
 
-      // Interactions
-      setupInteractions(nodes, links, radiusScale);
+        g = svg.append("g");
 
-      // Render stats
-      renderStats(stats);
+        zoom = d3
+          .zoom()
+          .scaleExtent([0.1, 5])
+          .on("zoom", (event) => g.attr("transform", event.transform));
 
-      // Rebind filters
-      bindFilters(nodes, links);
+        svg.call(zoom);
 
-      // Rebind zoom controls
-      document.getElementById('zoomIn').onclick = () => svg.transition().duration(400).call(zoom.scaleBy, 1.4);
-      document.getElementById('zoomOut').onclick = () => svg.transition().duration(400).call(zoom.scaleBy, 0.7);
-      document.getElementById('zoomReset').onclick = () => svg.transition().duration(600).call(zoom.transform, initialTransform);
-    }
+        initialTransform = d3.zoomIdentity
+          .translate(width / 2, height / 2)
+          .scale(0.55)
+          .translate(-width / 2, -height / 2);
+        svg.call(zoom.transform, initialTransform);
 
-    function setupInteractions(nodes, links) {
-      const tooltip = document.getElementById('tooltip');
+        const radiusScale = d3
+          .scaleSqrt()
+          .domain([0, d3.max(nodes, (d) => d.connections) || 15])
+          .range([5, 24]);
 
-      node.on('mouseover', function(event, d) {
-        const connectedIds = new Set([d.id]);
-        links.forEach(l => {
-          const sid = typeof l.source === 'object' ? l.source.id : l.source;
-          const tid = typeof l.target === 'object' ? l.target.id : l.target;
-          if (sid === d.id) connectedIds.add(tid);
-          if (tid === d.id) connectedIds.add(sid);
-        });
+        // Links
+        const linkGroup = g.append("g").attr("class", "links");
+        link = linkGroup
+          .selectAll("line")
+          .data(links)
+          .enter()
+          .append("line")
+          .attr("class", (d) => "link" + (d.isWajib ? " link-wajib" : ""))
+          .attr("stroke", (d) => linkColorMap[d.type] || "#475569")
+          .attr("stroke-width", (d) => (d.isWajib ? 2 : 1));
 
-        node.classed('dimmed', n => !connectedIds.has(n.id));
-        node.classed('highlighted', n => connectedIds.has(n.id));
-        link.classed('dimmed', l => {
-          const sid = typeof l.source === 'object' ? l.source.id : l.source;
-          const tid = typeof l.target === 'object' ? l.target.id : l.target;
-          return !connectedIds.has(sid) || !connectedIds.has(tid);
-        });
-        link.classed('highlighted', l => {
-          const sid = typeof l.source === 'object' ? l.source.id : l.source;
-          const tid = typeof l.target === 'object' ? l.target.id : l.target;
-          return connectedIds.has(sid) && connectedIds.has(tid);
-        });
+        // Nodes
+        const nodeGroup = g.append("g").attr("class", "nodes");
+        node = nodeGroup
+          .selectAll("g")
+          .data(nodes)
+          .enter()
+          .append("g")
+          .attr("class", "node")
+          .call(
+            d3
+              .drag()
+              .on("start", dragStart)
+              .on("drag", dragging)
+              .on("end", dragEnd),
+          );
 
-        let extraInfo = '';
-        if (d.lokasi) extraInfo += `<div class="tooltip-extra">📍 ${d.lokasi}</div>`;
-        if (d.pantanganCount) extraInfo += `<div class="tooltip-extra">⚠️ <span class="wajib-tag">${d.pantanganCount} tanaman dilarang</span></div>`;
+        node
+          .append("circle")
+          .attr("r", (d) => radiusScale(d.connections))
+          .attr("fill", (d) => colorMap[d.type])
+          .attr("stroke", (d) => colorMap[d.type])
+          .attr("stroke-opacity", 0.4)
+          .attr("filter", (d) => `url(#glow-${d.type})`);
 
-        tooltip.innerHTML = `
+        node
+          .append("text")
+          .text((d) => {
+            const maxLen =
+              d.type === "tanaman" ? 18 : d.type === "penyakit" ? 16 : 14;
+            return d.label.length > maxLen
+              ? d.label.substring(0, maxLen) + "…"
+              : d.label;
+          })
+          .attr("dy", (d) => radiusScale(d.connections) + 14)
+          .attr("text-anchor", "middle")
+          .attr("font-size", (d) => (d.type === "tanaman" ? "10.5px" : "9.5px"))
+          .attr("fill-opacity", 0.85);
+
+        // Simulation
+        simulation = d3
+          .forceSimulation(nodes)
+          .force(
+            "link",
+            d3
+              .forceLink(links)
+              .id((d) => d.id)
+              .distance(80)
+              .strength(0.3),
+          )
+          .force("charge", d3.forceManyBody().strength(-180))
+          .force("center", d3.forceCenter(width / 2, height / 2))
+          .force(
+            "collision",
+            d3.forceCollide().radius((d) => radiusScale(d.connections) + 12),
+          )
+          .force("x", d3.forceX(width / 2).strength(0.03))
+          .force("y", d3.forceY(height / 2).strength(0.03))
+          .on("tick", () => {
+            link
+              .attr("x1", (d) => d.source.x)
+              .attr("y1", (d) => d.source.y)
+              .attr("x2", (d) => d.target.x)
+              .attr("y2", (d) => d.target.y);
+            node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+          });
+
+        // Interactions
+        setupInteractions(nodes, links, radiusScale);
+
+        // Render stats
+        renderStats(stats);
+
+        // Rebind filters
+        bindFilters(nodes, links);
+
+        // Rebind zoom controls
+        document.getElementById("zoomIn").onclick = () =>
+          svg.transition().duration(400).call(zoom.scaleBy, 1.4);
+        document.getElementById("zoomOut").onclick = () =>
+          svg.transition().duration(400).call(zoom.scaleBy, 0.7);
+        document.getElementById("zoomReset").onclick = () =>
+          svg.transition().duration(600).call(zoom.transform, initialTransform);
+      }
+
+      function setupInteractions(nodes, links) {
+        const tooltip = document.getElementById("tooltip");
+
+        node
+          .on("mouseover", function (event, d) {
+            const connectedIds = new Set([d.id]);
+            links.forEach((l) => {
+              const sid = typeof l.source === "object" ? l.source.id : l.source;
+              const tid = typeof l.target === "object" ? l.target.id : l.target;
+              if (sid === d.id) connectedIds.add(tid);
+              if (tid === d.id) connectedIds.add(sid);
+            });
+
+            node.classed("dimmed", (n) => !connectedIds.has(n.id));
+            node.classed("highlighted", (n) => connectedIds.has(n.id));
+            link.classed("dimmed", (l) => {
+              const sid = typeof l.source === "object" ? l.source.id : l.source;
+              const tid = typeof l.target === "object" ? l.target.id : l.target;
+              return !connectedIds.has(sid) || !connectedIds.has(tid);
+            });
+            link.classed("highlighted", (l) => {
+              const sid = typeof l.source === "object" ? l.source.id : l.source;
+              const tid = typeof l.target === "object" ? l.target.id : l.target;
+              return connectedIds.has(sid) && connectedIds.has(tid);
+            });
+
+            let extraInfo = "";
+            if (d.lokasi)
+              extraInfo += `<div class="tooltip-extra">📍 ${d.lokasi}</div>`;
+            if (d.pantanganCount)
+              extraInfo += `<div class="tooltip-extra">⚠️ <span class="wajib-tag">${d.pantanganCount} tanaman dilarang</span></div>`;
+
+            tooltip.innerHTML = `
           <div class="tooltip-header">
             <span class="tooltip-type-badge" style="background:${bgColors[d.type]};color:${fgColors[d.type]}">${typeLabels[d.type]}</span>
           </div>
           <div class="tooltip-name">${d.label}</div>
-          ${d.desc ? `<div class="tooltip-desc">${d.desc}</div>` : ''}
+          ${d.desc ? `<div class="tooltip-desc">${d.desc}</div>` : ""}
           ${extraInfo}
           <div class="tooltip-connections"><strong>${d.connections}</strong> koneksi dalam graph</div>
         `;
 
-        const x = Math.min(event.clientX + 16, window.innerWidth - 380);
-        const y = Math.min(event.clientY - 10, window.innerHeight - 200);
-        tooltip.style.left = x + 'px';
-        tooltip.style.top = y + 'px';
-        tooltip.classList.add('show');
-      })
-      .on('mouseout', function() {
-        node.classed('dimmed', false).classed('highlighted', false);
-        link.classed('dimmed', false).classed('highlighted', false);
-        tooltip.classList.remove('show');
-      })
-      .on('mousemove', function(event) {
-        const x = Math.min(event.clientX + 16, window.innerWidth - 380);
-        const y = Math.min(event.clientY - 10, window.innerHeight - 200);
-        tooltip.style.left = x + 'px';
-        tooltip.style.top = y + 'px';
-      });
-    }
+            const x = Math.min(event.clientX + 16, window.innerWidth - 380);
+            const y = Math.min(event.clientY - 10, window.innerHeight - 200);
+            tooltip.style.left = x + "px";
+            tooltip.style.top = y + "px";
+            tooltip.classList.add("show");
+          })
+          .on("mouseout", function () {
+            node.classed("dimmed", false).classed("highlighted", false);
+            link.classed("dimmed", false).classed("highlighted", false);
+            tooltip.classList.remove("show");
+          })
+          .on("mousemove", function (event) {
+            const x = Math.min(event.clientX + 16, window.innerWidth - 380);
+            const y = Math.min(event.clientY - 10, window.innerHeight - 200);
+            tooltip.style.left = x + "px";
+            tooltip.style.top = y + "px";
+          });
+      }
 
-    function bindFilters(nodes, links) {
-      document.querySelectorAll('.filter-pill').forEach(btn => {
-        btn.onclick = function() {
-          document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          const type = this.dataset.type;
+      function bindFilters(nodes, links) {
+        document.querySelectorAll(".filter-pill").forEach((btn) => {
+          btn.onclick = function () {
+            document
+              .querySelectorAll(".filter-pill")
+              .forEach((b) => b.classList.remove("active"));
+            this.classList.add("active");
+            const type = this.dataset.type;
 
-          if (type === 'all') {
-            node.style('display', 'block');
-            link.style('display', 'block');
-          } else {
-            const visibleIds = new Set();
-            nodes.filter(n => n.type === type).forEach(n => visibleIds.add(n.id));
-            links.forEach(l => {
-              const sid = typeof l.source === 'object' ? l.source.id : l.source;
-              const tid = typeof l.target === 'object' ? l.target.id : l.target;
-              if (visibleIds.has(sid)) visibleIds.add(tid);
-              if (visibleIds.has(tid)) visibleIds.add(sid);
-            });
-            node.style('display', d => visibleIds.has(d.id) ? 'block' : 'none');
-            link.style('display', l => {
-              const sid = typeof l.source === 'object' ? l.source.id : l.source;
-              const tid = typeof l.target === 'object' ? l.target.id : l.target;
-              return visibleIds.has(sid) && visibleIds.has(tid) ? 'block' : 'none';
-            });
-          }
-        };
-      });
-    }
+            if (type === "all") {
+              node.style("display", "block");
+              link.style("display", "block");
+            } else {
+              const visibleIds = new Set();
+              nodes
+                .filter((n) => n.type === type)
+                .forEach((n) => visibleIds.add(n.id));
+              links.forEach((l) => {
+                const sid =
+                  typeof l.source === "object" ? l.source.id : l.source;
+                const tid =
+                  typeof l.target === "object" ? l.target.id : l.target;
+                if (visibleIds.has(sid)) visibleIds.add(tid);
+                if (visibleIds.has(tid)) visibleIds.add(sid);
+              });
+              node.style("display", (d) =>
+                visibleIds.has(d.id) ? "block" : "none",
+              );
+              link.style("display", (l) => {
+                const sid =
+                  typeof l.source === "object" ? l.source.id : l.source;
+                const tid =
+                  typeof l.target === "object" ? l.target.id : l.target;
+                return visibleIds.has(sid) && visibleIds.has(tid)
+                  ? "block"
+                  : "none";
+              });
+            }
+          };
+        });
+      }
 
-    function renderStats(stats) {
-      const items = [
-        { value: stats.gejala, label: 'Gejala', color: 'var(--accent-gejala)' },
-        { value: stats.penyakit, label: 'Penyakit', color: 'var(--accent-penyakit)' },
-        { value: stats.tanaman, label: 'Tanaman', color: 'var(--accent-tanaman)' },
-        { value: stats.kondisi, label: 'Kondisi', color: 'var(--accent-kondisi)' },
-        { value: stats.edges, label: 'Edges', color: '#8b5cf6' },
-        { value: stats.totalNodes, label: 'Total Nodes', color: 'var(--text-primary)' },
-      ];
-      document.getElementById('statsPanel').innerHTML = items.map(s => `
+      function renderStats(stats) {
+        const items = [
+          {
+            value: stats.gejala,
+            label: "Gejala",
+            color: "var(--accent-gejala)",
+          },
+          {
+            value: stats.penyakit,
+            label: "Penyakit",
+            color: "var(--accent-penyakit)",
+          },
+          {
+            value: stats.tanaman,
+            label: "Tanaman",
+            color: "var(--accent-tanaman)",
+          },
+          {
+            value: stats.kondisi,
+            label: "Kondisi",
+            color: "var(--accent-kondisi)",
+          },
+          { value: stats.edges, label: "Edges", color: "#8b5cf6" },
+          {
+            value: stats.totalNodes,
+            label: "Total Nodes",
+            color: "var(--text-primary)",
+          },
+        ];
+        document.getElementById("statsPanel").innerHTML = items
+          .map(
+            (s) => `
         <div class="stat-card">
           <div class="stat-value" style="color:${s.color}">${s.value}</div>
           <div class="stat-label">${s.label}</div>
         </div>
-      `).join('');
-    }
-
-    // Drag handlers
-    function dragStart(event, d) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x; d.fy = d.y;
-    }
-    function dragging(event, d) { d.fx = event.x; d.fy = event.y; }
-    function dragEnd(event, d) {
-      if (!event.active) simulation.alphaTarget(0);
-      d.fx = null; d.fy = null;
-    }
-
-    // Search
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const query = this.value.toLowerCase().trim();
-      if (!query) {
-        node.classed('dimmed', false).classed('highlighted', false);
-        link.classed('dimmed', false).classed('highlighted', false);
-        return;
+      `,
+          )
+          .join("");
       }
 
-      const matchIds = new Set();
-      currentNodes.forEach(n => { if (n.label.toLowerCase().includes(query)) matchIds.add(n.id); });
-
-      const connectedIds = new Set(matchIds);
-      currentLinks.forEach(l => {
-        const sid = typeof l.source === 'object' ? l.source.id : l.source;
-        const tid = typeof l.target === 'object' ? l.target.id : l.target;
-        if (matchIds.has(sid)) connectedIds.add(tid);
-        if (matchIds.has(tid)) connectedIds.add(sid);
-      });
-
-      node.classed('dimmed', n => !connectedIds.has(n.id));
-      node.classed('highlighted', n => matchIds.has(n.id));
-      link.classed('dimmed', l => {
-        const sid = typeof l.source === 'object' ? l.source.id : l.source;
-        const tid = typeof l.target === 'object' ? l.target.id : l.target;
-        return !connectedIds.has(sid) || !connectedIds.has(tid);
-      });
-      link.classed('highlighted', l => {
-        const sid = typeof l.source === 'object' ? l.source.id : l.source;
-        const tid = typeof l.target === 'object' ? l.target.id : l.target;
-        return matchIds.has(sid) || matchIds.has(tid);
-      });
-    });
-
-    // Handle resize
-    window.addEventListener('resize', () => {
-      if (svg) svg.attr('width', window.innerWidth).attr('height', window.innerHeight);
-    });
-
-    // ======================================================================
-    // URL QUERY PARAMETER HIGHLIGHTING (from Diagnosa V3)
-    // ======================================================================
-    function applyUrlHighlight() {
-      const params = new URLSearchParams(window.location.search);
-      const gejalaParam = params.get('gejala');
-      const penyakitParam = params.get('penyakit');
-      const tanamanParam = params.get('tanaman');
-
-      if (!gejalaParam && !penyakitParam && !tanamanParam) return;
-
-      // Parse DB IDs from URL
-      const gejalaDbIds = gejalaParam ? gejalaParam.split(',').filter(Boolean) : [];
-      const penyakitDbIds = penyakitParam ? penyakitParam.split(',').filter(Boolean) : [];
-      const tanamanDbIds = tanamanParam ? tanamanParam.split(',').filter(Boolean) : [];
-
-      // Find matching graph node IDs by database ID
-      const matchIds = new Set();
-      currentNodes.forEach(n => {
-        if (n.type === 'gejala' && gejalaDbIds.some(id => n.id.includes(id))) matchIds.add(n.id);
-        if (n.type === 'penyakit' && penyakitDbIds.some(id => n.id.includes(id))) matchIds.add(n.id);
-        if (n.type === 'tanaman' && tanamanDbIds.some(id => n.id.includes(id))) matchIds.add(n.id);
-      });
-
-      if (matchIds.size === 0) return;
-
-      // Also include connected neighbors
-      const connectedIds = new Set(matchIds);
-      currentLinks.forEach(l => {
-        const sid = typeof l.source === 'object' ? l.source.id : l.source;
-        const tid = typeof l.target === 'object' ? l.target.id : l.target;
-        if (matchIds.has(sid)) connectedIds.add(tid);
-        if (matchIds.has(tid)) connectedIds.add(sid);
-      });
-
-      // Apply dimming/highlighting
-      node.classed('dimmed', n => !connectedIds.has(n.id));
-      node.classed('highlighted', n => matchIds.has(n.id));
-      link.classed('dimmed', l => {
-        const sid = typeof l.source === 'object' ? l.source.id : l.source;
-        const tid = typeof l.target === 'object' ? l.target.id : l.target;
-        return !connectedIds.has(sid) || !connectedIds.has(tid);
-      });
-      link.classed('highlighted', l => {
-        const sid = typeof l.source === 'object' ? l.source.id : l.source;
-        const tid = typeof l.target === 'object' ? l.target.id : l.target;
-        return connectedIds.has(sid) && connectedIds.has(tid);
-      });
-
-      // Update header subtitle to show focused mode
-      const subtitle = document.querySelector('.header-subtitle');
-      if (subtitle) {
-        subtitle.textContent = `Fokus: ${gejalaDbIds.length} gejala, ${penyakitDbIds.length} penyakit, ${tanamanDbIds.length} tanaman`;
-        subtitle.style.color = '#60a5fa';
+      // Drag handlers
+      function dragStart(event, d) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
       }
-    }
+      function dragging(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+      }
+      function dragEnd(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
 
-    // ======================================================================
-    // BOOT
-    // ======================================================================
-    loadGraphData();
-  </script>
-</body>
+      // Search
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", function () {
+          const query = this.value.toLowerCase().trim();
+          if (!query) {
+            node.classed("dimmed", false).classed("highlighted", false);
+            link.classed("dimmed", false).classed("highlighted", false);
+            return;
+          }
+
+          const matchIds = new Set();
+          currentNodes.forEach((n) => {
+            if (n.label.toLowerCase().includes(query)) matchIds.add(n.id);
+          });
+
+          const connectedIds = new Set(matchIds);
+          currentLinks.forEach((l) => {
+            const sid = typeof l.source === "object" ? l.source.id : l.source;
+            const tid = typeof l.target === "object" ? l.target.id : l.target;
+            if (matchIds.has(sid)) connectedIds.add(tid);
+            if (matchIds.has(tid)) connectedIds.add(sid);
+          });
+
+          node.classed("dimmed", (n) => !connectedIds.has(n.id));
+          node.classed("highlighted", (n) => matchIds.has(n.id));
+          link.classed("dimmed", (l) => {
+            const sid = typeof l.source === "object" ? l.source.id : l.source;
+            const tid = typeof l.target === "object" ? l.target.id : l.target;
+            return !connectedIds.has(sid) || !connectedIds.has(tid);
+          });
+          link.classed("highlighted", (l) => {
+            const sid = typeof l.source === "object" ? l.source.id : l.source;
+            const tid = typeof l.target === "object" ? l.target.id : l.target;
+            return matchIds.has(sid) || matchIds.has(tid);
+          });
+        });
+
+      // Handle resize
+      window.addEventListener("resize", () => {
+        if (svg)
+          svg
+            .attr("width", window.innerWidth)
+            .attr("height", window.innerHeight);
+      });
+
+      // ======================================================================
+      // URL QUERY PARAMETER HIGHLIGHTING (from Diagnosa V3)
+      // ======================================================================
+      function applyUrlHighlight() {
+        const params = new URLSearchParams(window.location.search);
+        const gejalaParam = params.get("gejala");
+        const penyakitParam = params.get("penyakit");
+        const tanamanParam = params.get("tanaman");
+
+        if (!gejalaParam && !penyakitParam && !tanamanParam) return;
+
+        // Parse DB IDs from URL
+        const gejalaDbIds = gejalaParam
+          ? gejalaParam.split(",").filter(Boolean)
+          : [];
+        const penyakitDbIds = penyakitParam
+          ? penyakitParam.split(",").filter(Boolean)
+          : [];
+        const tanamanDbIds = tanamanParam
+          ? tanamanParam.split(",").filter(Boolean)
+          : [];
+
+        // Find matching graph node IDs by database ID
+        const matchIds = new Set();
+        currentNodes.forEach((n) => {
+          if (
+            n.type === "gejala" &&
+            gejalaDbIds.some((id) => n.id.includes(id))
+          )
+            matchIds.add(n.id);
+          if (
+            n.type === "penyakit" &&
+            penyakitDbIds.some((id) => n.id.includes(id))
+          )
+            matchIds.add(n.id);
+          if (
+            n.type === "tanaman" &&
+            tanamanDbIds.some((id) => n.id.includes(id))
+          )
+            matchIds.add(n.id);
+        });
+
+        if (matchIds.size === 0) return;
+
+        // Also include connected neighbors
+        const connectedIds = new Set(matchIds);
+        currentLinks.forEach((l) => {
+          const sid = typeof l.source === "object" ? l.source.id : l.source;
+          const tid = typeof l.target === "object" ? l.target.id : l.target;
+          if (matchIds.has(sid)) connectedIds.add(tid);
+          if (matchIds.has(tid)) connectedIds.add(sid);
+        });
+
+        // Apply dimming/highlighting
+        node.classed("dimmed", (n) => !connectedIds.has(n.id));
+        node.classed("highlighted", (n) => matchIds.has(n.id));
+        link.classed("dimmed", (l) => {
+          const sid = typeof l.source === "object" ? l.source.id : l.source;
+          const tid = typeof l.target === "object" ? l.target.id : l.target;
+          return !connectedIds.has(sid) || !connectedIds.has(tid);
+        });
+        link.classed("highlighted", (l) => {
+          const sid = typeof l.source === "object" ? l.source.id : l.source;
+          const tid = typeof l.target === "object" ? l.target.id : l.target;
+          return connectedIds.has(sid) && connectedIds.has(tid);
+        });
+
+        // Update header subtitle to show focused mode
+        const subtitle = document.querySelector(".header-subtitle");
+        if (subtitle) {
+          subtitle.textContent = `Fokus: ${gejalaDbIds.length} gejala, ${penyakitDbIds.length} penyakit, ${tanamanDbIds.length} tanaman`;
+          subtitle.style.color = "#60a5fa";
+        }
+      }
+
+      // ======================================================================
+      // BOOT
+      // ======================================================================
+      loadGraphData();
+    </script>
+  </body>
 </html>

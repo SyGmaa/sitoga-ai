@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   try {
     const { messages, provider, model } = await req.json();
 
-    const SYSTEM_PROMPT = `Sebagai Agent Medis Botani ReAct (Relational GraphRAG) Sitoga AI.
+    const SYSTEM_PROMPT = `Sebagai Agent Medis Botani ReAct (Relational GraphRAG) SITOBAT-AI.
 Kamu mengevaluasi keluhan dengan sangat analitis dengan menelusuri Graph Database secara berurutan.
 
 IKUTI LANGKAH INI DENGAN SANGAT KETAT:

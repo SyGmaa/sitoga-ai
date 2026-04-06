@@ -52,7 +52,7 @@ export default function DiagnosaV3Page() {
     messages: [{
       id: "system-v3",
       role: "assistant",
-      parts: [{ type: 'text', text: "Halo! Saya adalah Agent Relational GraphRAG (V-3) Sitoga AI. Ceritakan keluhan medis Anda, dan saya akan menelusuri hubungan Gejala dan Penyakit langsung dari database." }]
+      parts: [{ type: 'text', text: "Halo! Saya adalah Agent Relational GraphRAG (V-3) SITOBAT-AI. Ceritakan keluhan medis Anda, dan saya akan menelusuri hubungan Gejala dan Penyakit langsung dari database." }]
     }] as UIMessage[]
   });
 

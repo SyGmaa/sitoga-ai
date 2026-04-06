@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
 </p>
 
-<h1 align="center">🌿 SITOGA AI</h1>
+<h1 align="center">🌿 SITOBAT-AI</h1>
 <h3 align="center"><em>Sistem Informasi Toga Berbasis Artificial Intelligence</em></h3>
 
 <p align="center">
@@ -195,7 +195,7 @@ DATABASE_URL="postgresql://username:password@localhost:5432/sitoga_ai_db"
 AI_PROVIDER=google
 
 # Nama model default yang dipakai (Fallback)
-AI_MODEL=gemini-1.5-flash
+AI_MODEL=gemini-2.5-flash
 
 # ───────────── API KEYS ─────────────
 # Dapatkan di: https://aistudio.google.com/app/apikey
