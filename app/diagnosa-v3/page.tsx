@@ -252,14 +252,55 @@ export default function DiagnosaV3Page() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col h-full relative bg-background-dark bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#1a2e1d] via-background-dark to-background-dark">
         {/* Mobile Header */}
-        <header className="md:hidden flex items-center justify-between px-4 py-3 border-b border-[#234829]/50 bg-background-dark/80 backdrop-blur-md sticky top-0 z-30">
+        <header className="md:hidden flex items-center justify-between px-4 py-2 border-b border-[#234829]/50 bg-background-dark/80 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center gap-2 text-white">
             <span className="material-symbols-outlined text-primary">device_hub</span>
-            <span className="font-bold">GraphRAG V3</span>
+            <span className="font-bold text-sm">GraphRAG V3</span>
           </div>
-          <Link href="/" className="text-white p-2">
-            <span className="material-symbols-outlined">close</span>
-          </Link>
+          <div className="flex items-center gap-1">
+            {/* Model Selector - Mobile */}
+            <div className="relative mr-1">
+              <button
+                onClick={() => setShowModelPicker(!showModelPicker)}
+                disabled={isModelsLoading || aiModels.length === 0}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#234829]/50 border border-[#234829] text-white text-[11px] font-medium disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-primary text-[16px]">smart_toy</span>
+                <span className="max-w-[80px] truncate">{selectedModel?.label || 'AI'}</span>
+                <span className="material-symbols-outlined text-slate-400 text-[14px]">expand_more</span>
+              </button>
+              {showModelPicker && (
+                <div className="absolute top-full right-0 mt-2 w-56 bg-[#1a2e1d] border border-primary/20 rounded-2xl shadow-2xl overflow-hidden z-50 animate-[fadeIn_0.15s_ease-out]">
+                  <div className="px-4 py-2 bg-primary/10 border-b border-primary/10">
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Pilih Model AI</p>
+                  </div>
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {aiModels.map((m, idx) => (
+                      <button
+                        key={m.id}
+                        onClick={() => { setSelectedModelIdx(idx); setShowModelPicker(false); }}
+                        className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-primary/5 transition-colors ${
+                          idx === selectedModelIdx ? 'bg-primary/10 border-l-2 border-l-primary' : 'border-l-2 border-l-transparent'
+                        }`}
+                      >
+                        <div className="min-w-0">
+                          <p className={`text-sm font-semibold truncate ${idx === selectedModelIdx ? 'text-primary' : 'text-white'}`}>{m.label}</p>
+                          <p className="text-slate-400 text-[10px]">{m.provider}</p>
+                        </div>
+                        {idx === selectedModelIdx && (
+                          <span className="material-symbols-outlined text-primary text-sm">check_circle</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Link href="/" className="text-white p-2">
+              <span className="material-symbols-outlined">close</span>
+            </Link>
+          </div>
         </header>
 
         {/* Chat Stream */}
