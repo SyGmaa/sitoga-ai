@@ -1,4 +1,4 @@
-﻿import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { google } from "@ai-sdk/google";
 import { streamObject } from "ai";
 import { z } from "zod";
@@ -77,6 +77,7 @@ INSTRUKSI PENTING:
 2. Cari "Penyakit" dalam database di atas yang memiliki "Gejala" paling cocok.
 3. Kembalikan array objek berisi ID dan nama tanaman dari bidang "Tanaman Pengobatan yang direkomendasikan beserta ID-nya". HANYA GUNAKAN DATA YANG TERDAPAT PADA TEKS DI ATAS! Jangan mengarang ID atau nama tanaman.
 4. Jika gejala tidak cocok dengan penyakit apapun di database, kembalikan nama_penyakit "Tidak Diketahui/Di luar basis data kami", gejala_terdeteksi dengan gejala yang disebutkan, dan rekomendasi_tanaman kosong [].
+5. Selalu balas dalam bahasa yang sama dengan yang digunakan pengguna dalam pesan terakhirnya (misalnya jika pengguna menggunakan bahasa Jepang, balaslah dalam bahasa Jepang).
 
 Pesan pengguna saat ini: "${latestMessage}"`;
 
@@ -89,7 +90,7 @@ Pesan pengguna saat ini: "${latestMessage}"`;
         nama_penyakit: z
           .string()
           .describe(
-            'Nama penyakit yang paling cocok dengan gejala dari database, atau "Tidak Diketahui"',
+            'Nama penyakit yang paling cocok dengan gejala dari database, atau "Tidak Diketahui". Terjemahkan jika bahasa pengguna bukan Indonesia/Inggris.',
           ),
         gejala_terdeteksi: z
           .array(z.string())
@@ -109,7 +110,7 @@ Pesan pengguna saat ini: "${latestMessage}"`;
         penjelasan_singkat: z
           .string()
           .describe(
-            "Penjelasan singkat dan ramah (max 2 kalimat) menyapa pengguna dan menjelaskan diagnosis awal.",
+            "Penjelasan singkat dan ramah (max 2 kalimat) menyapa pengguna dan menjelaskan diagnosis awal. WAJIB GUNAKAN BAHASA YANG SAMA DENGAN INPUT PENGGUNA.",
           ),
       }),
     });
