@@ -69,22 +69,23 @@ export default function AdminModelsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 max-w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold tracking-tight">Kelola Model AI</h2>
-          <p className="text-slate-500 mt-1 text-sm">Atur model AI yang tersedia untuk diagnosa.</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Kelola Model AI</h2>
+          <p className="text-slate-500 mt-1 text-xs sm:text-sm">Atur model AI yang tersedia untuk diagnosa.</p>
         </div>
         <button 
           onClick={() => { setEditingModel({}); setIsModalOpen(true); }}
-          className="bg-primary text-background-dark px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:brightness-110 transition-all shadow-glow"
+          className="w-full sm:w-auto bg-primary text-background-dark px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:brightness-110 transition-all shadow-glow"
         >
           <span className="material-symbols-outlined">add</span>
           Tambah Model
         </button>
       </div>
 
-      <div className="bg-white/50 dark:bg-emerald-950/20 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-white/5 overflow-hidden shadow-sm">
+      {/* Desktop View: Table */}
+      <div className="hidden md:block bg-white/50 dark:bg-emerald-950/20 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-white/5 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -164,28 +165,112 @@ export default function AdminModelsPage() {
         </div>
       </div>
 
+      <div className="md:hidden space-y-4">
+        {isLoading ? (
+          <div className="p-10 text-center text-slate-500 italic bg-white/50 dark:bg-emerald-950/20 rounded-3xl border border-white/20">
+            Mencolokan kabel ke server...
+          </div>
+        ) : models.length === 0 ? (
+          <div className="p-10 text-center text-slate-500 bg-white/50 dark:bg-emerald-950/20 rounded-3xl border border-white/20">
+            Belum ada model yang ditambahkan.
+          </div>
+        ) : models.map((model) => (
+          <div key={model.id} className="relative group bg-white/50 dark:bg-emerald-950/20 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-white/5 p-6 shadow-sm overflow-hidden">
+            {/* Status Badge - Positioned absolutely for stability */}
+            <div className="absolute top-4 right-4">
+              <button 
+                onClick={() => handleToggleStatus(model.id, model.isActive)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black tracking-wider transition-all shadow-sm ${
+                  model.isActive 
+                    ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/20" 
+                    : "bg-red-500/20 text-red-500 border border-red-500/20"
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${model.isActive ? "bg-emerald-500" : "bg-red-500"}`}></span>
+                {model.isActive ? "ACTIVE" : "INACTIVE"}
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Header Info */}
+              <div className="pr-20"> {/* Give space for the absolute badge */}
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-black text-slate-900 dark:text-white text-lg leading-tight">{model.label}</h4>
+                    {model.isDefault && (
+                      <span className="bg-primary/20 text-primary text-[9px] px-2 py-0.5 rounded-md font-black border border-primary/20">DEFAULT</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 text-[11px] font-medium text-slate-400">
+                    <span className="material-symbols-outlined !text-sm">{model.provider === 'google' ? 'smart_toy' : 'hub'}</span>
+                    <span className="capitalize">{model.provider}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Model Detail Card */}
+              <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-4 border border-white/10">
+                <div className="flex flex-col gap-1 overflow-hidden">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Model ID</span>
+                  <span className="font-mono text-xs text-slate-600 dark:text-slate-300 break-all bg-white/50 dark:bg-black/20 px-2 py-1.5 rounded-lg border border-white/5">
+                    {model.modelId}
+                  </span>
+                </div>
+              </div>
+
+              {/* Footer Actions */}
+              <div className="flex items-center justify-between pt-2 border-t border-white/10 dark:border-white/5">
+                <div className="flex gap-2">
+                  {model.badge && (
+                    <span className="bg-primary/10 text-primary text-[10px] px-3 py-1 rounded-full font-bold border border-primary/10">
+                      {model.badge}
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => { setEditingModel(model); setIsModalOpen(true); }}
+                    className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-primary transition-all hover:bg-primary/10 rounded-xl"
+                    title="Edit Model"
+                  >
+                    <span className="material-symbols-outlined text-xl">edit</span>
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(model.id)}
+                    className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-red-500 transition-all hover:bg-red-500/10 rounded-xl"
+                    title="Hapus Model"
+                  >
+                    <span className="material-symbols-outlined text-xl">delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Custom Modal for Add/Edit */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
-          <div className="bg-white dark:bg-emerald-950 rounded-3xl shadow-2xl overflow-visible border border-white/10 w-full max-w-lg relative">
-            <div className="px-8 py-6 border-b border-white/10 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">{editingModel?.id ? "Edit Model" : "Tambah Model Baru"}</h3>
-              <button onClick={() => { setIsModalOpen(false); setShowProviderDropdown(false); }} className="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">close</button>
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
+          <div className="bg-white dark:bg-emerald-950 rounded-t-[32px] sm:rounded-3xl shadow-2xl overflow-visible border border-white/10 w-full max-w-lg relative max-h-[90vh] flex flex-col">
+            <div className="px-6 sm:px-8 py-5 sm:py-6 border-b border-white/10 flex justify-between items-center shrink-0">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">{editingModel?.id ? "Edit Model" : "Tambah Model Baru"}</h3>
+              <button onClick={() => { setIsModalOpen(false); setShowProviderDropdown(false); }} className="p-2 -mr-2 material-symbols-outlined text-slate-400 hover:text-primary transition-colors">close</button>
             </div>
-            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-5 sm:space-y-6 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-400/30 [&::-webkit-scrollbar-thumb]:rounded-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2 relative">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Provider</label>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Provider</label>
                   <button
                     type="button"
                     onClick={() => setShowProviderDropdown(!showProviderDropdown)}
                     className="w-full flex items-center justify-between h-[46px] px-4 rounded-xl bg-slate-100 dark:bg-emerald-900/30 border border-white/10 hover:border-primary/40 transition-all group overflow-hidden"
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2.5 text-left">
                       <span className="material-symbols-outlined text-primary !text-lg shrink-0">
                         {selectedProvider === 'google' ? 'smart_toy' : 'hub'}
                       </span>
-                      <span className="capitalize text-slate-900 dark:text-white font-semibold text-sm">{selectedProvider}</span>
+                      <span className="capitalize text-slate-900 dark:text-white font-semibold text-sm truncate">{selectedProvider}</span>
                     </div>
                     <span className={`material-symbols-outlined text-slate-400 text-lg transition-transform duration-300 ${showProviderDropdown ? 'rotate-180' : ''}`}>expand_more</span>
                   </button>
@@ -213,7 +298,7 @@ export default function AdminModelsPage() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Badge</label>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Badge</label>
                   <input 
                     name="badge" 
                     defaultValue={editingModel?.badge || ""} 
@@ -225,7 +310,7 @@ export default function AdminModelsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Label / Name</label>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Label / Name</label>
                 <input 
                   name="label" 
                   defaultValue={editingModel?.label || ""} 
@@ -237,7 +322,7 @@ export default function AdminModelsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Model ID</label>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Model ID</label>
                 <input 
                   name="modelId" 
                   defaultValue={editingModel?.modelId || ""} 
@@ -248,7 +333,7 @@ export default function AdminModelsPage() {
                 />
               </div>
 
-              <div className="flex gap-6 pt-2">
+              <div className="flex flex-wrap gap-x-6 gap-y-3 pt-2">
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <div className="relative flex items-center">
                     <input type="checkbox" name="isActive" value="true" defaultChecked={editingModel?.isActive ?? true} className="peer w-5 h-5 opacity-0 absolute cursor-pointer" />
@@ -267,9 +352,9 @@ export default function AdminModelsPage() {
                 </label>
               </div>
 
-              <div className="flex gap-4 pt-4">
-                <button type="button" onClick={() => { setIsModalOpen(false); setShowProviderDropdown(false); }} className="flex-1 px-6 py-3.5 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 font-bold text-slate-600 dark:text-slate-300 transition-all">Batal</button>
-                <button type="submit" className="flex-1 px-6 py-3.5 rounded-xl bg-primary text-background-dark font-bold hover:shadow-glow-lg transition-all active:scale-95">Simpan Model</button>
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 pb-2">
+                <button type="button" onClick={() => { setIsModalOpen(false); setShowProviderDropdown(false); }} className="w-full sm:flex-1 px-6 py-3.5 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 font-bold text-slate-600 dark:text-slate-300 transition-all">Batal</button>
+                <button type="submit" className="w-full sm:flex-1 px-6 py-3.5 rounded-xl bg-primary text-background-dark font-bold hover:shadow-glow-lg transition-all active:scale-95">Simpan Model</button>
               </div>
             </form>
           </div>
