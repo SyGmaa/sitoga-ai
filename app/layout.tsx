@@ -10,8 +10,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Campus Botanical - Herbal Medicine Diagnosis",
-  description: "Identify herbal remedies instantly with AI diagnosis.",
+  title: "SITOBAT-AI",
+  description: "Hmmm... blom tau lagi",
 };
 
 const themeScript = `

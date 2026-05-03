@@ -5,6 +5,8 @@ import { ReactNode, useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useTheme } from "@/components/ThemeProvider";
+import Image from "next/image";
+
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -117,14 +119,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </button>
           
           <Link href="/admin" className="flex items-center gap-3 group cursor-pointer">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/40 rounded-xl blur-sm group-hover:blur-md transition-all duration-300"></div>
-              <div className="relative bg-gradient-to-br from-primary/20 to-emerald-500/20 p-2 rounded-xl text-primary border border-primary/20">
-                <span className="material-symbols-outlined text-3xl animate-[pulse-glow_2s_cubic-bezier(0.4,0,0.6,1)_infinite]">spa</span>
-              </div>
+            <div className="relative flex items-center justify-center">
+              <Image 
+                src="/logo.svg" 
+                alt="SITOBAT-AI Logo" 
+                width={36} 
+                height={36} 
+                className="w-9 h-9 object-contain"
+              />
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight hidden sm:block">
-              SITOBAT AI <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#13ec37] to-[#0ea5e9]">Admin</span>
+              SITOBAT AI
             </h1>
           </Link>
           

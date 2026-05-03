@@ -3,15 +3,23 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DiagnosaDropdown } from "@/components/DiagnosaDropdown";
+import Image from "next/image";
+
 
 export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full glass-card border-b border-slate-200 dark:border-leaf-700/50 px-6 py-4 transition-all duration-300">
       <div className="mx-auto max-w-7xl flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center size-10 rounded-full bg-primary/10 text-primary">
-            <span className="material-symbols-outlined text-3xl">eco</span>
-          </div>
+          <Link href="/" className="flex items-center justify-center">
+            <Image 
+              src="/logo.svg" 
+              alt="SITOBAT-AI Logo" 
+              width={36} 
+              height={36} 
+              className="w-9 h-9 object-contain"
+            />
+          </Link>
           <h2 className="text-slate-800 dark:text-white text-xl font-bold tracking-tight">SITOBAT-AI UP</h2>
         </div>
         <nav className="hidden md:flex flex-wrap items-center gap-4 lg:gap-8">
