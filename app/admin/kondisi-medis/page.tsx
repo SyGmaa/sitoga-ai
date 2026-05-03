@@ -10,19 +10,20 @@ export default async function AdminKondisiMedisPage() {
     <div className="flex flex-col gap-6 animate-[slide-up_0.5s_ease-out_forwards]">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Kondisi Medis</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Kelola data kondisi medis untuk pantangan tanaman.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Kondisi Medis</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base">Kelola data kondisi medis untuk pantangan tanaman.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/admin/kondisi-medis/baru" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-105 flex items-center gap-2">
+        <div className="flex items-center">
+          <Link href="/admin/kondisi-medis/baru" className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-base">add</span> Tambah Kondisi
           </Link>
         </div>
       </div>
 
-      <div className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-3xl overflow-hidden">
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-3xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
+          <table className="w-full text-left text-sm">
             <thead className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200/50 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
               <tr>
                 <th className="px-6 py-5 font-bold" scope="col">Nama Kondisi</th>
@@ -70,6 +71,42 @@ export default async function AdminKondisiMedisPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+        {kondisiList.map(kondisi => (
+          <div key={kondisi.id} className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-sm rounded-2xl p-5 flex flex-col gap-4">
+            <div className="flex justify-between items-start">
+              <div className="flex flex-col gap-1">
+                <span className="font-bold text-slate-900 dark:text-slate-100 text-lg leading-tight">
+                  {kondisi.nama}
+                </span>
+                <span className="inline-flex items-center w-fit px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                  {kondisi._count.pantanganTanaman} Pantangan
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Link href={`/admin/kondisi-medis/${kondisi.id}/edit`} className="p-2.5 bg-white/80 dark:bg-slate-800/80 rounded-xl text-slate-500 hover:text-blue-500 shadow-sm border border-slate-100 dark:border-slate-700">
+                  <span className="material-symbols-outlined text-xl">edit</span>
+                </Link>
+                <DeleteKondisiMedisButton id={kondisi.id} />
+              </div>
+            </div>
+            
+            {kondisi.deskripsi && (
+              <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-2 italic">
+                &ldquo;{kondisi.deskripsi}&rdquo;
+              </p>
+            )}
+          </div>
+        ))}
+
+        {kondisiList.length === 0 && (
+          <div className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-2xl p-8 text-center text-slate-500 text-sm">
+            Belum ada kondisi medis.
+          </div>
+        )}
       </div>
     </div>
   );

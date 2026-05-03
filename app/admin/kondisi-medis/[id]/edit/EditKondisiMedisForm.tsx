@@ -59,7 +59,7 @@ export function EditKondisiMedisForm({ initialData }: { initialData: KondisiMedi
         />
       </div>
 
-      <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-4 pt-4">
+      <div className="flex flex-col sm:flex-row items-center justify-end gap-4 pt-4">
         <button
           disabled={isPending}
           type="submit"
