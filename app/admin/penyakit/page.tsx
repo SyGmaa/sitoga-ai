@@ -21,7 +21,8 @@ export default async function AdminPenyakitPage() {
       </div>
 
       <div className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-3xl overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop View: Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200/50 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
               <tr>
@@ -67,6 +68,49 @@ export default async function AdminPenyakitPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile View: Cards */}
+        <div className="md:hidden flex flex-col divide-y divide-slate-200/50 dark:divide-slate-700/50">
+          {penyakitList.map(penyakit => (
+            <div key={penyakit.id} className="p-5 flex flex-col gap-4">
+              <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Penyakit / Keluhan</span>
+                  <span className="font-bold text-slate-900 dark:text-slate-100 text-lg leading-tight">
+                    {penyakit.nama}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link href={`/admin/penyakit/${penyakit.id}/edit`} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 hover:text-blue-500 transition-colors">
+                    <span className="material-symbols-outlined text-lg">edit</span>
+                  </Link>
+                  <DeletePenyakitButton id={penyakit.id} />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Deskripsi</span>
+                <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-3">
+                  {penyakit.deskripsi || <span className="text-slate-400 italic">No description available</span>}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Terhubung ke Gejala</span>
+                <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                  {penyakit._count.gejala} Gejala
+                </span>
+              </div>
+            </div>
+          ))}
+
+          {penyakitList.length === 0 && (
+            <div className="p-12 text-center text-slate-500 flex flex-col items-center gap-3">
+              <span className="material-symbols-outlined text-4xl opacity-20">error_outline</span>
+              <p>No ailments found. Click "New Ailment" to add one.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
