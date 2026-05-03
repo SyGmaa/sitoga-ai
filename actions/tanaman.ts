@@ -191,3 +191,18 @@ export async function updateTanaman(id: string, formData: FormData) {
   redirect('/admin/tanaman');
 }
 
+export async function deleteTanaman(id: string) {
+  try {
+    // Check if tanaman has image and maybe delete it? (Optional for now)
+    await prisma.tanaman.delete({
+      where: { id }
+    });
+    
+    revalidatePath('/admin/tanaman');
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting tanaman:", error);
+    return { success: false, error: "Failed to delete plant." };
+  }
+}
+

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getAllTanaman } from '@/actions/tanaman';
 import Image from 'next/image';
 import { QRButton } from '@/components/QRButton';
+import { DeleteTanamanButton } from '@/components/DeleteTanamanButton';
 
 export default async function AdminTanamanPage() {
   const result = await getAllTanaman();
@@ -11,26 +12,27 @@ export default async function AdminTanamanPage() {
     <div className="flex flex-col gap-6 animate-[slide-up_0.5s_ease-out_forwards]">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Data Tanaman</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Manage entries and update existing medicinal plants.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Data Tanaman</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base">Kelola daftar tanaman obat dan informasi detailnya.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/admin/tanaman/baru" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-105 flex items-center gap-2">
-            <span className="material-symbols-outlined text-base">add</span> New Plant
+        <div className="flex items-center">
+          <Link href="/admin/tanaman/baru" className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
+            <span className="material-symbols-outlined text-base">add</span> Tanaman Baru
           </Link>
         </div>
       </div>
 
-      <div className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-3xl overflow-hidden">
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-3xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200/50 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200/50 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs font-bold">
               <tr>
-                <th className="px-6 py-5 font-bold" scope="col">Plant Name</th>
-                <th className="px-6 py-5 font-bold hidden sm:table-cell" scope="col">Scientific Name</th>
-                <th className="px-6 py-5 font-bold hidden md:table-cell" scope="col">Lokasi</th>
-                <th className="px-6 py-5 font-bold hidden lg:table-cell" scope="col">Khasiat</th>
-                <th className="px-6 py-5 font-bold text-right" scope="col">Actions</th>
+                <th className="px-6 py-5" scope="col">Nama Tanaman</th>
+                <th className="px-6 py-5 hidden lg:table-cell" scope="col">Nama Ilmiah</th>
+                <th className="px-6 py-5" scope="col">Lokasi</th>
+                <th className="px-6 py-5 hidden xl:table-cell" scope="col">Khasiat Utama</th>
+                <th className="px-6 py-5 text-right" scope="col">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200/50 dark:divide-slate-700/50">
@@ -39,40 +41,37 @@ export default async function AdminTanamanPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
                       {tanaman.gambarUrl ? (
-                         <div className="h-12 w-12 rounded-xl bg-cover bg-center shadow-md group-hover:scale-110 transition-transform duration-300" style={{ backgroundImage: `url(${tanaman.gambarUrl})` }}></div>
+                         <div className="h-12 w-12 rounded-xl bg-cover bg-center shadow-md group-hover:scale-110 transition-transform duration-300 border border-white/20" style={{ backgroundImage: `url(${tanaman.gambarUrl})` }}></div>
                       ) : (
-                         <div className="h-12 w-12 rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                         <div className="h-12 w-12 rounded-xl bg-slate-200 dark:bg-slate-800/50 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 border border-slate-200 dark:border-slate-700">
                            <span className="material-symbols-outlined text-slate-400">local_florist</span>
                          </div>
                       )}
                      
-                      <div>
-                        <Link href={`/tanaman/${tanaman.id}`} className="font-bold text-slate-900 dark:text-slate-100 text-base hover:text-primary transition-colors">
+                      <div className="flex flex-col">
+                        <Link href={`/tanaman/${tanaman.id}`} className="font-bold text-slate-900 dark:text-slate-100 text-base hover:text-primary transition-colors leading-tight">
                           {tanaman.namaLokal}
                         </Link>
-                        <div className="text-xs text-slate-500 sm:hidden max-w-[120px] truncate">{tanaman.namaLatin}</div>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 italic mt-0.5 lg:hidden">{tanaman.namaLatin}</span>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-slate-600 dark:text-slate-300 italic hidden sm:table-cell">{tanaman.namaLatin}</td>
-                  <td className="px-6 py-4 hidden md:table-cell">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800 truncate max-w-[150px]">
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-300 italic hidden lg:table-cell">{tanaman.namaLatin}</td>
+                  <td className="px-6 py-4">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-blue-100/50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50 truncate max-w-[150px]">
                       {tanaman.lokasiTanam}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-slate-500 hidden lg:table-cell max-w-[200px] truncate">
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden xl:table-cell max-w-[250px] truncate text-xs">
                     {tanaman.khasiatUtama}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center justify-end gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
                       <QRButton plantId={tanaman.id} plantName={tanaman.namaLokal} />
-                      <Link href={`/admin/tanaman/${tanaman.id}/edit`} className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 hover:shadow-sm transition-all inline-flex items-center justify-center">
+                      <Link href={`/admin/tanaman/${tanaman.id}/edit`} className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 hover:shadow-sm transition-all inline-flex items-center justify-center" title="Edit Tanaman">
                         <span className="material-symbols-outlined text-lg">edit</span>
                       </Link>
-                      {/* Note: Disabling delete button visually for now until delete action is wired up */}
-                      <button className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-red-500 hover:shadow-sm transition-all inline-flex items-center justify-center" title="Delete functionality requires further setup.">
-                        <span className="material-symbols-outlined text-lg">delete</span>
-                      </button>
+                      <DeleteTanamanButton id={tanaman.id} name={tanaman.namaLokal} />
                     </div>
                   </td>
                 </tr>
@@ -81,13 +80,66 @@ export default async function AdminTanamanPage() {
               {tanamanList.length === 0 && (
                 <tr>
                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
-                     No plants found. Click "New Plant" to add one.
+                     Belum ada data tanaman. Klik &quot;Tanaman Baru&quot; untuk menambahkan.
                    </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+        {tanamanList.map(tanaman => (
+          <div key={tanaman.id} className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-sm rounded-3xl p-4 flex flex-col gap-4">
+            <div className="flex items-center gap-4">
+              {tanaman.gambarUrl ? (
+                 <div className="h-16 w-16 rounded-2xl bg-cover bg-center shadow-md border border-white/20 shrink-0" style={{ backgroundImage: `url(${tanaman.gambarUrl})` }}></div>
+              ) : (
+                 <div className="h-16 w-16 rounded-2xl bg-slate-200 dark:bg-slate-800/50 flex items-center justify-center shadow-md border border-slate-200 dark:border-slate-700 shrink-0">
+                   <span className="material-symbols-outlined text-slate-400 text-2xl">local_florist</span>
+                 </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <Link href={`/tanaman/${tanaman.id}`} className="font-bold text-slate-900 dark:text-slate-100 text-lg hover:text-primary transition-colors block truncate leading-tight">
+                  {tanaman.namaLokal}
+                </Link>
+                <p className="text-xs text-slate-500 dark:text-slate-400 italic truncate mt-0.5">{tanaman.namaLatin}</p>
+                <div className="mt-2 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[14px] text-blue-500">location_on</span>
+                  <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 truncate">{tanaman.lokasiTanam}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-slate-50/50 dark:bg-black/20 rounded-2xl p-3 border border-slate-100/50 dark:border-white/5">
+              <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Khasiat Utama</p>
+              <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                {tanaman.khasiatUtama || <span className="italic text-slate-400">Tidak ada informasi khasiat.</span>}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-white/5 mt-auto">
+              <div className="flex items-center gap-1">
+                <QRButton plantId={tanaman.id} plantName={tanaman.namaLokal} />
+              </div>
+              <div className="flex items-center gap-2">
+                <Link href={`/admin/tanaman/${tanaman.id}/edit`} className="flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-slate-800/80 rounded-xl text-slate-600 dark:text-slate-300 font-bold text-xs shadow-sm border border-slate-100 dark:border-slate-700 active:scale-95 transition-all">
+                  <span className="material-symbols-outlined text-base">edit</span>
+                  Edit
+                </Link>
+                <DeleteTanamanButton id={tanaman.id} name={tanaman.namaLokal} />
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {tanamanList.length === 0 && (
+          <div className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-3xl p-10 text-center text-slate-500 text-sm">
+            Belum ada data tanaman.
+          </div>
+        )}
       </div>
     </div>
   );
