@@ -39,7 +39,7 @@ export default function DiagnosaPage() {
     {
       id: "system-1",
       role: "assistant",
-      content: "Yooo... aku clonenya gama, siap membantu mendiagnosa penyakit kamu dengan gacorrr."
+      content: "Yooo... aku SITOBAT-AI, siap membantu mendiagnosa penyakit kamu dengan gacorrr."
     }
   ]);
   const [input, setInput] = useState("");
