@@ -77,10 +77,10 @@ export default function AdminModelsPage() {
         </div>
         <button 
           onClick={() => { setEditingModel({}); setIsModalOpen(true); }}
-          className="w-full sm:w-auto bg-primary text-background-dark px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:brightness-110 transition-all shadow-glow"
+          className="fixed bottom-6 right-6 w-14 h-14 rounded-full z-50 shadow-2xl bg-primary text-background-dark flex items-center justify-center sm:static sm:w-auto sm:h-auto sm:rounded-xl sm:px-5 sm:py-2.5 sm:z-auto font-bold gap-2 hover:brightness-110 transition-all sm:shadow-glow"
         >
-          <span className="material-symbols-outlined">add</span>
-          Tambah Model
+          <span className="material-symbols-outlined text-2xl sm:text-base">add</span>
+          <span className="hidden sm:inline">Tambah Model</span>
         </button>
       </div>
 

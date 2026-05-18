@@ -14,8 +14,9 @@ export default async function AdminGejalaPage() {
           <p className="text-slate-500 dark:text-slate-400 text-sm">Manage symptoms that the AI can detect.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/admin/gejala/baru" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all hover:scale-105 flex items-center gap-2">
-            <span className="material-symbols-outlined text-base">add</span> New Symptom
+          <Link href="/admin/gejala/baru" className="fixed bottom-6 right-6 w-14 h-14 rounded-full z-50 shadow-2xl bg-primary text-white flex items-center justify-center sm:static sm:w-auto sm:h-auto sm:rounded-xl sm:px-4 sm:py-2 sm:shadow-lg sm:shadow-primary/30 sm:z-auto hover:bg-primary-hover transition-all hover:scale-105 text-sm font-bold gap-2">
+            <span className="material-symbols-outlined text-2xl sm:text-base">add</span> 
+            <span className="hidden sm:inline">New Symptom</span>
           </Link>
         </div>
       </div>
