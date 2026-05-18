@@ -25,7 +25,7 @@ export default async function Home() {
               style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCMp6BXMzmd_VAUg-meCYBH7Lzy6Uo0eqBX2EdpwfrrIlzJ8gbh4BQbrFqhtbLmgfBC4DGD-3lFXTFeAL88LUtkafI8V9aBl3cz4aeAm_o6WDo0Nq7RgwZjEEkGKG8Ta2DwnG71tnZZy3-cOPhCL9dr5r3XjTFWDPlw7nO9pgj8lYHAvstj2YCFZ-9EoqVfrI5zhOjuItsAapZtZ2y365s9AvFeh6qA0LwQMhKHSq9e0Tj6fFModUB_N7g7aPsSrQqr-MAKCH8I1A')" }}
             />
             {/* Dark/Light mode gradient overlays that fade into the solid background color at the very bottom */}
-            <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-transparent via-background-light/50 to-background-light dark:from-transparent dark:via-background-dark/50 dark:to-background-dark"></div>
+            <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-black/40 via-black/15 to-background-light dark:from-transparent dark:via-background-dark/50 dark:to-background-dark"></div>
           </div>
           
           <div className="relative z-10 flex-1 flex flex-col justify-center px-4 max-w-4xl mx-auto text-center items-center gap-6 md:gap-8 my-auto">
@@ -36,16 +36,16 @@ export default async function Home() {
               </span>
               AI Powered System
             </div>
-            <h1 className="text-slate-900 dark:text-white text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight dark:hero-text-shadow">
+            <h1 className="text-white text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight dark:hero-text-shadow">
               Proyek Skripsi,<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">SITOBAT-AI UP</span>
             </h1>
-            <p className="text-slate-600 dark:text-slate-200 text-lg md:text-xl font-light max-w-2xl leading-relaxed dark:hero-text-shadow">
+            <p className="text-slate-200 text-lg md:text-xl font-light max-w-2xl leading-relaxed dark:hero-text-shadow">
               Explore our campus collection and identify herbal remedies instantly. Just snap a photo to unlock centuries of botanical wisdom.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mt-4 items-center">
               <DiagnosaDropdown variant="hero" />
-              <Link href="/peta" className="flex items-center justify-center gap-3 cursor-pointer rounded-full h-14 px-8 glass-card hover:bg-black/5 dark:hover:bg-white/10 text-slate-700 dark:text-white text-base font-bold transition-all border border-slate-300 dark:border-white/20">
+              <Link href="/peta" className="flex items-center justify-center gap-3 cursor-pointer rounded-full h-14 px-8 glass-card hover:bg-white/10 text-white text-base font-bold transition-all border border-white/20">
                 <span className="material-symbols-outlined">map</span>
                 <span>View Garden Map</span>
               </Link>
@@ -53,8 +53,8 @@ export default async function Home() {
           </div>
           
           <div className="relative z-10 flex flex-col items-center gap-2 opacity-70 animate-bounce mt-auto pt-16 md:pt-20 pb-4">
-            <span className="text-xs uppercase tracking-widest text-slate-400 dark:text-white/60">Scroll</span>
-            <span className="material-symbols-outlined text-slate-500 dark:text-white">keyboard_arrow_down</span>
+            <span className="text-xs uppercase tracking-widest text-white/60">Scroll</span>
+            <span className="material-symbols-outlined text-white">keyboard_arrow_down</span>
           </div>
         </section>
 
@@ -124,7 +124,7 @@ export default async function Home() {
 
         {/* Diagnosis Call to Action Section */}
         <section className="py-20 px-6 relative bg-background-light dark:bg-background-dark">
-          <div className="max-w-5xl mx-auto rounded-[2.5rem] bg-gradient-to-br from-slate-100 to-white dark:from-[#1a331d] dark:to-[#0f1f10] border border-slate-200 dark:border-[#234829] p-8 md:p-16 flex flex-col md:flex-row items-center gap-10 overflow-hidden relative">
+          <div className="max-w-5xl mx-auto rounded-[2.5rem] bg-gradient-to-br from-slate-100 to-white dark:from-surface-dark dark:to-background-dark border border-slate-200 dark:border-[#234829] p-8 md:p-16 flex flex-col md:flex-row items-center gap-10 overflow-hidden relative">
             <div className="absolute -right-20 -top-20 w-80 h-80 bg-primary/10 rounded-full blur-[80px]"></div>
             
             <div className="flex-1 z-10 text-center md:text-left">
