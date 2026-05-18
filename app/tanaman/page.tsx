@@ -98,7 +98,7 @@ export default async function PlantListPage() {
           </div>
 
           {/* Plant Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 pt-4">
             {plants.map((plant) => {
               const words = plant.khasiatUtama
                 ? plant.khasiatUtama
@@ -113,10 +113,10 @@ export default async function PlantListPage() {
                   key={plant.id}
                   className="group relative flex flex-col glass-card rounded-2xl overflow-hidden hover:-translate-y-2 dark:hover:shadow-glow-hover hover:shadow-lg transition-all duration-300 cursor-pointer border border-slate-200 dark:border-leaf-700 bg-white dark:bg-transparent"
                 >
-                  <div className="relative h-64 w-full overflow-hidden">
-                    <div className="absolute top-3 right-3 z-10">
-                      <button className="bg-white/80 dark:bg-black/40 hover:bg-primary dark:hover:bg-primary backdrop-blur-md text-slate-700 hover:text-white dark:text-white rounded-full p-2 transition-colors">
-                        <span className="material-symbols-outlined text-[20px]">
+                  <div className="relative h-40 sm:h-48 md:h-64 w-full overflow-hidden">
+                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">
+                      <button className="bg-white/80 dark:bg-black/40 hover:bg-primary dark:hover:bg-primary backdrop-blur-md text-slate-700 hover:text-white dark:text-white rounded-full p-1.5 sm:p-2 transition-colors">
+                        <span className="material-symbols-outlined text-[16px] sm:text-[20px]">
                           favorite
                         </span>
                       </button>
@@ -129,7 +129,7 @@ export default async function PlantListPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 dark:bg-leaf-800 transition-transform duration-500 group-hover:scale-110">
-                        <span className="material-symbols-outlined text-6xl text-primary/30">
+                        <span className="material-symbols-outlined text-4xl sm:text-6xl text-primary/30">
                           local_florist
                         </span>
                       </div>
@@ -137,39 +137,39 @@ export default async function PlantListPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 dark:from-background-dark via-transparent to-transparent opacity-80 z-0"></div>
                   </div>
 
-                  <div className="p-5 flex flex-col gap-3 flex-1 bg-white dark:bg-leaf-800/60 dark:backdrop-blur-md z-10">
+                  <div className="p-3 sm:p-5 flex flex-col gap-2 sm:gap-3 flex-1 bg-white dark:bg-leaf-800/60 dark:backdrop-blur-md z-10">
                     <div>
-                      <div className="flex justify-between items-start">
-                        <h3 className="text-slate-900 dark:text-white text-xl font-bold leading-tight group-hover:text-primary transition-colors">
+                      <div className="flex flex-col sm:flex-row justify-between items-start gap-1 sm:gap-2">
+                        <h3 className="text-slate-900 dark:text-white text-base sm:text-xl font-bold leading-tight group-hover:text-primary transition-colors">
                           {plant.namaLokal}
                         </h3>
-                        <span className="bg-primary/10 dark:bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider">
+                        <span className="bg-primary/10 dark:bg-primary/20 text-primary text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full uppercase tracking-wider shrink-0">
                           Tanaman
                         </span>
                       </div>
-                      <p className="text-slate-600 dark:text-leaf-400 text-sm italic mt-1 font-serif">
+                      <p className="text-slate-600 dark:text-leaf-400 text-xs sm:text-sm italic mt-1 font-serif">
                         {plant.namaLatin}
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 mt-auto pt-2">
+                    <div className="flex flex-wrap gap-1 sm:gap-2 mt-auto pt-2">
                       {tags.map((tag, idx) => (
                         <span
                           key={idx}
-                          className="px-3 py-1 bg-slate-100 dark:bg-leaf-700 text-slate-700 dark:text-white/80 text-xs rounded-full border border-slate-200 dark:border-white/5"
+                          className="px-2 py-0.5 sm:px-3 sm:py-1 bg-slate-100 dark:bg-leaf-700 text-slate-700 dark:text-white/80 text-[10px] sm:text-xs rounded-full border border-slate-200 dark:border-white/5"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
 
-                    <div className="pt-3 border-t border-slate-200 dark:border-white/10 mt-2 flex justify-end items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                    <div className="pt-2 sm:pt-3 border-t border-slate-200 dark:border-white/10 mt-1 sm:mt-2 flex justify-end items-center opacity-80 group-hover:opacity-100 transition-opacity">
                       <Link
                         href={`/tanaman/${plant.id}`}
-                        className="text-xs text-primary font-bold flex items-center gap-1 group/btn"
+                        className="text-[10px] sm:text-xs text-primary font-bold flex items-center gap-1 group/btn"
                       >
                         Detail{" "}
-                        <span className="material-symbols-outlined text-[14px] group-hover/btn:translate-x-1 transition-transform">
+                        <span className="material-symbols-outlined text-[12px] sm:text-[14px] group-hover/btn:translate-x-1 transition-transform">
                           arrow_forward
                         </span>
                       </Link>
