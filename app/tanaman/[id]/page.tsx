@@ -201,12 +201,16 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
                       const { bagian, pengolahan, pakai, keamanan } = parseRecipeBody(body);
 
                       return (
-                        <div key={resep.id} className="relative group flex flex-col p-5 rounded-2xl bg-slate-50 dark:bg-background-dark/30 border border-slate-100 dark:border-leaf-700/50 hover:border-primary/40 dark:hover:border-primary/40 transition-all duration-300 shadow-xs hover:shadow-md overflow-hidden">
+                        <details 
+                          key={resep.id} 
+                          className="group relative flex flex-col rounded-2xl bg-slate-50 dark:bg-background-dark/30 border border-slate-100 dark:border-leaf-700/50 hover:border-primary/40 dark:hover:border-primary/40 transition-all duration-300 shadow-xs hover:shadow-md [&_summary::-webkit-details-marker]:hidden"
+                          open={idx === 0}
+                        >
                           {/* Decorative subtle background glow on hover */}
                           <div className="absolute -inset-px bg-gradient-to-r from-primary/5 to-leaf-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 pointer-events-none" />
 
-                          {/* Top Header Row */}
-                          <div className="flex items-start justify-between gap-4 mb-3">
+                          {/* Top Header Row (Clickable Summary) */}
+                          <summary className="flex items-center justify-between gap-4 p-5 cursor-pointer select-none">
                             <div className="flex items-center gap-2">
                               <span className="material-symbols-outlined text-primary text-[20px] font-bold">medication</span>
                               <h4 className="text-sm font-extrabold text-slate-800 dark:text-white tracking-tight group-hover:text-primary transition-colors">
@@ -214,56 +218,61 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
                               </h4>
                             </div>
                             
-                            {bagian && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
-                                <span className="material-symbols-outlined text-[12px]">eco</span>
-                                {bagian}
-                              </span>
-                            )}
+                            <div className="flex items-center gap-3">
+                              {bagian && (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
+                                  <span className="material-symbols-outlined text-[12px]">eco</span>
+                                  {bagian}
+                                </span>
+                              )}
+                              <span className="material-symbols-outlined text-slate-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
+                            </div>
+                          </summary>
+
+                          {/* Details Grid (Content) */}
+                          <div className="px-5 pb-5 pt-0 border-t border-slate-100/50 dark:border-leaf-700/30 text-xs">
+                            <div className="pt-4 space-y-3.5">
+                              {/* Pengolahan */}
+                              {pengolahan && (
+                                <div className="flex gap-2">
+                                  <div className="flex-shrink-0 mt-0.5 text-primary/80">
+                                    <span className="material-symbols-outlined text-[16px]">soup_kitchen</span>
+                                  </div>
+                                  <div>
+                                    <span className="block font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider mb-0.5">Cara Pengolahan</span>
+                                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-xs">{pengolahan}</p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Cara Pakai */}
+                              {pakai && (
+                                <div className="flex gap-2">
+                                  <div className="flex-shrink-0 mt-0.5 text-primary/80">
+                                    <span className="material-symbols-outlined text-[16px]">local_cafe</span>
+                                  </div>
+                                  <div>
+                                    <span className="block font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider mb-0.5">Cara Pakai Tradisional</span>
+                                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-xs">{pakai}</p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Keamanan */}
+                              {keamanan && (
+                                <div className="mt-2 p-3 rounded-xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20 text-amber-800 dark:text-amber-300 flex gap-2">
+                                  <div className="flex-shrink-0 mt-0.5 text-amber-600 dark:text-amber-400">
+                                    <span className="material-symbols-outlined text-[16px] font-bold">warning</span>
+                                  </div>
+                                  <div>
+                                    <span className="block font-bold text-[9px] uppercase tracking-wider mb-0.5">Catatan Keamanan</span>
+                                    <p className="text-[11px] leading-relaxed">{keamanan}</p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
-
-                          {/* Details Grid */}
-                          <div className="space-y-3.5 text-xs mt-1">
-                            {/* Pengolahan */}
-                            {pengolahan && (
-                              <div className="flex gap-2">
-                                <div className="flex-shrink-0 mt-0.5 text-primary/80">
-                                  <span className="material-symbols-outlined text-[16px]">soup_kitchen</span>
-                                </div>
-                                <div>
-                                  <span className="block font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider mb-0.5">Cara Pengolahan</span>
-                                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-xs">{pengolahan}</p>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Cara Pakai */}
-                            {pakai && (
-                              <div className="flex gap-2">
-                                <div className="flex-shrink-0 mt-0.5 text-primary/80">
-                                  <span className="material-symbols-outlined text-[16px]">local_cafe</span>
-                                </div>
-                                <div>
-                                  <span className="block font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider mb-0.5">Cara Pakai Tradisional</span>
-                                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-xs">{pakai}</p>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Keamanan */}
-                            {keamanan && (
-                              <div className="mt-2 p-3 rounded-xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20 text-amber-800 dark:text-amber-300 flex gap-2">
-                                <div className="flex-shrink-0 mt-0.5 text-amber-600 dark:text-amber-400">
-                                  <span className="material-symbols-outlined text-[16px] font-bold">warning</span>
-                                </div>
-                                <div>
-                                  <span className="block font-bold text-[9px] uppercase tracking-wider mb-0.5">Catatan Keamanan</span>
-                                  <p className="text-[11px] leading-relaxed">{keamanan}</p>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                        </details>
                       );
                     }) : (
                       <p className="text-slate-500 dark:text-slate-400 text-sm italic">Belum ada resep pengolahan tercatat untuk tanaman ini.</p>
