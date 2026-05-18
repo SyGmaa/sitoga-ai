@@ -9,6 +9,10 @@ export default async function TambahTanamanPage() {
     select: { id: true, nama: true },
     orderBy: { nama: 'asc' },
   });
+  const penyakitList = await prisma.penyakit.findMany({
+    select: { id: true, nama: true },
+    orderBy: { nama: 'asc' },
+  });
   return (
     <div className="flex flex-col gap-8 animate-[slide-up_0.5s_ease-out_forwards]">
       
@@ -30,7 +34,7 @@ export default async function TambahTanamanPage() {
         {/* Form Container */}
         <div className="w-full xl:w-2/3 flex flex-col gap-8">
           <div className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-3xl p-6 md:p-10 relative transition-all">
-            <TambahTanamanForm kondisiMedisList={kondisiMedisList} />
+            <TambahTanamanForm kondisiMedisList={kondisiMedisList} penyakitList={penyakitList} />
           </div>
         </div>
 

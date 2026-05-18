@@ -11,13 +11,21 @@ interface PantanganEntry {
 
 interface TambahTanamanFormProps {
   kondisiMedisList: { id: string; nama: string }[];
+  penyakitList: { id: string; nama: string }[];
 }
 
-export function TambahTanamanForm({ kondisiMedisList }: TambahTanamanFormProps) {
+export function TambahTanamanForm({ kondisiMedisList, penyakitList }: TambahTanamanFormProps) {
   const [isPending, startTransition] = useTransition();
   const [step, setStep] = useState(1);
   const [langkahPengolahan, setLangkahPengolahan] = useState<string[]>([""]);
   const [pantanganList, setPantanganList] = useState<PantanganEntry[]>([]);
+  const [penyakitSelected, setPenyakitSelected] = useState<string[]>([]);
+
+  const handleTogglePenyakit = (id: string) => {
+    setPenyakitSelected(prev => 
+      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+    );
+  };
 
   const handleAddLangkah = () => {
     setLangkahPengolahan([...langkahPengolahan, ""]);
@@ -94,6 +102,9 @@ export function TambahTanamanForm({ kondisiMedisList }: TambahTanamanFormProps) 
       
       {/* Hidden input to store JSON array of pantangan */}
       <input type="hidden" name="pantanganData" value={JSON.stringify(pantanganList.filter(p => p.kondisiMedisId !== ""))} />
+
+      {/* Hidden input to store JSON array of penyakit */}
+      <input type="hidden" name="penyakitData" value={JSON.stringify(penyakitSelected)} />
       
       {/* Steps Indicator */}
       <div className="flex flex-col gap-2 mb-2">
@@ -182,6 +193,43 @@ export function TambahTanamanForm({ kondisiMedisList }: TambahTanamanFormProps) 
           <div className="flex flex-col gap-2">
             <label htmlFor="khasiatUtama" className="text-sm font-bold text-slate-700 dark:text-slate-300">Khasiat Utama</label>
             <textarea required name="khasiatUtama" id="khasiatUtama" placeholder="e.g. Mengobati luka bakar, panas dalam..." rows={5} className="w-full bg-transparent border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-slate-900 dark:text-white"></textarea>
+          </div>
+        </div>
+        
+        <div className="h-px bg-linear-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent w-full my-2"></div>
+
+        {/* Section: Penyakit yang Bisa Diobati */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2 text-primary">
+            <span className="material-symbols-outlined animate-bounce">healing</span>
+            <span className="text-sm font-bold uppercase tracking-wider">Penyakit yang Bisa Diobati</span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {penyakitList.length === 0 ? (
+              <div className="col-span-full text-sm text-slate-500">Belum ada data penyakit.</div>
+            ) : (
+              penyakitList.map((penyakit) => (
+                <label 
+                  key={penyakit.id} 
+                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                    penyakitSelected.includes(penyakit.id) 
+                      ? "bg-primary/10 border-primary/50" 
+                      : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-primary/30"
+                  }`}
+                >
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4 text-primary rounded focus:ring-primary focus:ring-2"
+                    checked={penyakitSelected.includes(penyakit.id)}
+                    onChange={() => handleTogglePenyakit(penyakit.id)}
+                  />
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    {penyakit.nama}
+                  </span>
+                </label>
+              ))
+            )}
           </div>
         </div>
         

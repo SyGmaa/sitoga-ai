@@ -18,6 +18,11 @@ export async function getTanamanById(id: string) {
           include: {
             penyakit: true
           }
+        },
+        pantanganTanaman: {
+          include: {
+            kondisiMedis: true
+          }
         }
       }
     });
@@ -50,6 +55,7 @@ export async function createTanaman(formData: FormData) {
     const khasiatUtama = formData.get("khasiatUtama") as string;
     const resepPengolahanRaw = formData.get("resepPengolahan") as string;
     const pantanganDataRaw = formData.get("pantanganData") as string;
+    const penyakitDataRaw = formData.get("penyakitData") as string;
     
     let resepPengolahan: string[] = [];
     try {
@@ -67,6 +73,15 @@ export async function createTanaman(formData: FormData) {
       }
     } catch (e) {
       console.error("Error parsing pantanganData:", e);
+    }
+
+    let penyakitData: string[] = [];
+    try {
+      if (penyakitDataRaw) {
+        penyakitData = JSON.parse(penyakitDataRaw);
+      }
+    } catch (e) {
+      console.error("Error parsing penyakitData:", e);
     }
     
     let gambarUrl = null;
@@ -102,6 +117,11 @@ export async function createTanaman(formData: FormData) {
             create: resepPengolahan.map((langkah) => ({ langkah }))
           }
         }),
+        ...(penyakitData.length > 0 && {
+          penyakitTerkait: {
+            create: penyakitData.map((penyakitId) => ({ penyakitId }))
+          }
+        }),
         ...(pantanganData.length > 0 && {
           pantanganTanaman: {
             create: pantanganData.map((p) => ({
@@ -130,6 +150,8 @@ export async function updateTanaman(id: string, formData: FormData) {
     const kandunganSenyawa = formData.get("kandunganSenyawa") as string;
     const khasiatUtama = formData.get("khasiatUtama") as string;
     const resepPengolahanRaw = formData.get("resepPengolahan") as string;
+    const pantanganDataRaw = formData.get("pantanganData") as string;
+    const penyakitDataRaw = formData.get("penyakitData") as string;
     
     let resepPengolahan: string[] = [];
     try {
@@ -138,6 +160,24 @@ export async function updateTanaman(id: string, formData: FormData) {
       }
     } catch (e) {
       console.error("Error parsing resepPengolahan:", e);
+    }
+
+    let pantanganData: { kondisiMedisId: string; tingkatRisiko: string; alasan: string }[] = [];
+    try {
+      if (pantanganDataRaw) {
+        pantanganData = JSON.parse(pantanganDataRaw);
+      }
+    } catch (e) {
+      console.error("Error parsing pantanganData:", e);
+    }
+
+    let penyakitData: string[] = [];
+    try {
+      if (penyakitDataRaw) {
+        penyakitData = JSON.parse(penyakitDataRaw);
+      }
+    } catch (e) {
+      console.error("Error parsing penyakitData:", e);
     }
     
     let gambarUrl = undefined;
@@ -174,6 +214,18 @@ export async function updateTanaman(id: string, formData: FormData) {
         resepPengolahan: {
           deleteMany: {}, // Hapus langkah lama
           create: resepPengolahan.map((langkah) => ({ langkah })) // Buat baru dari form
+        },
+        penyakitTerkait: {
+          deleteMany: {},
+          create: penyakitData.map((penyakitId) => ({ penyakitId }))
+        },
+        pantanganTanaman: {
+          deleteMany: {},
+          create: pantanganData.map((p) => ({
+            kondisiMedisId: p.kondisiMedisId,
+            tingkatRisiko: p.tingkatRisiko || null,
+            alasan: p.alasan || null,
+          }))
         }
       }
     });

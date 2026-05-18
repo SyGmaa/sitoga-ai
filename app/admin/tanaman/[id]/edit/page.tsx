@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTanamanById } from '@/actions/tanaman';
 import { EditTanamanForm } from './EditTanamanForm';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export default async function EditTanamanPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -12,6 +15,15 @@ export default async function EditTanamanPage({ params }: { params: Promise<{ id
   }
 
   const tanaman = result.data;
+
+  const kondisiMedisList = await prisma.kondisiMedis.findMany({
+    select: { id: true, nama: true },
+    orderBy: { nama: 'asc' },
+  });
+  const penyakitList = await prisma.penyakit.findMany({
+    select: { id: true, nama: true },
+    orderBy: { nama: 'asc' },
+  });
 
   return (
     <div className="flex flex-col gap-8 animate-[slide-up_0.5s_ease-out_forwards]">
@@ -34,7 +46,7 @@ export default async function EditTanamanPage({ params }: { params: Promise<{ id
         {/* Form Container */}
         <div className="w-full xl:w-2/3 flex flex-col gap-8">
           <div className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-3xl p-6 md:p-10 relative transition-all">
-            <EditTanamanForm initialData={tanaman} />
+            <EditTanamanForm initialData={tanaman} kondisiMedisList={kondisiMedisList} penyakitList={penyakitList} />
           </div>
         </div>
 

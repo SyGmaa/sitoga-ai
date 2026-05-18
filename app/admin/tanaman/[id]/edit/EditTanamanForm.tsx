@@ -3,6 +3,12 @@
 import { useTransition, useState } from "react";
 import { updateTanaman } from "@/actions/tanaman";
 
+interface PantanganEntry {
+  kondisiMedisId: string;
+  tingkatRisiko: string;
+  alasan: string;
+}
+
 type TanamanInitialData = {
   id: string;
   namaLokal: string;
@@ -12,9 +18,17 @@ type TanamanInitialData = {
   khasiatUtama: string;
   gambarUrl: string | null;
   resepPengolahan?: { langkah: string }[];
+  penyakitTerkait?: { penyakitId: string }[];
+  pantanganTanaman?: { kondisiMedisId: string; tingkatRisiko: string | null; alasan: string | null }[];
 };
 
-export function EditTanamanForm({ initialData }: { initialData: TanamanInitialData }) {
+interface EditTanamanFormProps {
+  initialData: TanamanInitialData;
+  kondisiMedisList: { id: string; nama: string }[];
+  penyakitList: { id: string; nama: string }[];
+}
+
+export function EditTanamanForm({ initialData, kondisiMedisList, penyakitList }: EditTanamanFormProps) {
   const [isPending, startTransition] = useTransition();
   const [step, setStep] = useState(1);
   
@@ -24,6 +38,38 @@ export function EditTanamanForm({ initialData }: { initialData: TanamanInitialDa
     : [""];
   
   const [langkahPengolahan, setLangkahPengolahan] = useState<string[]>(initialResep);
+  
+  const initialPenyakit = initialData.penyakitTerkait?.map(p => p.penyakitId) || [];
+  const [penyakitSelected, setPenyakitSelected] = useState<string[]>(initialPenyakit);
+  
+  const initialPantangan = initialData.pantanganTanaman?.map(p => ({
+    kondisiMedisId: p.kondisiMedisId,
+    tingkatRisiko: p.tingkatRisiko || "HATI-HATI",
+    alasan: p.alasan || "",
+  })) || [];
+  const [pantanganList, setPantanganList] = useState<PantanganEntry[]>(initialPantangan);
+
+  const handleTogglePenyakit = (id: string) => {
+    setPenyakitSelected(prev => 
+      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+    );
+  };
+
+  const handleAddPantangan = () => {
+    setPantanganList([...pantanganList, { kondisiMedisId: "", tingkatRisiko: "HATI-HATI", alasan: "" }]);
+  };
+
+  const handleRemovePantangan = (index: number) => {
+    const newList = [...pantanganList];
+    newList.splice(index, 1);
+    setPantanganList(newList);
+  };
+
+  const handleChangePantangan = (index: number, field: keyof PantanganEntry, value: string) => {
+    const newList = [...pantanganList];
+    newList[index] = { ...newList[index], [field]: value };
+    setPantanganList(newList);
+  };
 
   const handleAddLangkah = () => {
     setLangkahPengolahan([...langkahPengolahan, ""]);
@@ -77,6 +123,12 @@ export function EditTanamanForm({ initialData }: { initialData: TanamanInitialDa
       
       {/* Hidden input to store JSON array of preparation steps */}
       <input type="hidden" name="resepPengolahan" value={JSON.stringify(langkahPengolahan.filter(l => l.trim() !== ""))} />
+      
+      {/* Hidden input to store JSON array of pantangan */}
+      <input type="hidden" name="pantanganData" value={JSON.stringify(pantanganList.filter(p => p.kondisiMedisId !== ""))} />
+
+      {/* Hidden input to store JSON array of penyakit */}
+      <input type="hidden" name="penyakitData" value={JSON.stringify(penyakitSelected)} />
 
       {/* Steps Indicator */}
       <div className="flex flex-col gap-2 mb-2">
@@ -179,6 +231,43 @@ export function EditTanamanForm({ initialData }: { initialData: TanamanInitialDa
 
         <div className="h-px bg-linear-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent w-full my-2"></div>
 
+        {/* Section: Penyakit yang Bisa Diobati */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2 text-primary">
+            <span className="material-symbols-outlined animate-bounce">healing</span>
+            <span className="text-sm font-bold uppercase tracking-wider">Penyakit yang Bisa Diobati</span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {penyakitList.length === 0 ? (
+              <div className="col-span-full text-sm text-slate-500">Belum ada data penyakit.</div>
+            ) : (
+              penyakitList.map((penyakit) => (
+                <label 
+                  key={penyakit.id} 
+                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                    penyakitSelected.includes(penyakit.id) 
+                      ? "bg-primary/10 border-primary/50" 
+                      : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-primary/30"
+                  }`}
+                >
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4 text-primary rounded focus:ring-primary focus:ring-2"
+                    checked={penyakitSelected.includes(penyakit.id)}
+                    onChange={() => handleTogglePenyakit(penyakit.id)}
+                  />
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    {penyakit.nama}
+                  </span>
+                </label>
+              ))
+            )}
+          </div>
+        </div>
+        
+        <div className="h-px bg-linear-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent w-full my-2"></div>
+
         {/* Section: Preparation Steps */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
@@ -222,6 +311,93 @@ export function EditTanamanForm({ initialData }: { initialData: TanamanInitialDa
                     <span className="material-symbols-outlined text-[20px]">delete</span>
                   </button>
                 )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="h-px bg-linear-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent w-full my-2"></div>
+
+        {/* Section: Pantangan (Contraindications) */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-amber-500">
+              <span className="material-symbols-outlined animate-bounce">warning</span>
+              <span className="text-sm font-bold uppercase tracking-wider">Pantangan / Kontraindikasi</span>
+            </div>
+            <button 
+              type="button" 
+              onClick={handleAddPantangan}
+              className="text-amber-500 text-sm font-bold hover:text-amber-600 transition-colors flex items-center gap-1"
+            >
+              <span className="material-symbols-outlined text-lg">playlist_add</span>
+              Tambah Pantangan
+            </button>
+          </div>
+
+          {pantanganList.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-8 px-4 bg-slate-50 dark:bg-slate-800/30 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-center">
+              <span className="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600 mb-2">shield</span>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Belum ada pantangan ditambahkan.</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">Klik &quot;Tambah Pantangan&quot; untuk menentukan kondisi medis yang perlu diwaspadai.</p>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-3">
+            {pantanganList.map((pantangan, index) => (
+              <div key={index} className="flex flex-col gap-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 transition-all group">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded">Pantangan {index + 1}</span>
+                  <button 
+                    type="button" 
+                    onClick={() => handleRemovePantangan(index)}
+                    className="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                    title="Hapus Pantangan"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">close</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Kondisi Medis</label>
+                    <select
+                      value={pantangan.kondisiMedisId}
+                      onChange={(e) => handleChangePantangan(index, "kondisiMedisId", e.target.value)}
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 transition-all text-slate-900 dark:text-white text-sm"
+                    >
+                      <option value="">— Pilih Kondisi —</option>
+                      {kondisiMedisList.map((kondisi) => (
+                        <option key={kondisi.id} value={kondisi.id}>
+                          {kondisi.nama}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Tingkat Risiko</label>
+                    <select
+                      value={pantangan.tingkatRisiko}
+                      onChange={(e) => handleChangePantangan(index, "tingkatRisiko", e.target.value)}
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 transition-all text-slate-900 dark:text-white text-sm"
+                    >
+                      <option value="HATI-HATI">⚠️ HATI-HATI</option>
+                      <option value="BERBAHAYA">🚫 BERBAHAYA</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Alasan Pantangan</label>
+                  <textarea
+                    value={pantangan.alasan}
+                    onChange={(e) => handleChangePantangan(index, "alasan", e.target.value)}
+                    placeholder="Jelaskan alasan mengapa tanaman ini dilarang untuk kondisi tersebut..."
+                    rows={2}
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 transition-all text-slate-900 dark:text-white text-sm resize-none"
+                  ></textarea>
+                </div>
               </div>
             ))}
           </div>
