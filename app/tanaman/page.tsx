@@ -163,13 +163,7 @@ export default async function PlantListPage() {
                       ))}
                     </div>
 
-                    <div className="pt-3 border-t border-slate-200 dark:border-white/10 mt-2 flex justify-between items-center opacity-80 group-hover:opacity-100 transition-opacity">
-                      <span className="text-xs text-slate-500 dark:text-leaf-400 flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[14px]">
-                          location_on
-                        </span>{" "}
-                        {plant.lokasiTanam || "Zona Tak Dikenal"}
-                      </span>
+                    <div className="pt-3 border-t border-slate-200 dark:border-white/10 mt-2 flex justify-end items-center opacity-80 group-hover:opacity-100 transition-opacity">
                       <Link
                         href={`/tanaman/${plant.id}`}
                         className="text-xs text-primary font-bold flex items-center gap-1 group/btn"

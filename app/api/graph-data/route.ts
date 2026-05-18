@@ -38,7 +38,6 @@ export async function GET() {
         namaLokal: true,
         namaLatin: true,
         khasiatUtama: true,
-        lokasiTanam: true,
         penyakitTerkait: {
           select: {
             penyakitId: true,
@@ -108,7 +107,6 @@ export async function GET() {
         type: "tanaman",
         label: t.namaLokal,
         desc: `${t.namaLatin} — ${t.khasiatUtama}`,
-        lokasi: t.lokasiTanam,
         dbId: t.id,
       });
 

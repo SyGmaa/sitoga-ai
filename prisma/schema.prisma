@@ -28,7 +28,6 @@ model Tanaman {
   deskripsi        String  @db.Text
   kandunganSenyawa String  @db.Text
   khasiatUtama     String  @db.Text
-  lokasiTanam      String  @db.Text // Berupa teks deskriptif, misal: "Blok A Taman Herbal"
   gambarUrl        String? // URL gambar setelah di-upload
 
   // Relasi

@@ -31,7 +31,7 @@ export default async function AdminTanamanPage() {
               <tr>
                 <th className="px-6 py-5" scope="col">Nama Tanaman</th>
                 <th className="px-6 py-5 hidden lg:table-cell" scope="col">Nama Ilmiah</th>
-                <th className="px-6 py-5" scope="col">Lokasi</th>
+
                 <th className="px-6 py-5 hidden xl:table-cell" scope="col">Khasiat Utama</th>
                 <th className="px-6 py-5 text-right" scope="col">Aksi</th>
               </tr>
@@ -58,11 +58,7 @@ export default async function AdminTanamanPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-slate-600 dark:text-slate-300 italic hidden lg:table-cell">{tanaman.namaLatin}</td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-blue-100/50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50 truncate max-w-[150px]">
-                      {tanaman.lokasiTanam}
-                    </span>
-                  </td>
+
                   <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden xl:table-cell max-w-[250px] truncate text-xs">
                     {tanaman.khasiatUtama}
                   </td>
@@ -107,10 +103,7 @@ export default async function AdminTanamanPage() {
                   {tanaman.namaLokal}
                 </Link>
                 <p className="text-xs text-slate-500 dark:text-slate-400 italic truncate mt-0.5">{tanaman.namaLatin}</p>
-                <div className="mt-2 flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[14px] text-blue-500">location_on</span>
-                  <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 truncate">{tanaman.lokasiTanam}</span>
-                </div>
+
               </div>
             </div>
 

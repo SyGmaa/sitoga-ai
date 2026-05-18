@@ -75,12 +75,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
                 <h1 className="text-5xl md:text-6xl font-bold text-white mb-2 tracking-tight">{tanaman.namaLokal}</h1>
                 <h2 className="text-xl md:text-2xl text-leaf-400 italic font-light mb-6">{tanaman.namaLatin}</h2>
                 
-                <div className="flex flex-wrap items-center gap-4 mb-8">
-                  <div className="flex items-center gap-2 bg-surface-dark px-4 py-2 rounded-full border border-leaf-700 text-white">
-                    <span className="material-symbols-outlined text-primary text-[20px]">location_on</span>
-                    <span className="text-sm">{tanaman.lokasiTanam}</span>
-                  </div>
-                </div>
+
                 
                 <p className="text-slate-300 leading-relaxed text-lg mb-8 max-w-xl">
                   {tanaman.deskripsi}

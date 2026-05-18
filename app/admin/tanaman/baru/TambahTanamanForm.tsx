@@ -128,10 +128,7 @@ export function TambahTanamanForm({ kondisiMedisList }: TambahTanamanFormProps) 
             <input required name="namaLatin" id="namaLatin" placeholder="e.g. Aloe vera" type="text" className="w-full bg-transparent border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-slate-900 dark:text-white italic" />
           </div>
           
-          <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
-            <label htmlFor="lokasiTanam" className="text-sm font-bold text-slate-700 dark:text-slate-300">Lokasi Tanam</label>
-            <input required name="lokasiTanam" id="lokasiTanam" placeholder="e.g. Blok A Taman Herbal" type="text" className="w-full bg-transparent border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-slate-900 dark:text-white" />
-          </div>
+
 
           <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
             <label htmlFor="deskripsi" className="text-sm font-bold text-slate-700 dark:text-slate-300">Deskripsi Umum</label>

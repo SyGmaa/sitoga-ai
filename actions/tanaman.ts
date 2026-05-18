@@ -46,7 +46,6 @@ export async function createTanaman(formData: FormData) {
     const namaLokal = formData.get("namaLokal") as string;
     const namaLatin = formData.get("namaLatin") as string;
     const deskripsi = formData.get("deskripsi") as string;
-    const lokasiTanam = formData.get("lokasiTanam") as string;
     const kandunganSenyawa = formData.get("kandunganSenyawa") as string;
     const khasiatUtama = formData.get("khasiatUtama") as string;
     const resepPengolahanRaw = formData.get("resepPengolahan") as string;
@@ -95,7 +94,6 @@ export async function createTanaman(formData: FormData) {
         namaLokal,
         namaLatin,
         deskripsi,
-        lokasiTanam,
         kandunganSenyawa,
         khasiatUtama,
         gambarUrl,
@@ -129,7 +127,6 @@ export async function updateTanaman(id: string, formData: FormData) {
     const namaLokal = formData.get("namaLokal") as string;
     const namaLatin = formData.get("namaLatin") as string;
     const deskripsi = formData.get("deskripsi") as string;
-    const lokasiTanam = formData.get("lokasiTanam") as string;
     const kandunganSenyawa = formData.get("kandunganSenyawa") as string;
     const khasiatUtama = formData.get("khasiatUtama") as string;
     const resepPengolahanRaw = formData.get("resepPengolahan") as string;
@@ -171,7 +168,6 @@ export async function updateTanaman(id: string, formData: FormData) {
         namaLokal,
         namaLatin,
         deskripsi,
-        lokasiTanam,
         kandunganSenyawa,
         khasiatUtama,
         ...(gambarUrl !== undefined ? { gambarUrl } : {}),

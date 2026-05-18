@@ -330,7 +330,6 @@ async function main() {
       deskripsi: 'Rimpang yang sangat populer sebagai rempah dan obat. Jahe memiliki rasa pedas dan memberikan sensasi hangat.',
       kandunganSenyawa: 'Gingerol, Shogaol, Zingerone, Minyak Atsiri',
       khasiatUtama: 'Meredakan mual, batuk, nyeri sendi, dan gangguan pernapasan ringan.',
-      lokasiTanam: 'Blok A (Taman Rimpang)',
       gambarUrl: 'https://images.unsplash.com/photo-1615486171448-4fd1ebdd1c12?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Batuk dan Flu', 'Gangguan Pencernaan / Maag', 'Asam Urat (Gout)'],
       resep: [
@@ -345,7 +344,6 @@ async function main() {
       deskripsi: 'Rimpang berwarna kuning-oranye yang khas, sering digunakan untuk bumbu masakan dan obat luka lambung.',
       kandunganSenyawa: 'Kurkumin, Seskuiterpen, Bisdesmetoksikurkumin',
       khasiatUtama: 'Anti-inflamasi kuat, menyembuhkan maag, dan meredakan nyeri menstruasi.',
-      lokasiTanam: 'Blok A (Taman Rimpang)',
       gambarUrl: 'https://images.unsplash.com/photo-1615560462719-7521c7d2e964?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Gangguan Pencernaan / Maag', 'Asam Urat (Gout)'],
       resep: [
@@ -360,7 +358,6 @@ async function main() {
       deskripsi: 'Tanaman berbunga putih menyerupai kumis kucing. Sangat terkenal sebagai luruh kencing (diuretik).',
       kandunganSenyawa: 'Ortosifonin, Sinensetin, Asam Rosmarinat, Flavonoid',
       khasiatUtama: 'Melancarkan buang air kecil, menghancurkan batu ginjal, dan menurunkan asam urat.',
-      lokasiTanam: 'Blok B (Taman Perdu Obat)',
       gambarUrl: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&q=80', // placeholder
       penyakitTerkait: ['Infeksi Saluran Kemih (ISK)', 'Asam Urat (Gout)', 'Hipertensi (Tekanan Darah Tinggi)'],
       resep: [
@@ -375,7 +372,6 @@ async function main() {
       deskripsi: 'Tanaman herba yang rasanya sangat pahit (Raja Pahit). Memiliki ragam khasiat sangat kuat untuk berbagai penyakit kronis.',
       kandunganSenyawa: 'Andrographolide, Flavonoid, Saponin, Tannin',
       khasiatUtama: 'Menurunkan gula darah, tekanan darah, dan sebagai imunomodulator kuat penurun demam.',
-      lokasiTanam: 'Blok B (Taman Perdu Obat)',
       gambarUrl: 'https://cdn.pixabay.com/photo/2020/09/25/11/47/andrographis-paniculata-5601112_1280.jpg',
       penyakitTerkait: ['Diabetes Melitus', 'Hipertensi (Tekanan Darah Tinggi)', 'Radang Tenggorokan'],
       resep: [
@@ -390,7 +386,6 @@ async function main() {
       deskripsi: 'Tanaman berduri lunak berpaging tebal berlendir jernih. Obat pertolongan pertama yang sangat baik di rumah.',
       kandunganSenyawa: 'Aloin, Enzim Bradykinase, Asam Salisilat alami, Lignin',
       khasiatUtama: 'Menyembuhkan luka bakar, meredakan radang tenggorokan, mendinginkan pencernaan.',
-      lokasiTanam: 'Blok C (Area Sukulen)',
       gambarUrl: 'https://images.unsplash.com/photo-1596547609652-9fc5d8d428ce?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Luka Luar dan Luka Bakar Ringan', 'Radang Tenggorokan', 'Gangguan Pencernaan / Maag'],
       resep: [
@@ -406,7 +401,6 @@ async function main() {
       deskripsi: 'Bumbu dapur yang merupakan antibiotik alami bertenaga tinggi dan peluruh lemak pembuluh darah.',
       kandunganSenyawa: 'Allicin, Alliin, Dialil Disulfida',
       khasiatUtama: 'Menurunkan kolesterol, menurunkan tekanan darah tinggi, membunuh bakteri asing.',
-      lokasiTanam: 'Blok D (Tanaman Dapur Hidup)',
       gambarUrl: 'https://images.unsplash.com/photo-1615486171448-4fd1ebdd1c12?auto=format&fit=crop&q=80', // Replace with garlic
       penyakitTerkait: ['Kolesterol Tinggi', 'Hipertensi (Tekanan Darah Tinggi)'],
       resep: [
@@ -421,7 +415,6 @@ async function main() {
       deskripsi: 'Daun mint memiliki aroma segar mentol yang menenangkan saluran pernapasan dan pencernaan.',
       kandunganSenyawa: 'Menthol, Menthone, Menthyl acetate',
       khasiatUtama: 'Meredakan sakit kepala, batuk pilek, dan masalah pencernaan.',
-      lokasiTanam: 'Blok A (Taman Rimpang)',
       gambarUrl: 'https://images.unsplash.com/photo-1628156173003-8d0092c8dc8f?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Masalah pencernaan (kembung, mual, iritasi usus)', 'Sakit kepala', 'Batuk pilek', 'Gangguan pernapasan ringan', 'Stres ringan'],
       resep: ['Seduh 5-7 lembar daun mint segar dengan secangkir air panas.']
@@ -432,7 +425,6 @@ async function main() {
       deskripsi: 'Pohon murbei menghasilkan daun yang banyak digunakan dalam pengobatan tradisional untuk mengontrol gula darah.',
       kandunganSenyawa: 'DNJ (1-deoxynojirimycin), Flavonoid',
       khasiatUtama: 'Menurunkan gula darah (diabetes), kolesterol, dan mengatasi infeksi pernapasan.',
-      lokasiTanam: 'Blok B (Taman Perdu Obat)',
       gambarUrl: 'https://images.unsplash.com/photo-1620619864227-8494c2599b9e?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Diabetes Melitus', 'Kolesterol Tinggi', 'Infeksi saluran napas', 'Gangguan kognitif'],
       resep: ['Rebus segenggam daun murbei kering, minum sebagai teh sehari sekali.']
@@ -443,7 +435,6 @@ async function main() {
       deskripsi: 'Tanaman herbal aromatik berdaun jarum. Populer karena kemampuannya meningkatkan fungsi otak dan kekebalan.',
       kandunganSenyawa: 'Asam rosmarinat, Asam karnosat',
       khasiatUtama: 'Mengatasi peradangan sendi, infeksi bakteri, dan memulihkan kelelahan mental.',
-      lokasiTanam: 'Blok B (Taman Perdu Obat)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Peradangan sendi', 'Infeksi bakteri ringan', 'Kelelahan', 'Gangguan hati ringan'],
       resep: ['Gunakan secukupnya aromanya dengan diseduh atau dihirup uapnya.']
@@ -454,7 +445,6 @@ async function main() {
       deskripsi: 'Daun dengan aroma tajam yang banyak digunakan untuk pengobatan tradisional perut.',
       kandunganSenyawa: 'Mahanimbine, Koenimbine',
       khasiatUtama: 'Menyehatkan pencernaan dan meredakan mual.',
-      lokasiTanam: 'Blok D (Tanaman Dapur Hidup)',
       gambarUrl: 'https://images.unsplash.com/photo-1621245785097-f131aebb2dfd?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Gangguan Pencernaan / Maag'],
       resep: ['Rebus 5 lembar daun kari segar, lalu minum air sarinya.']
@@ -465,7 +455,6 @@ async function main() {
       deskripsi: 'Bawang lokal dengan bonggol panjang merah menyala khas obat tradisional dayak.',
       kandunganSenyawa: 'Naphthoquinone (eleutherin, isoeleutherin), flavonoid, saponin, tanin, alkaloid',
       khasiatUtama: 'Antioksidan, antidiabetes, antikanker, antibakteri, antijamur, antiinflamasi',
-      lokasiTanam: 'Blok A (Taman Rimpang)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Diabetes Melitus', 'Kanker payudara & kolon', 'Infeksi bakteri/jamur', 'Hipertensi ringan', 'Masalah pencernaan (kembung, mual, iritasi usus)'],
       resep: ['Rajang bawang dayak segar lalu seduh dengan air mendidih.']
@@ -476,7 +465,6 @@ async function main() {
       deskripsi: 'Bunga rambat biru ungu cerah sering digunakan sebagai seduhan teh pewarna alami relaksan otak.',
       kandunganSenyawa: 'Anthocyanin (ternatin), flavonoid, alkaloid, saponin, tanin',
       khasiatUtama: 'Antioksidan kuat, neuroprotektif, antiinflamasi, meningkatkan memori',
-      lokasiTanam: 'Blok C (Area Tanaman Rambat)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Gangguan memori', 'Kecemasan', 'Radang', 'Stres oksidatif'],
       resep: ['Sajikan 5 bunga telang sebagai teh herbal warna biru alami. Tambahkan perasan melon jeruk.']
@@ -487,7 +475,6 @@ async function main() {
       deskripsi: 'Biji selasih yang kembang direndaman air dan daun aromatik penghias es manis.',
       kandunganSenyawa: 'Eugenol, linalool, methyl chavicol, flavonoid, saponin',
       khasiatUtama: 'Antibakteri, antijamur, antiinflamasi, menenangkan, meningkatkan pencernaan',
-      lokasiTanam: 'Blok B (Taman Perdu Obat)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Masalah pencernaan (kembung, mual, iritasi usus)', 'Stres', 'Infeksi ringan', 'Batuk'],
       resep: ['Siapkan satu sendok biji selasih kering di air hangat sebagai pendamping teh hangat mint.']
@@ -498,7 +485,6 @@ async function main() {
       deskripsi: 'Daun kenikir adalah jenis sayuran lalab kesukaan nusantara. Berbentuk memanjang dan rasanya lumayan enak khas.',
       kandunganSenyawa: 'Flavonoid (quercetin), tokoferol, fenolik, asam amino',
       khasiatUtama: 'Antioksidan kuat, menurunkan gula darah, meningkatkan nafsu makan',
-      lokasiTanam: 'Blok D (Tanaman Dapur Hidup)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Diabetes Melitus', 'Radikal bebas', 'Kurang nafsu makan'],
       resep: ['Konsumsi seledri segar yang diseduh di lauk basah nasi.']
@@ -509,7 +495,6 @@ async function main() {
       deskripsi: 'Spesies jeruk peras sangat kecil asam segar. Dikenal luar di kuliner dan anti infeksi peradangan gatal.',
       kandunganSenyawa: 'Vitamin C tinggi, limonene, citral, flavonoid',
       khasiatUtama: 'Antiviral, antibakteri, ekspektoran, antioksidan',
-      lokasiTanam: 'Blok B (Taman Perdu Obat)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Batuk', 'Flu', 'Radang Tenggorokan', 'Gangguan Pencernaan / Maag'],
       resep: ['Peras dua butir jeruk kasturi ke dalam segelas air hangat dan madu.']
@@ -520,7 +505,6 @@ async function main() {
       deskripsi: 'Gulma liar kaya manfaat dengan buah bertabung kulit lampion yang sangat bermanfaat dan bisa dikonsumsi di masa panen matang.',
       kandunganSenyawa: 'Withanolides, saponin, flavonoid, physalin',
       khasiatUtama: 'Antidiabetes, antihipertensi, antikanker, imunomodulator',
-      lokasiTanam: 'Blok B (Taman Perdu Obat)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Diabetes Melitus', 'Hipertensi (Tekanan Darah Tinggi)', 'Kanker', 'Peradangan'],
       resep: ['Makan buah matang atau rebus daun cabut keseluruhan ciplukan sebagai air mandian obat luar memar.']
@@ -531,7 +515,6 @@ async function main() {
       deskripsi: 'Rimpang keras populer nusantara.',
       kandunganSenyawa: 'Galangin, eugenol, flavonoid, diarylheptanoids',
       khasiatUtama: 'Antimikroba, antiinflamasi, melancarkan pencernaan',
-      lokasiTanam: 'Blok A (Taman Rimpang)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Infeksi bakteri', 'Nyeri sendi', 'Masalah pencernaan (kembung, mual, iritasi usus)'],
       resep: ['Tumbuk kecil lengkuas lalu rebus bersama jahe dan serai minum ketika pagi.']
@@ -542,7 +525,6 @@ async function main() {
       deskripsi: 'Daun hijau lebar dikenal luas efektif untuk mengatasi penyakit kronis terkait tekanan darah dan gula tubuh hati.',
       kandunganSenyawa: 'Flavonoid, asam fenolat, saponin, tanin',
       khasiatUtama: 'Hipoglikemik, hepatoprotektif, antiinflamasi',
-      lokasiTanam: 'Blok D (Tanaman Dapur Hidup)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Diabetes Melitus', 'Penyakit hati', 'Hipertensi (Tekanan Darah Tinggi)'],
       resep: ['Lalap 3 daun nyawa layu atau direbus air semalaman didinginkan']
@@ -553,7 +535,6 @@ async function main() {
       deskripsi: 'Kaktus berbentuk telinga dengan gel kaya nutrisi luka.',
       kandunganSenyawa: 'Saponin, mukilago, vitamin B & C, betalain',
       khasiatUtama: 'Menyembuhkan luka bakar, antiinflamasi, analgesik',
-      lokasiTanam: 'Blok C (Area Sukulen)',
       gambarUrl: 'https://images.unsplash.com/photo-1596547609652-9fc5d8d428ce?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Luka bakar', 'Radang kulit', 'Sakit sendi'],
       resep: ['Buka lapisan kulitnya, lumatkan gel tipis di jaringan radang area luar atau kompres tempel.']
@@ -564,7 +545,6 @@ async function main() {
       deskripsi: 'Tanaman populer perdu hias aroma bunga dan pembakar lemak di rahasia ayu tradisional tubuh putri keratin kraton nusantara.',
       kandunganSenyawa: 'Alkaloid murrayanine, coumarin, flavonoid, essential oil',
       khasiatUtama: 'Peluruh lemak, antiradang, analgesik',
-      lokasiTanam: 'Blok B (Taman Perdu Obat)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Obesitas', 'Nyeri haid', 'Nyeri sendi'],
       resep: ['Daun kemuning segar diparut ditaruh dahi, jika rebus minum selagi pahitnya kuat hangat.']
@@ -575,7 +555,6 @@ async function main() {
       deskripsi: 'Belimbing sangat lengket manis dan asam segar kaya antioksidan pendorong daya tahan dan penyembuhan jaringan kulit.',
       kandunganSenyawa: 'Asam oksalat, vitamin C, flavonoid, saponin',
       khasiatUtama: 'Antiseptik, antioksidan, antidiabetes, antihipertensi',
-      lokasiTanam: 'Blok B (Taman Perdu Obat)',
       gambarUrl: 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80',
       penyakitTerkait: ['Jerawat', 'Hipertensi (Tekanan Darah Tinggi)', 'Diabetes Melitus', 'Infeksi kulit'],
       resep: ['Tumbuk lumat peras air lalu rendam bilas pada rambut gatal atau seduh dengan garam madu dikit atasi flu tegang hipertensi.']
@@ -593,7 +572,6 @@ async function main() {
           deskripsi: t.deskripsi,
           kandunganSenyawa: t.kandunganSenyawa,
           khasiatUtama: t.khasiatUtama,
-          lokasiTanam: t.lokasiTanam,
           gambarUrl: t.gambarUrl,
           penyakitTerkait: {
             create: t.penyakitTerkait.map(pName => ({
