@@ -22,7 +22,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
     : [];
   
   return (
-    <div className="bg-background-dark font-sans text-slate-100 min-h-screen flex flex-col">
+    <div className="bg-background-light dark:bg-background-dark font-sans text-slate-800 dark:text-slate-100 min-h-screen flex flex-col">
       <Navbar />
 
       <main className="flex-grow">
@@ -30,16 +30,16 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
           <div className="w-full max-w-7xl px-4 md:px-10 py-8">
             
             {/* Breadcrumbs */}
-            <div className="flex items-center gap-2 text-sm text-leaf-400 mb-6">
+            <div className="flex items-center gap-2 text-sm text-leaf-600 dark:text-leaf-400 mb-6">
               <Link className="hover:text-primary" href="/">Library</Link>
               <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-              <span className="text-white font-medium">{tanaman.namaLatin}</span>
+              <span className="text-slate-800 dark:text-white font-medium">{tanaman.namaLatin}</span>
             </div>
             
             {/* Hero Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
               {/* Image Column */}
-              <div className="relative group w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10 glass-card">
+              <div className="relative group w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg dark:shadow-2xl ring-1 ring-slate-200/50 dark:ring-white/10 glass-card">
                 {tanaman.gambarUrl ? (
                   <img 
                     alt={tanaman.namaLokal} 
@@ -47,12 +47,12 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
                     src={tanaman.gambarUrl}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-surface-dark/50">
+                  <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-surface-dark/50">
                     <span className="material-symbols-outlined text-6xl text-primary/30">local_florist</span>
                   </div>
                 )}
                 
-                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-primary px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold uppercase tracking-wider border border-primary/20">
+                <div className="absolute top-4 right-4 bg-white/80 dark:bg-black/60 backdrop-blur-md text-primary px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold uppercase tracking-wider border border-primary/20 shadow-sm">
                   <span className="material-symbols-outlined text-[16px]">eco</span>
                   Medicinal
                 </div>
@@ -66,27 +66,25 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
                     Verified Specimen
                   </span>
                   {tanaman.penyakitTerkait?.map(pt => (
-                    <span key={pt.penyakitId} className="inline-flex items-center px-3 py-1 rounded-full bg-surface-dark text-slate-300 text-xs font-medium border border-white/10">
+                    <span key={pt.penyakitId} className="inline-flex items-center px-3 py-1 rounded-full bg-white dark:bg-surface-dark text-slate-700 dark:text-slate-300 text-xs font-medium border border-slate-200 dark:border-white/10 shadow-xs">
                       {pt.penyakit.nama}
                     </span>
                   ))}
                 </div>
                 
-                <h1 className="text-5xl md:text-6xl font-bold text-white mb-2 tracking-tight">{tanaman.namaLokal}</h1>
-                <h2 className="text-xl md:text-2xl text-leaf-400 italic font-light mb-6">{tanaman.namaLatin}</h2>
+                <h1 className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">{tanaman.namaLokal}</h1>
+                <h2 className="text-xl md:text-2xl text-leaf-600 dark:text-leaf-400 italic font-light mb-6">{tanaman.namaLatin}</h2>
                 
-
-                
-                <p className="text-slate-300 leading-relaxed text-lg mb-8 max-w-xl">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg mb-8 max-w-xl">
                   {tanaman.deskripsi}
                 </p>
                 
                 <div className="flex flex-wrap gap-4">
-                  <Link href="/peta" className="flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-primary text-leaf-900 text-base font-bold hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(19,236,55,0.3)] hover:shadow-[0_0_30px_rgba(19,236,55,0.5)]">
+                  <Link href="/peta" className="flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-primary text-white dark:text-leaf-900 text-base font-bold hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(19,236,55,0.3)] hover:shadow-[0_0_30px_rgba(19,236,55,0.5)]">
                     <span className="material-symbols-outlined">map</span>
                     Locate in Garden
                   </Link>
-                  <button className="flex items-center justify-center gap-2 h-12 w-12 rounded-full bg-surface-dark border border-leaf-700 text-white hover:border-primary hover:text-primary transition-all">
+                  <button className="flex items-center justify-center gap-2 h-12 w-12 rounded-full bg-white dark:bg-surface-dark border border-slate-200 dark:border-leaf-700 text-slate-700 dark:text-white hover:border-primary dark:hover:border-primary hover:text-primary dark:hover:text-primary transition-all shadow-xs">
                     <span className="material-symbols-outlined">share</span>
                   </button>
                 </div>
@@ -99,49 +97,49 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
               
               {/* Left Column: Accordions */}
               <div className="lg:col-span-7 flex flex-col gap-4">
-                <h3 className="text-2xl font-bold text-white mb-2">Botanical Details</h3>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Botanical Details</h3>
                 
-                <details className="group bg-surface-dark border border-leaf-700 rounded-xl open:border-primary/50 transition-all duration-300" open>
+                <details className="group bg-white dark:bg-surface-dark border border-slate-200 dark:border-leaf-700 rounded-xl open:border-primary/50 open:ring-1 open:ring-primary/20 transition-all duration-300 shadow-xs" open>
                   <summary className="flex cursor-pointer items-center justify-between p-6 list-none [&::-webkit-details-marker]:hidden">
                     <div className="flex items-center gap-4">
-                      <div className="p-2 bg-leaf-700 rounded-full text-primary group-open:bg-primary group-open:text-leaf-900 transition-colors">
+                      <div className="p-2 bg-slate-100 dark:bg-leaf-700 rounded-full text-primary group-open:bg-primary group-open:text-white dark:group-open:text-leaf-900 transition-colors">
                         <span className="material-symbols-outlined text-[24px]">spa</span>
                       </div>
-                      <h4 className="text-lg font-bold text-white">Deskripsi</h4>
+                      <h4 className="text-lg font-bold text-slate-800 dark:text-white">Deskripsi</h4>
                     </div>
                     <span className="material-symbols-outlined text-slate-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
                   </summary>
-                  <div className="px-6 pb-6 pt-0 text-slate-300 leading-relaxed border-t border-leaf-700/50 mt-2">
+                  <div className="px-6 pb-6 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-leaf-700/50 mt-2">
                     <p className="mb-4 pt-4 whitespace-pre-wrap">{tanaman.deskripsi}</p>
                   </div>
                 </details>
 
-                <details className="group bg-surface-dark border border-leaf-700 rounded-xl open:border-primary/50 transition-all duration-300">
+                <details className="group bg-white dark:bg-surface-dark border border-slate-200 dark:border-leaf-700 rounded-xl open:border-primary/50 open:ring-1 open:ring-primary/20 transition-all duration-300 shadow-xs">
                   <summary className="flex cursor-pointer items-center justify-between p-6 list-none [&::-webkit-details-marker]:hidden">
                     <div className="flex items-center gap-4">
-                      <div className="p-2 bg-leaf-700 rounded-full text-primary group-open:bg-primary group-open:text-leaf-900 transition-colors">
+                      <div className="p-2 bg-slate-100 dark:bg-leaf-700 rounded-full text-primary group-open:bg-primary group-open:text-white dark:group-open:text-leaf-900 transition-colors">
                         <span className="material-symbols-outlined text-[24px]">science</span>
                       </div>
-                      <h4 className="text-lg font-bold text-white">Kandungan Senyawa</h4>
+                      <h4 className="text-lg font-bold text-slate-800 dark:text-white">Kandungan Senyawa</h4>
                     </div>
                     <span className="material-symbols-outlined text-slate-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
                   </summary>
-                  <div className="px-6 pb-6 pt-0 text-slate-300 leading-relaxed border-t border-leaf-700/50 mt-2">
+                  <div className="px-6 pb-6 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-leaf-700/50 mt-2">
                     <p className="mb-4 pt-4 whitespace-pre-wrap">{tanaman.kandunganSenyawa}</p>
                   </div>
                 </details>
 
-                <details className="group bg-surface-dark border border-leaf-700 rounded-xl open:border-primary/50 transition-all duration-300">
+                <details className="group bg-white dark:bg-surface-dark border border-slate-200 dark:border-leaf-700 rounded-xl open:border-primary/50 open:ring-1 open:ring-primary/20 transition-all duration-300 shadow-xs">
                   <summary className="flex cursor-pointer items-center justify-between p-6 list-none [&::-webkit-details-marker]:hidden">
                     <div className="flex items-center gap-4">
-                      <div className="p-2 bg-leaf-700 rounded-full text-primary group-open:bg-primary group-open:text-leaf-900 transition-colors">
+                      <div className="p-2 bg-slate-100 dark:bg-leaf-700 rounded-full text-primary group-open:bg-primary group-open:text-white dark:group-open:text-leaf-900 transition-colors">
                         <span className="material-symbols-outlined text-[24px]">healing</span>
                       </div>
-                      <h4 className="text-lg font-bold text-white">Khasiat Utama</h4>
+                      <h4 className="text-lg font-bold text-slate-800 dark:text-white">Khasiat Utama</h4>
                     </div>
                     <span className="material-symbols-outlined text-slate-400 group-open:rotate-180 transition-transform duration-300">expand_more</span>
                   </summary>
-                  <div className="px-6 pb-6 pt-0 text-slate-300 leading-relaxed border-t border-leaf-700/50 mt-2">
+                  <div className="px-6 pb-6 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-leaf-700/50 mt-2">
                     <p className="pt-4 whitespace-pre-wrap">{tanaman.khasiatUtama}</p>
                   </div>
                 </details>
@@ -150,28 +148,28 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
 
               {/* Right Column: Recipe Checklist */}
               <div className="lg:col-span-5">
-                <div className="sticky top-24 bg-surface-dark rounded-2xl p-6 border border-leaf-700 shadow-xl">
+                <div className="sticky top-24 bg-white dark:bg-surface-dark rounded-2xl p-6 border border-slate-200 dark:border-leaf-700 shadow-lg dark:shadow-xl">
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h3 className="text-xl font-bold text-white">Cara Pengolahan</h3>
-                      <p className="text-sm text-leaf-400">Resep Pengobatan Tradisional</p>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">Cara Pengolahan</h3>
+                      <p className="text-sm text-leaf-600 dark:text-leaf-400">Resep Pengobatan Tradisional</p>
                     </div>
-                    <div className="p-2 bg-leaf-700 rounded-lg text-white">
+                    <div className="p-2 bg-slate-100 dark:bg-leaf-700 rounded-lg text-slate-700 dark:text-white">
                       <span className="material-symbols-outlined text-[24px]">local_cafe</span>
                     </div>
                   </div>
                   
                   <div className="space-y-3">
                     {tanaman.resepPengolahan.length > 0 ? tanaman.resepPengolahan.map((resep, idx) => (
-                      <label key={resep.id} className="group flex items-start gap-4 p-4 rounded-xl bg-background-dark/50 border border-transparent hover:border-primary/30 cursor-pointer transition-all has-[:checked]:bg-primary/10 has-[:checked]:border-primary/50">
-                        <input className="peer h-5 w-5 mt-0.5 rounded border-2 border-leaf-700 bg-transparent text-primary focus:ring-0 focus:ring-offset-0 checked:border-primary checked:bg-primary transition-all cursor-pointer appearance-none checked:after:content-['✓'] checked:after:text-background-dark checked:after:font-bold checked:after:flex checked:after:items-center checked:after:justify-center checked:after:text-xs" type="checkbox"/>
+                      <label key={resep.id} className="group flex items-start gap-4 p-4 rounded-xl bg-slate-50 dark:bg-background-dark/50 border border-slate-100 dark:border-transparent hover:border-primary/30 cursor-pointer transition-all has-[:checked]:bg-primary/10 has-[:checked]:border-primary/50">
+                        <input className="peer h-5 w-5 mt-0.5 rounded border-2 border-slate-300 dark:border-leaf-700 bg-transparent text-primary focus:ring-0 focus:ring-offset-0 checked:border-primary checked:bg-primary transition-all cursor-pointer appearance-none checked:after:content-['✓'] checked:after:text-white dark:checked:after:text-background-dark checked:after:font-bold checked:after:flex checked:after:items-center checked:after:justify-center checked:after:text-xs" type="checkbox"/>
                         <div className="flex flex-col">
-                          <span className="text-white font-medium peer-checked:text-primary peer-checked:line-through transition-colors">Langkah {idx + 1}</span>
-                          <span className="text-xs text-slate-400 mt-1 whitespace-pre-wrap">{resep.langkah}</span>
+                          <span className="text-slate-800 dark:text-white font-medium peer-checked:text-primary peer-checked:line-through transition-colors">Langkah {idx + 1}</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 mt-1 whitespace-pre-wrap">{resep.langkah}</span>
                         </div>
                       </label>
                     )) : (
-                      <p className="text-slate-400 text-sm italic">Belum ada resep pengolahan tercatat untuk tanaman ini.</p>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm italic">Belum ada resep pengolahan tercatat untuk tanaman ini.</p>
                     )}
                   </div>
                 </div>
@@ -181,11 +179,11 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
 
             {/* Related Plants */}
             {relatedPlants.length > 0 && (
-              <div className="mt-16 pt-10 border-t border-leaf-700">
-                <h3 className="text-xl font-bold text-white mb-6">Related Medicinal Plants</h3>
+              <div className="mt-16 pt-10 border-t border-slate-200 dark:border-leaf-700">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Related Medicinal Plants</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {relatedPlants.map(related => (
-                    <Link key={related.id} href={`/tanaman/${related.id}`} className="group block relative rounded-2xl overflow-hidden aspect-[3/4] border border-leaf-700">
+                    <Link key={related.id} href={`/tanaman/${related.id}`} className="group block relative rounded-2xl overflow-hidden aspect-[3/4] border border-slate-200 dark:border-leaf-700 shadow-sm">
                       {related.gambarUrl ? (
                         <img 
                           alt={related.namaLokal} 
@@ -193,14 +191,14 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
                           src={related.gambarUrl}
                         />
                       ) : (
-                        <div className="w-full h-full bg-surface-dark flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
+                        <div className="w-full h-full bg-slate-100 dark:bg-surface-dark flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
                           <span className="material-symbols-outlined text-4xl text-primary/30">local_florist</span>
                         </div>
                       )}
                       
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
                         <h4 className="text-white font-bold group-hover:text-primary transition-colors text-lg">{related.namaLokal}</h4>
-                        <p className="text-sm text-slate-300 italic">{related.namaLatin}</p>
+                        <p className="text-sm text-slate-200 italic">{related.namaLatin}</p>
                       </div>
                     </Link>
                   ))}
