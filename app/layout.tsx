@@ -18,13 +18,13 @@ const themeScript = `
   (function() {
     try {
       var theme = localStorage.getItem('theme');
-      if (theme === 'light') {
-        document.documentElement.classList.remove('dark');
-      } else {
+      if (theme === 'dark') {
         document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
       }
     } catch(e) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('dark');
     }
   })();
 `;
