@@ -231,7 +231,7 @@ export const ValidasiGejalaWajib = tool({
 // 4. Tool: FilterKontraindikasiMurni
 export const FilterKontraindikasiMurni = tool({
   description:
-    "Mencegah resepan obat berbahaya dengan mem-filter tanaman yang pantang untuk kondisi pasien (Hamil, dll).",
+    "Mengevaluasi kontraindikasi tanaman terhadap kondisi kesehatan pasien (misal: Hamil, Darah Tinggi). Membedakan tingkat risiko: 'BERBAHAYA' (dilarang keras) dan 'HATI-HATI' (diperbolehkan dengan catatan khusus).",
   parameters: z.object({
     tanamanIds: z
       .array(z.string())
@@ -254,12 +254,16 @@ export const FilterKontraindikasiMurni = tool({
   }) => {
     try {
       if (!tanamanIds || tanamanIds.length === 0)
-        return { tanamanYangAman: [] };
+        return { tanamanTerlarangIds: [], tanamanPeringatanIds: [], pesanDilarang: [], pesanPeringatan: [], aman: true };
 
       // Asumsi: jika user tidak menyebutkan kondisi, berarti aman (atau LLM bisa dipandu bertanya)
       if (!kondisiKesehatanPasien || kondisiKesehatanPasien.length === 0) {
         return {
           aman: true,
+          tanamanTerlarangIds: [],
+          tanamanPeringatanIds: [],
+          pesanDilarang: [],
+          pesanPeringatan: [],
           message:
             "Pasien tidak memiliki kondisi khusus. Cek database dilewati.",
         };
@@ -277,6 +281,10 @@ export const FilterKontraindikasiMurni = tool({
       if (kondisiDatabase.length === 0) {
         return {
           aman: true,
+          tanamanTerlarangIds: [],
+          tanamanPeringatanIds: [],
+          pesanDilarang: [],
+          pesanPeringatan: [],
           message:
             "Kondisi pasien spesifik tidak tercatat dalam database kontraindikasi. Resep dianggap layak uji.",
         };
@@ -291,32 +299,54 @@ export const FilterKontraindikasiMurni = tool({
           kondisiMedisId: { in: kondisiIds },
         },
         include: {
-          tanaman: { select: { namaLokal: true } },
+          tanaman: { select: { id: true, namaLokal: true } },
           kondisiMedis: { select: { nama: true } },
         },
       });
 
       if (pantangan.length > 0) {
-        const peringatan = pantangan.map(
+        // Filter berdasarkan tingkat risiko
+        const dilarang = pantangan.filter(p => p.tingkatRisiko?.toUpperCase() === "BERBAHAYA" || !p.tingkatRisiko);
+        const peringatan = pantangan.filter(p => p.tingkatRisiko?.toUpperCase() === "HATI-HATI");
+
+        const daftarDilarang = dilarang.map(
           (p) =>
-            `[BAHAYA - ${p.tingkatRisiko}] Tanaman '${p.tanaman.namaLokal}' DILARANG untuk penderita '${p.kondisiMedis.nama}'. Alasan Medis: ${p.alasan}`,
+            `[DILARANG - BERBAHAYA] Tanaman '${p.tanaman.namaLokal}' DILARANG KERAS untuk penderita '${p.kondisiMedis.nama}'. Alasan Medis: ${p.alasan || "Tidak ada alasan spesifik."}`,
         );
+
+        const daftarPeringatan = peringatan.map(
+          (p) =>
+            `[PERINGATAN - HATI-HATI] Tanaman '${p.tanaman.namaLokal}' dapat dikonsumsi penderita '${p.kondisiMedis.nama}' dengan catatan khusus: ${p.alasan || "Tidak ada alasan spesifik."}`,
+        );
+
         return {
-          aman: false,
-          peringatanKeras: peringatan, // LLM harus menggunakan peringatan keras ini untuk memilah resep akhir
-          message:
-            "BEBERAPA TANAMAN GAGAL SENSOR KONTRAINDIKASI. HARAP JANGAN BERIKAN TANAMAN TERSEBUT KEPADA PASIEN.",
+          aman: dilarang.length === 0,
+          tanamanTerlarangIds: dilarang.map(p => p.tanamanId),
+          tanamanPeringatanIds: peringatan.map(p => p.tanamanId),
+          pesanDilarang: daftarDilarang,
+          pesanPeringatan: daftarPeringatan,
+          message: dilarang.length > 0
+            ? "Terdapat tanaman berbahaya yang dilarang keras untuk dikonsumsi pasien. Tanaman terlarang ini tidak boleh direkomendasikan."
+            : "Ada tanaman dengan catatan risiko ringan (HATI-HATI). Dapat direkomendasikan dengan menyertakan catatan khusus.",
         };
       }
 
       return {
         aman: true,
+        tanamanTerlarangIds: [],
+        tanamanPeringatanIds: [],
+        pesanDilarang: [],
+        pesanPeringatan: [],
         message: "Semua tanaman lolos sensor kontraindikasi murni.",
       };
     } catch (error) {
       console.error("FilterKontraindikasiMurni Error:", error);
       return {
         aman: false,
+        tanamanTerlarangIds: [],
+        tanamanPeringatanIds: [],
+        pesanDilarang: [],
+        pesanPeringatan: ["Sistem Pengaman Error. Hindari merekomendasikan tanaman dulu."],
         message: "Sistem Pengaman Error. Jangan rekomendasikan tanaman dulu.",
       };
     }

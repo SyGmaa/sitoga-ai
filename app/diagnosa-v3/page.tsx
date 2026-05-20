@@ -85,6 +85,7 @@ export default function DiagnosaV3Page() {
     const gejalaIds: string[] = [];
     const penyakitIds: string[] = [];
     const tanamanIds: string[] = [];
+    const prohibitedTanamanIds: string[] = [];
 
     if (!msg.parts) return { tanaman, gejalaIds, penyakitIds, tanamanIds };
 
@@ -137,9 +138,27 @@ export default function DiagnosaV3Page() {
           }
         }
       }
+
+      // FilterKontraindikasiMurni -> collect prohibited plant IDs
+      if (toolName === 'FilterKontraindikasiMurni' && result.tanamanTerlarangIds) {
+        for (const id of result.tanamanTerlarangIds) {
+          if (!prohibitedTanamanIds.includes(id)) {
+            prohibitedTanamanIds.push(id);
+          }
+        }
+      }
     }
 
-    return { tanaman, gejalaIds, penyakitIds, tanamanIds };
+    // Filter out prohibited plants
+    const filteredTanaman = tanaman.filter(t => !prohibitedTanamanIds.includes(t.id));
+    const filteredTanamanIds = tanamanIds.filter(id => !prohibitedTanamanIds.includes(id));
+
+    return { 
+      tanaman: filteredTanaman, 
+      gejalaIds, 
+      penyakitIds, 
+      tanamanIds: filteredTanamanIds 
+    };
   };
 
   // Build graph visualization URL with highlight params
