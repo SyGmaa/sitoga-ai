@@ -32,8 +32,23 @@ export default function DiagnosaV3Page() {
 
   const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRefA = useRef<HTMLTextAreaElement>(null);
+  const textareaRefB = useRef<HTMLTextAreaElement>(null);
 
   const selectedModel = aiModels[selectedModelIdx] || null;
+
+  // Auto-resize textarea height helper
+  const handleInputResize = (textarea: HTMLTextAreaElement | null) => {
+    if (!textarea) return;
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 180)}px`;
+  };
+
+  // Adjust height of textareas automatically when input state changes
+  useEffect(() => {
+    handleInputResize(textareaRefA.current);
+    handleInputResize(textareaRefB.current);
+  }, [input]);
 
   // Fetch AI Models
   useEffect(() => {
@@ -149,6 +164,13 @@ export default function DiagnosaV3Page() {
         model: selectedModel?.modelId,
       }
     });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage(e);
+    }
   };
 
   // Helper: Extract tanaman, gejala, and penyakit data from tool results in a message
@@ -525,97 +547,106 @@ export default function DiagnosaV3Page() {
 
               <form
                 onSubmit={handleSendMessage}
-                className="relative bg-[#f0f4f9] dark:bg-[#1e1f20] border border-[#e3e3e3] dark:border-[#2d2e30] rounded-[28px] p-2 pl-5 pr-3.5 flex items-center gap-3.5 shadow-xl hover:bg-[#e9eff6] hover:dark:bg-[#232426] focus-within:bg-background-light focus-within:dark:bg-[#232426] transition-all duration-300"
+                className="relative bg-[#f0f4f9] dark:bg-[#1e1f20] border border-[#e3e3e3] dark:border-[#2d2e30] rounded-[28px] pt-3.5 pb-2 px-5 flex flex-col shadow-xl hover:bg-[#e9eff6] hover:dark:bg-[#232426] focus-within:bg-background-light focus-within:dark:bg-[#232426] transition-all duration-300 w-full"
               >
-                {/* 1. Plus Action Button */}
-                <button
-                  type="button"
-                  onClick={() => setShowSettings(true)}
-                  className="w-11 h-11 rounded-full hover:bg-slate-200 dark:hover:bg-[#2b2c2d] flex items-center justify-center text-[#444746] dark:text-[#c4c7c5] transition-colors shrink-0 cursor-pointer"
-                  title="Configure Parameters"
-                >
-                  <span className="material-symbols-outlined text-[24px]">add</span>
-                </button>
-
-                {/* 2. Chat Input Box */}
-                <input
-                  type="text"
-                  name="prompt"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  disabled={isLoading}
-                  autoComplete="off"
-                  className="w-full bg-transparent border-none focus:ring-0 text-[#1f1f1f] dark:text-[#e3e3e3] placeholder-[#757775] dark:placeholder-[#8e918f] text-base py-3 outline-none"
-                  placeholder={isLoading ? "Agent sedang menelusuri Graph Database..." : "Ketikan keluhan atau gejala di sini..."}
-                />
-
-                {/* 3. Dropdown Model Picker Inside Input (Hidden on mobile) */}
-                <div className="hidden sm:block relative shrink-0 select-none">
-                  <button
-                    type="button"
-                    onClick={() => setShowModelPicker(!showModelPicker)}
-                    disabled={isModelsLoading || aiModels.length === 0}
-                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-background-light dark:bg-[#2b2c2d] text-[#444746] dark:text-[#c4c7c5] text-xs font-semibold border border-[#d3d6d9] dark:border-[#3e4042] hover:bg-slate-100 hover:dark:bg-[#353739] transition-all disabled:opacity-50 cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-[#13ec37] text-sm shrink-0">smart_toy</span>
-                    <span>{selectedModel ? selectedModel.label : "Pro"}</span>
-                    <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
-                  </button>
-
-                  {/* Dropdown Options List */}
-                  {showModelPicker && (
-                    <div className="absolute top-full right-0 mt-3 w-64 bg-background-light dark:bg-[#282a2c] border border-[#e3e3e3] dark:border-[#3c4043] rounded-2xl shadow-2xl overflow-hidden z-[100] animate-[fadeIn_0.15s_ease-out]">
-                      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-black/10">
-                        <p className="text-[10px] font-bold text-[#13ec37] uppercase tracking-wider">Pilih Model AI Diagnosa</p>
-                      </div>
-                      <div className="max-h-[220px] overflow-y-auto">
-                        {aiModels.map((m, idx) => (
-                          <button
-                            key={m.id}
-                            type="button"
-                            onClick={() => { setSelectedModelIdx(idx); setShowModelPicker(false); }}
-                            className={`w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-100 dark:hover:bg-[#202124] transition-colors ${idx === selectedModelIdx
-                              ? 'bg-blue-50 dark:bg-[#2b2c2d] border-l-3 border-[#13ec37]'
-                              : 'border-l-3 border-transparent'
-                              }`}
-                          >
-                            <div className="min-w-0">
-                              <p className={`text-xs font-semibold truncate ${idx === selectedModelIdx ? 'text-[#13ec37]' : 'text-[#1f1f1f] dark:text-[#e3e3e3]'}`}>{m.label}</p>
-                              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{m.provider}</p>
-                            </div>
-                            {idx === selectedModelIdx && (
-                              <span className="material-symbols-outlined text-[#13ec37] text-base">check_circle</span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                {/* 1. Text Area Row (Full Width) */}
+                <div className="w-full">
+                  <textarea
+                    ref={textareaRefA}
+                    name="prompt"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    disabled={isLoading}
+                    rows={1}
+                    className="w-full bg-transparent border-none focus:ring-0 text-[#1f1f1f] dark:text-[#e3e3e3] placeholder-[#757775] dark:placeholder-[#8e918f] text-base py-1 outline-none resize-none overflow-y-auto max-h-[180px] leading-relaxed"
+                    placeholder={isLoading ? "Agent sedang menelusuri Graph Database..." : "Ketikan keluhan atau gejala di sini..."}
+                  />
                 </div>
 
-                {/* 4. Voice Microphone Dictation Icon */}
-                <button
-                  type="button"
-                  onClick={toggleListening}
-                  className={`w-11 h-11 rounded-full hover:bg-slate-200 dark:hover:bg-[#2b2c2d] flex items-center justify-center transition-all shrink-0 cursor-pointer ${isListening
-                    ? 'text-red-500 bg-red-500/10 animate-pulse border border-red-500/20'
-                    : 'text-[#444746] dark:text-[#c4c7c5]'
-                    }`}
-                  title={isListening ? "Sedang mendengarkan... Klik untuk berhenti" : "Diagnosa lewat Suara (Speech to Text)"}
-                >
-                  <span className="material-symbols-outlined text-[22px]">
-                    {isListening ? 'mic_off' : 'mic'}
-                  </span>
-                </button>
+                {/* 2. Actions Row (Left & Right) */}
+                <div className="flex items-center justify-between w-full mt-1.5">
+                  {/* Left Side: Plus Settings Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowSettings(true)}
+                    className="w-11 h-11 rounded-full hover:bg-slate-200 dark:hover:bg-[#2b2c2d] flex items-center justify-center text-[#444746] dark:text-[#c4c7c5] transition-colors shrink-0 cursor-pointer"
+                    title="Configure Parameters"
+                  >
+                    <span className="material-symbols-outlined text-[24px]">add</span>
+                  </button>
 
-                {/* 5. Submit Arrow Icon */}
-                <button
-                  type="submit"
-                  disabled={isLoading || !input.trim()}
-                  className="w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 disabled:opacity-35 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(19,236,55,0.4)] cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
-                </button>
+                  {/* Right Side: Model, Mic, and Send Buttons */}
+                  <div className="flex items-center gap-2 select-none">
+                    {/* Dropdown Model Picker Inside Input (Hidden on mobile) */}
+                    <div className="hidden sm:block relative shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setShowModelPicker(!showModelPicker)}
+                        disabled={isModelsLoading || aiModels.length === 0}
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-background-light dark:bg-[#2b2c2d] text-[#444746] dark:text-[#c4c7c5] text-xs font-semibold border border-[#d3d6d9] dark:border-[#3e4042] hover:bg-slate-100 hover:dark:bg-[#353739] transition-all disabled:opacity-50 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-[#13ec37] text-sm shrink-0">smart_toy</span>
+                        <span>{selectedModel ? selectedModel.label : "Pro"}</span>
+                        <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
+                      </button>
+
+                      {/* Dropdown Options List */}
+                      {showModelPicker && (
+                        <div className="absolute top-full right-0 mt-3 w-64 bg-background-light dark:bg-[#282a2c] border border-[#e3e3e3] dark:border-[#3c4043] rounded-2xl shadow-2xl overflow-hidden z-[100] animate-[fadeIn_0.15s_ease-out]">
+                          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-black/10">
+                            <p className="text-[10px] font-bold text-[#13ec37] uppercase tracking-wider">Pilih Model AI Diagnosa</p>
+                          </div>
+                          <div className="max-h-[220px] overflow-y-auto">
+                            {aiModels.map((m, idx) => (
+                              <button
+                                key={m.id}
+                                type="button"
+                                onClick={() => { setSelectedModelIdx(idx); setShowModelPicker(false); }}
+                                className={`w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-100 dark:hover:bg-[#202124] transition-colors ${idx === selectedModelIdx
+                                  ? 'bg-blue-50 dark:bg-[#2b2c2d] border-l-3 border-[#13ec37]'
+                                  : 'border-l-3 border-transparent'
+                                  }`}
+                              >
+                                <div className="min-w-0">
+                                  <p className={`text-xs font-semibold truncate ${idx === selectedModelIdx ? 'text-[#13ec37]' : 'text-[#1f1f1f] dark:text-[#e3e3e3]'}`}>{m.label}</p>
+                                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{m.provider}</p>
+                                </div>
+                                {idx === selectedModelIdx && (
+                                  <span className="material-symbols-outlined text-[#13ec37] text-base">check_circle</span>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Voice Microphone Dictation Icon */}
+                    <button
+                      type="button"
+                      onClick={toggleListening}
+                      className={`w-11 h-11 rounded-full hover:bg-slate-200 dark:hover:bg-[#2b2c2d] flex items-center justify-center transition-all shrink-0 cursor-pointer ${isListening
+                        ? 'text-red-500 bg-red-500/10 animate-pulse border border-red-500/20'
+                        : 'text-[#444746] dark:text-[#c4c7c5]'
+                        }`}
+                      title={isListening ? "Sedang mendengarkan... Klik untuk berhenti" : "Diagnosa lewat Suara (Speech to Text)"}
+                    >
+                      <span className="material-symbols-outlined text-[22px]">
+                        {isListening ? 'mic_off' : 'mic'}
+                      </span>
+                    </button>
+
+                    {/* Submit Arrow Icon */}
+                    <button
+                      type="submit"
+                      disabled={isLoading || !input.trim()}
+                      className="w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 disabled:opacity-35 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(19,236,55,0.4)] cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                    </button>
+                  </div>
+                </div>
               </form>
             </div>
 
@@ -906,92 +937,106 @@ export default function DiagnosaV3Page() {
 
                 <form
                   onSubmit={handleSendMessage}
-                  className="relative bg-[#f0f4f9] dark:bg-[#1e1f20] border border-[#e3e3e3] dark:border-[#2d2e30] rounded-[28px] p-2 pl-5 pr-3.5 flex items-center gap-3.5 shadow-xl hover:bg-[#e9eff6] hover:dark:bg-[#232426] focus-within:bg-background-light focus-within:dark:bg-[#232426] transition-all duration-300"
+                  className="relative bg-[#f0f4f9] dark:bg-[#1e1f20] border border-[#e3e3e3] dark:border-[#2d2e30] rounded-[28px] pt-3.5 pb-2 px-5 flex flex-col shadow-xl hover:bg-[#e9eff6] hover:dark:bg-[#232426] focus-within:bg-background-light focus-within:dark:bg-[#232426] transition-all duration-300 w-full"
                 >
-                  <button
-                    type="button"
-                    onClick={() => setShowSettings(true)}
-                    className="w-11 h-11 rounded-full hover:bg-slate-200 dark:hover:bg-[#2b2c2d] flex items-center justify-center text-[#444746] dark:text-[#c4c7c5] transition-colors shrink-0 cursor-pointer"
-                    title="Configure Parameters"
-                  >
-                    <span className="material-symbols-outlined text-[24px]">add</span>
-                  </button>
-
-                  <input
-                    type="text"
-                    name="prompt"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    disabled={isLoading}
-                    autoComplete="off"
-                    className="w-full bg-transparent border-none focus:ring-0 text-[#1f1f1f] dark:text-[#e3e3e3] placeholder-[#757775] dark:placeholder-[#8e918f] text-base py-3 outline-none"
-                    placeholder={isLoading ? "Agent sedang menganalisis database..." : "Ketikan gejala atau keluhan lanjutan medis Anda..."}
-                  />
-
-                  {/* Dropdown Model Selector Inside Input (Hidden on mobile) */}
-                  <div className="hidden sm:block relative shrink-0 select-none">
-                    <button
-                      type="button"
-                      onClick={() => setShowModelPicker(!showModelPicker)}
-                      disabled={isModelsLoading || aiModels.length === 0}
-                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-background-light dark:bg-[#2b2c2d] text-[#444746] dark:text-[#c4c7c5] text-xs font-semibold border border-[#d3d6d9] dark:border-[#3e4042] hover:bg-slate-100 hover:dark:bg-[#353739] transition-all disabled:opacity-50 cursor-pointer"
-                    >
-                      <span className="material-symbols-outlined text-[#13ec37] text-sm shrink-0">smart_toy</span>
-                      <span>{selectedModel ? selectedModel.label : "Pro"}</span>
-                      <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
-                    </button>
-
-                    {showModelPicker && (
-                      <div className="absolute bottom-full right-0 mb-3 w-64 bg-background-light dark:bg-[#282a2c] border border-[#e3e3e3] dark:border-[#3c4043] rounded-2xl shadow-2xl overflow-hidden z-[100] animate-[fadeIn_0.15s_ease-out]">
-                        <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-black/10">
-                          <p className="text-[10px] font-bold text-[#13ec37] uppercase tracking-wider">Pilih Model AI Diagnosa</p>
-                        </div>
-                        <div className="max-h-[220px] overflow-y-auto">
-                          {aiModels.map((m, idx) => (
-                            <button
-                              key={m.id}
-                              type="button"
-                              onClick={() => { setSelectedModelIdx(idx); setShowModelPicker(false); }}
-                              className={`w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-100 dark:hover:bg-[#202124] transition-colors ${idx === selectedModelIdx
-                                ? 'bg-blue-50 dark:bg-[#2b2c2d] border-l-3 border-[#13ec37]'
-                                : 'border-l-3 border-transparent'
-                                }`}
-                            >
-                              <div className="min-w-0">
-                                <p className={`text-xs font-semibold truncate ${idx === selectedModelIdx ? 'text-[#13ec37]' : 'text-[#1f1f1f] dark:text-[#e3e3e3]'}`}>{m.label}</p>
-                                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{m.provider}</p>
-                              </div>
-                              {idx === selectedModelIdx && (
-                                <span className="material-symbols-outlined text-[#13ec37] text-base">check_circle</span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                  {/* 1. Text Area Row (Full Width) */}
+                  <div className="w-full">
+                    <textarea
+                      ref={textareaRefB}
+                      name="prompt"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      disabled={isLoading}
+                      rows={1}
+                      className="w-full bg-transparent border-none focus:ring-0 text-[#1f1f1f] dark:text-[#e3e3e3] placeholder-[#757775] dark:placeholder-[#8e918f] text-base py-1 outline-none resize-none overflow-y-auto max-h-[180px] leading-relaxed"
+                      placeholder={isLoading ? "Agent sedang menganalisis database..." : "Ketikan gejala atau keluhan lanjutan medis Anda..."}
+                    />
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={toggleListening}
-                    className={`w-11 h-11 rounded-full hover:bg-slate-200 dark:hover:bg-[#2b2c2d] flex items-center justify-center transition-all shrink-0 cursor-pointer ${isListening
-                      ? 'text-red-500 bg-red-500/10 animate-pulse border border-red-500/20'
-                      : 'text-[#444746] dark:text-[#c4c7c5]'
-                      }`}
-                    title={isListening ? "Listening..." : "Voice input"}
-                  >
-                    <span className="material-symbols-outlined text-[22px]">
-                      {isListening ? 'mic_off' : 'mic'}
-                    </span>
-                  </button>
+                  {/* 2. Actions Row (Left & Right) */}
+                  <div className="flex items-center justify-between w-full mt-1.5">
+                    {/* Left Side: Plus Settings Button */}
+                    <button
+                      type="button"
+                      onClick={() => setShowSettings(true)}
+                      className="w-11 h-11 rounded-full hover:bg-slate-200 dark:hover:bg-[#2b2c2d] flex items-center justify-center text-[#444746] dark:text-[#c4c7c5] transition-colors shrink-0 cursor-pointer"
+                      title="Configure Parameters"
+                    >
+                      <span className="material-symbols-outlined text-[24px]">add</span>
+                    </button>
 
-                  <button
-                    type="submit"
-                    disabled={isLoading || !input.trim()}
-                    className="w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 disabled:opacity-35 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(19,236,55,0.4)] cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
-                  </button>
+                    {/* Right Side: Model, Mic, and Send Buttons */}
+                    <div className="flex items-center gap-2 select-none">
+                      {/* Dropdown Model Picker Inside Input (Hidden on mobile) */}
+                      <div className="hidden sm:block relative shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setShowModelPicker(!showModelPicker)}
+                          disabled={isModelsLoading || aiModels.length === 0}
+                          className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-background-light dark:bg-[#2b2c2d] text-[#444746] dark:text-[#c4c7c5] text-xs font-semibold border border-[#d3d6d9] dark:border-[#3e4042] hover:bg-slate-100 hover:dark:bg-[#353739] transition-all disabled:opacity-50 cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-[#13ec37] text-sm shrink-0">smart_toy</span>
+                          <span>{selectedModel ? selectedModel.label : "Pro"}</span>
+                          <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
+                        </button>
+
+                        {/* Dropdown Options List */}
+                        {showModelPicker && (
+                          <div className="absolute bottom-full right-0 mb-3 w-64 bg-background-light dark:bg-[#282a2c] border border-[#e3e3e3] dark:border-[#3c4043] rounded-2xl shadow-2xl overflow-hidden z-[100] animate-[fadeIn_0.15s_ease-out]">
+                            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-black/10">
+                              <p className="text-[10px] font-bold text-[#13ec37] uppercase tracking-wider">Pilih Model AI Diagnosa</p>
+                            </div>
+                            <div className="max-h-[220px] overflow-y-auto">
+                              {aiModels.map((m, idx) => (
+                                <button
+                                  key={m.id}
+                                  type="button"
+                                  onClick={() => { setSelectedModelIdx(idx); setShowModelPicker(false); }}
+                                  className={`w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-100 dark:hover:bg-[#202124] transition-colors ${idx === selectedModelIdx
+                                    ? 'bg-blue-50 dark:bg-[#2b2c2d] border-l-3 border-[#13ec37]'
+                                    : 'border-l-3 border-transparent'
+                                    }`}
+                                >
+                                  <div className="min-w-0">
+                                    <p className={`text-xs font-semibold truncate ${idx === selectedModelIdx ? 'text-[#13ec37]' : 'text-[#1f1f1f] dark:text-[#e3e3e3]'}`}>{m.label}</p>
+                                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{m.provider}</p>
+                                  </div>
+                                  {idx === selectedModelIdx && (
+                                    <span className="material-symbols-outlined text-[#13ec37] text-base">check_circle</span>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Voice Microphone Dictation Icon */}
+                      <button
+                        type="button"
+                        onClick={toggleListening}
+                        className={`w-11 h-11 rounded-full hover:bg-slate-200 dark:hover:bg-[#2b2c2d] flex items-center justify-center transition-all shrink-0 cursor-pointer ${isListening
+                          ? 'text-red-500 bg-red-500/10 animate-pulse border border-red-500/20'
+                          : 'text-[#444746] dark:text-[#c4c7c5]'
+                          }`}
+                        title={isListening ? "Listening..." : "Voice input"}
+                      >
+                        <span className="material-symbols-outlined text-[22px]">
+                          {isListening ? 'mic_off' : 'mic'}
+                        </span>
+                      </button>
+
+                      {/* Submit Arrow Icon */}
+                      <button
+                        type="submit"
+                        disabled={isLoading || !input.trim()}
+                        className="w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 disabled:opacity-35 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(19,236,55,0.4)] cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                      </button>
+                    </div>
+                  </div>
                 </form>
               </div>
             </div>
