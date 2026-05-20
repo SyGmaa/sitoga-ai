@@ -59,10 +59,10 @@ function parseMasterConditions(content: string): Map<string, MasterCondition> {
 
         if (slug && nama) {
           const gejalaWajib = gejalaWajibRaw && gejalaWajibRaw !== '-'
-            ? gejalaWajibRaw.split(',').map(s => s.trim()).filter(Boolean)
+            ? gejalaWajibRaw.split(';').map(s => s.trim()).filter(Boolean)
             : [];
           const gejalaUmum = gejalaUmumRaw && gejalaUmumRaw !== '-'
-            ? gejalaUmumRaw.split(',').map(s => s.trim()).filter(Boolean)
+            ? gejalaUmumRaw.split(';').map(s => s.trim()).filter(Boolean)
             : [];
 
           map.set(slug, {
@@ -172,6 +172,15 @@ function normalizeEntityName(name: string): string {
     .trim();
   if (!cleaned) return '';
   cleaned = cleaned.toLowerCase();
+  
+  // Hapus kata sambung pembuka "atau " atau "dan "
+  if (cleaned.startsWith('atau ')) {
+    cleaned = cleaned.substring(5).trim();
+  } else if (cleaned.startsWith('dan ')) {
+    cleaned = cleaned.substring(4).trim();
+  }
+  
+  if (!cleaned) return '';
   return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
 }
 
@@ -369,7 +378,7 @@ async function main() {
     // Relasikan Tanaman ke Penyakit via TanamanPenyakit
     const kondisiRefsRaw = overviewData['Kondisi refs'] || '';
     const kondisiSlugs = kondisiRefsRaw
-      ? kondisiRefsRaw.replace(/`/g, '').split(',').map(s => s.trim()).filter(Boolean)
+      ? kondisiRefsRaw.replace(/`/g, '').split(';').map(s => s.trim()).filter(Boolean)
       : [];
 
     for (const slug of kondisiSlugs) {
@@ -393,7 +402,7 @@ async function main() {
       const alasan = contraData['Alasan risiko'] || '';
 
       const riskSlugs = kelompokRisikoRefsRaw
-        ? kelompokRisikoRefsRaw.replace(/`/g, '').split(',').map(s => s.trim()).filter(Boolean)
+        ? kelompokRisikoRefsRaw.replace(/`/g, '').split(';').map(s => s.trim()).filter(Boolean)
         : [];
 
       for (const slug of riskSlugs) {
