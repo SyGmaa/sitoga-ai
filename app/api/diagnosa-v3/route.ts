@@ -45,7 +45,8 @@ IKUTI LANGKAH INI DENGAN SANGAT KETAT:
 4. Jika merekomendasikan resep tanaman, kamu HARUS memeriksanya dengan tool "FilterKontraindikasiMurni" beserta kondisi medis pasien jika ada (misal: Hamil, Darah Tinggi).
    - Tanaman yang tercantum dalam 'pesanDilarang' atau 'tanamanTerlarangIds' (tingkat risiko BERBAHAYA) DILARANG KERAS untuk direkomendasikan. Kamu wajib membuang tanaman ini dari daftar resep/rekomendasi.
    - Tanaman yang tercantum dalam 'pesanPeringatan' atau 'tanamanPeringatanIds' (tingkat risiko HATI-HATI) TETAP BOLEH direkomendasikan, tetapi kamu WAJIB menuliskan catatan peringatan/edukasi kontraindikasi tersebut secara eksplisit kepada pengguna dalam jawaban akhirmu.
-5. Teruslah berpikir mandiri jika menemukan jalan buntu (loop), lalu rangkai bukti konklusimu ke pengguna. Jelaskan apa yang kamu temukan dari database kepada pasien dengan ramah. Kamu WAJIB membalas menggunakan bahasa yang sama persis dengan bahasa yang digunakan oleh pengguna dalam keluhannya (baik Bahasa Inggris, Bahasa Indonesia, bahasa daerah, maupun bahasa asing lainnya).
+5. TANYAKAN KONDISI MEDIS SECARA PROAKTIF: Jika pengguna belum menyebutkan adanya kondisi medis khusus (seperti hamil, menyusui, darah tinggi/hipertensi, maag, gangguan ginjal/jantung, dll.) dalam riwayat percakapan, kamu WAJIB secara proaktif menanyakan kepada pengguna apakah mereka memiliki salah satu kondisi tersebut sebelum atau bersamaan dengan penyampaian hasil rekomendasi tanaman obat. Hal ini sangat penting agar pengguna dapat mengonfirmasinya jika saja mereka lupa menyebutkan kondisi medis tersebut di awal keluhan. Jika pengguna merespons dengan suatu kondisi medis, lakukan penyaringan ulang menggunakan tool 'FilterKontraindikasiMurni' pada giliran percakapan berikutnya.
+6. Teruslah berpikir mandiri jika menemukan jalan buntu (loop), lalu rangkai bukti konklusimu ke pengguna. Jelaskan apa yang kamu temukan dari database kepada pasien dengan ramah. Kamu WAJIB membalas menggunakan bahasa yang sama persis dengan bahasa yang digunakan oleh pengguna dalam keluhannya (baik Bahasa Inggris, Bahasa Indonesia, bahasa daerah, maupun bahasa asing lainnya).
 `;
 
     // Pastikan payload memiliki array kosong atau 'parts' untuk property yang di-map secara buta oleh convertToModelMessages di SDK v6
@@ -96,7 +97,7 @@ IKUTI LANGKAH INI DENGAN SANGAT KETAT:
            }
 
            // 2. Ekstrak data dari toolResults
-           const toolResults = event.toolResults || [];
+           const toolResults = (event.toolResults || []) as any[];
            logDebug("2. Tool Results Raw", toolResults);
 
            // Cari gejala terdeteksi
