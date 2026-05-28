@@ -333,14 +333,13 @@ export default function DiagnosaV3Page() {
                   <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#geminiLogoGrad)" />
                   <defs>
                     <linearGradient id="geminiLogoGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stopColor="#13ec37" />
-                      <stop offset="35%" stopColor="#0dbd2a" />
-                      <stop offset="70%" stopColor="#92c99b" />
-                      <stop offset="100%" stopColor="#3a7544" />
+                      <stop offset="0%" stopColor="hsl(var(--primary))" />
+                      <stop offset="50%" stopColor="var(--color-primary-hover)" />
+                      <stop offset="100%" stopColor="var(--color-leaf-400)" />
                     </linearGradient>
                   </defs>
                 </svg>
-                <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-[#13ec37] to-[#92c99b] bg-clip-text text-transparent">
+                <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-primary to-leaf-400 bg-clip-text text-transparent">
                   SITOBAT V3
                 </span>
               </div>
@@ -444,8 +443,8 @@ export default function DiagnosaV3Page() {
             </div>
             {sidebarExpanded && (
               <div className="min-w-0 flex-1 animate-[fadeIn_0.2s_ease-out]">
-                <p className="text-xs font-semibold text-[#1f1f1f] dark:text-white truncate">Parsivale</p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Analyst / Doctor</p>
+                <p className="text-xs font-semibold text-[#1f1f1f] dark:text-white truncate">Pengguna Sitoga</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">User / Pasien</p>
               </div>
             )}
           </div>
@@ -456,7 +455,7 @@ export default function DiagnosaV3Page() {
       <main className="flex-1 flex flex-col h-full relative bg-background-light dark:bg-background-dark transition-colors duration-300">
 
         {/* Glowing Gradient Background Highlight (Only visible in dark mode, matches screenshot perfectly) */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-[75%] bg-[radial-gradient(circle_at_50%_35%,_rgba(19,236,55,0.05)_0%,_transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_35%,_rgba(19,236,55,0.08)_0%,_transparent_65%)] pointer-events-none z-0"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-[75%] bg-[radial-gradient(circle_at_50%_35%,_rgba(31,137,54,0.05)_0%,_transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_35%,_rgba(31,137,54,0.08)_0%,_transparent_65%)] pointer-events-none z-0"></div>
 
         {/* Global Floating Header (Always accessible) */}
         <header className="flex items-center justify-between px-6 py-4 relative z-10 shrink-0 select-none">
@@ -465,7 +464,7 @@ export default function DiagnosaV3Page() {
               <span className="material-symbols-outlined text-[#444746] dark:text-[#c4c7c5]">menu</span>
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#13ec37] shadow-[0_0_8px_rgba(19,236,55,0.7)] animate-[pulse_1.5s_infinite]"></span>
+              <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(31,137,54,0.7)] animate-[pulse_1.5s_infinite]"></span>
               <span className="text-xs font-bold uppercase tracking-wider text-[#3a7544] dark:text-[#92c99b]">
                 GraphRAG ReAct Agent
               </span>
@@ -481,7 +480,7 @@ export default function DiagnosaV3Page() {
                 disabled={isModelsLoading || aiModels.length === 0}
                 className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#f0f4f9] dark:bg-[#1e1f20] text-[#444746] dark:text-[#c4c7c5] text-[10px] font-semibold border border-[#e3e3e3] dark:border-[#2d2e30] hover:bg-slate-100 hover:dark:bg-[#353739] transition-all disabled:opacity-50 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[#13ec37] text-xs shrink-0">smart_toy</span>
+                <span className="material-symbols-outlined text-primary text-xs shrink-0">smart_toy</span>
                 <span className="max-w-[70px] truncate">{selectedModel ? selectedModel.label : "Pro"}</span>
                 <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
               </button>
@@ -489,7 +488,7 @@ export default function DiagnosaV3Page() {
               {showModelPicker && (
                 <div className="absolute top-full right-0 mt-2 w-56 bg-background-light dark:bg-[#282a2c] border border-[#e3e3e3] dark:border-[#3c4043] rounded-2xl shadow-2xl overflow-hidden z-[100] animate-[fadeIn_0.15s_ease-out]">
                   <div className="px-3.5 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-black/10">
-                    <p className="text-[9px] font-bold text-[#13ec37] uppercase tracking-wider">Pilih Model AI Diagnosa</p>
+                    <p className="text-[9px] font-bold text-primary uppercase tracking-wider">Pilih Model AI Diagnosa</p>
                   </div>
                   <div className="max-h-[220px] overflow-y-auto">
                     {aiModels.map((m, idx) => (
@@ -498,16 +497,16 @@ export default function DiagnosaV3Page() {
                         type="button"
                         onClick={() => { setSelectedModelIdx(idx); setShowModelPicker(false); }}
                         className={`w-full flex items-center justify-between px-3.5 py-3 text-left hover:bg-slate-100 dark:hover:bg-[#202124] transition-colors ${idx === selectedModelIdx
-                          ? 'bg-blue-50 dark:bg-[#2b2c2d] border-l-3 border-[#13ec37]'
+                          ? 'bg-blue-50 dark:bg-[#2b2c2d] border-l-3 border-primary'
                           : 'border-l-3 border-transparent'
                           }`}
                       >
                         <div className="min-w-0">
-                          <p className={`text-[11px] font-semibold truncate ${idx === selectedModelIdx ? 'text-[#13ec37]' : 'text-[#1f1f1f] dark:text-[#e3e3e3]'}`}>{m.label}</p>
+                          <p className={`text-[11px] font-semibold truncate ${idx === selectedModelIdx ? 'text-primary' : 'text-[#1f1f1f] dark:text-[#e3e3e3]'}`}>{m.label}</p>
                           <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5">{m.provider}</p>
                         </div>
                         {idx === selectedModelIdx && (
-                          <span className="material-symbols-outlined text-[#13ec37] text-sm">check_circle</span>
+                          <span className="material-symbols-outlined text-primary text-sm">check_circle</span>
                         )}
                       </button>
                     ))}
@@ -534,7 +533,7 @@ export default function DiagnosaV3Page() {
                 <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1f1f1f] dark:text-[#c4c7c5] mb-2">
                   Hi,
                 </h2>
-                <h3 className="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-[#13ec37] via-[#0dbd2a] to-[#92c99b] bg-clip-text text-transparent py-1 leading-tight select-none">
+                <h3 className="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary-hover to-leaf-400 bg-clip-text text-transparent py-1 leading-tight select-none">
                   ada keluhan apa hari ini?
                 </h3>
               </div>
@@ -543,7 +542,7 @@ export default function DiagnosaV3Page() {
             {/* Center Pill Input Bar */}
             <div className="w-full relative group mb-4 sm:mb-10">
               {/* Pulsing Border Gradient Glow on focus/hover */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#13ec37]/30 via-[#0dbd2a]/20 to-[#92c99b]/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-primary-hover/20 to-leaf-400/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
 
               <form
                 onSubmit={handleSendMessage}
@@ -586,7 +585,7 @@ export default function DiagnosaV3Page() {
                         disabled={isModelsLoading || aiModels.length === 0}
                         className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-background-light dark:bg-[#2b2c2d] text-[#444746] dark:text-[#c4c7c5] text-xs font-semibold border border-[#d3d6d9] dark:border-[#3e4042] hover:bg-slate-100 hover:dark:bg-[#353739] transition-all disabled:opacity-50 cursor-pointer"
                       >
-                        <span className="material-symbols-outlined text-[#13ec37] text-sm shrink-0">smart_toy</span>
+                        <span className="material-symbols-outlined text-primary text-sm shrink-0">smart_toy</span>
                         <span>{selectedModel ? selectedModel.label : "Pro"}</span>
                         <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
                       </button>
@@ -595,7 +594,7 @@ export default function DiagnosaV3Page() {
                       {showModelPicker && (
                         <div className="absolute top-full right-0 mt-3 w-64 bg-background-light dark:bg-[#282a2c] border border-[#e3e3e3] dark:border-[#3c4043] rounded-2xl shadow-2xl overflow-hidden z-[100] animate-[fadeIn_0.15s_ease-out]">
                           <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-black/10">
-                            <p className="text-[10px] font-bold text-[#13ec37] uppercase tracking-wider">Pilih Model AI Diagnosa</p>
+                            <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Pilih Model AI Diagnosa</p>
                           </div>
                           <div className="max-h-[220px] overflow-y-auto">
                             {aiModels.map((m, idx) => (
@@ -604,16 +603,16 @@ export default function DiagnosaV3Page() {
                                 type="button"
                                 onClick={() => { setSelectedModelIdx(idx); setShowModelPicker(false); }}
                                 className={`w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-100 dark:hover:bg-[#202124] transition-colors ${idx === selectedModelIdx
-                                  ? 'bg-blue-50 dark:bg-[#2b2c2d] border-l-3 border-[#13ec37]'
+                                  ? 'bg-blue-50 dark:bg-[#2b2c2d] border-l-3 border-primary'
                                   : 'border-l-3 border-transparent'
                                   }`}
                               >
                                 <div className="min-w-0">
-                                  <p className={`text-xs font-semibold truncate ${idx === selectedModelIdx ? 'text-[#13ec37]' : 'text-[#1f1f1f] dark:text-[#e3e3e3]'}`}>{m.label}</p>
+                                  <p className={`text-xs font-semibold truncate ${idx === selectedModelIdx ? 'text-primary' : 'text-[#1f1f1f] dark:text-[#e3e3e3]'}`}>{m.label}</p>
                                   <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{m.provider}</p>
                                 </div>
                                 {idx === selectedModelIdx && (
-                                  <span className="material-symbols-outlined text-[#13ec37] text-base">check_circle</span>
+                                  <span className="material-symbols-outlined text-primary text-base">check_circle</span>
                                 )}
                               </button>
                             ))}
@@ -641,7 +640,7 @@ export default function DiagnosaV3Page() {
                     <button
                       type="submit"
                       disabled={isLoading || !input.trim()}
-                      className="w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 disabled:opacity-35 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(19,236,55,0.4)] cursor-pointer"
+                      className="w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 disabled:opacity-35 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(31,137,54,0.4)] cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
                     </button>
@@ -658,11 +657,11 @@ export default function DiagnosaV3Page() {
                   onClick={() => handleSendMessage(undefined, s.text)}
                   className="flex items-start gap-4 p-5 rounded-2xl bg-[#f0f4f9]/50 dark:bg-[#1e1f20]/50 border border-[#e3e3e3] dark:border-[#2d2e30]/80 text-left hover:bg-[#e1e5ea] hover:dark:bg-[#2b2c2d] hover:scale-[1.01] hover:border-slate-400 hover:dark:border-[#3e4042] transition-all duration-300 group cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#2d2e30] border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0 text-[#13ec37] dark:text-[#92c99b] group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#2d2e30] border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0 text-primary dark:text-leaf-400 group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-xl">{s.icon}</span>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold text-[#1f1f1f] dark:text-[#e3e3e3] line-clamp-1 group-hover:text-[#13ec37] transition-colors">{s.text}</p>
+                    <p className="text-xs font-semibold text-[#1f1f1f] dark:text-[#e3e3e3] line-clamp-1 group-hover:text-primary transition-colors">{s.text}</p>
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">{s.subtext}</p>
                   </div>
                 </button>
@@ -710,9 +709,9 @@ export default function DiagnosaV3Page() {
                             <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#botGrad)" />
                             <defs>
                               <linearGradient id="botGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stopColor="#13ec37" />
-                                <stop offset="50%" stopColor="#0dbd2a" />
-                                <stop offset="100%" stopColor="#92c99b" />
+                                <stop offset="0%" stopColor="hsl(var(--primary))" />
+                                <stop offset="50%" stopColor="var(--color-primary-hover)" />
+                                <stop offset="100%" stopColor="var(--color-leaf-400)" />
                               </linearGradient>
                             </defs>
                           </svg>
@@ -836,7 +835,7 @@ export default function DiagnosaV3Page() {
                               {extractedTanaman.length > 0 && (
                                 <div className="bg-white dark:bg-[#1a1a1a]/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
                                   <div className="flex items-center gap-2 mb-3.5 select-none">
-                                    <span className="material-symbols-outlined text-[#13ec37] text-[19px]">eco</span>
+                                    <span className="material-symbols-outlined text-primary text-[19px]">eco</span>
                                     <span className="text-xs font-bold text-[#1f1f1f] dark:text-white uppercase tracking-wider">
                                       Rekomendasi Tanaman Obat
                                     </span>
@@ -847,18 +846,18 @@ export default function DiagnosaV3Page() {
                                         key={t.id}
                                         href={`/tanaman/${t.id}`}
                                         target="_blank"
-                                        className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-slate-50 dark:bg-[#202124]/40 border border-slate-100 dark:border-slate-800/80 hover:border-[#13ec37]/50 dark:hover:border-[#13ec37]/50 hover:bg-slate-100 hover:dark:bg-[#202124]/90 hover:scale-[1.01] transition-all group shadow-2xs"
+                                        className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-slate-50 dark:bg-[#202124]/40 border border-slate-100 dark:border-slate-800/80 hover:border-primary/50 dark:hover:border-primary/50 hover:bg-slate-100 hover:dark:bg-[#202124]/90 hover:scale-[1.01] transition-all group shadow-2xs"
                                       >
                                         <div className="w-9.5 h-9.5 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500/20 transition-colors">
-                                          <span className="material-symbols-outlined text-[#13ec37] text-[19px]">local_florist</span>
+                                          <span className="material-symbols-outlined text-primary text-[19px]">local_florist</span>
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                          <p className="text-slate-800 dark:text-white text-xs font-bold truncate group-hover:text-[#13ec37] transition-colors">{t.nama}</p>
+                                          <p className="text-slate-800 dark:text-white text-xs font-bold truncate group-hover:text-primary transition-colors">{t.nama}</p>
                                           {t.khasiatUtama && (
                                             <p className="text-slate-500 dark:text-slate-400 text-[10px] truncate mt-1">{t.khasiatUtama}</p>
                                           )}
                                         </div>
-                                        <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-[#13ec37] transition-colors">open_in_new</span>
+                                        <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-primary transition-colors">open_in_new</span>
                                       </Link>
                                     ))}
                                   </div>
@@ -871,18 +870,18 @@ export default function DiagnosaV3Page() {
                                   href={buildGraphUrl(gejalaIds, penyakitIds, tanamanIds)}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-blue-500/5 dark:bg-[#1a1a2e]/40 border border-blue-500/10 dark:border-blue-500/10 hover:border-[#13ec37]/50 hover:bg-blue-500/10 hover:dark:bg-[#1a1a2e]/85 hover:scale-[1.01] transition-all shadow-2xs group w-full"
+                                  className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-blue-500/5 dark:bg-[#1a1a2e]/40 border border-blue-500/10 dark:border-blue-500/10 hover:border-primary/50 hover:bg-blue-500/10 hover:dark:bg-[#1a1a2e]/85 hover:scale-[1.01] transition-all shadow-2xs group w-full"
                                 >
                                   <div className="w-9.5 h-9.5 rounded-full bg-blue-500/15 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500/25 transition-colors">
-                                    <span className="material-symbols-outlined text-[#13ec37] text-[19px]">hub</span>
+                                    <span className="material-symbols-outlined text-primary text-[19px]">hub</span>
                                   </div>
                                   <div className="min-w-0 flex-1">
-                                    <p className="text-slate-800 dark:text-white text-xs font-bold group-hover:text-[#13ec37] transition-colors">Lihat Visualisasi Knowledge Graph</p>
+                                    <p className="text-slate-800 dark:text-white text-xs font-bold group-hover:text-primary transition-colors">Lihat Visualisasi Knowledge Graph</p>
                                     <p className="text-slate-500 dark:text-slate-400 text-[10px] mt-1 select-none">
                                       Menelusuri peta relasi {gejalaIds.length} gejala, {penyakitIds.length} penyakit{tanamanIds.length > 0 ? `, ${tanamanIds.length} tanaman` : ''} di database
                                     </p>
                                   </div>
-                                  <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-[#13ec37] transition-colors">arrow_outward</span>
+                                  <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-primary transition-colors">arrow_outward</span>
                                 </a>
                               )}
                             </div>
@@ -912,16 +911,16 @@ export default function DiagnosaV3Page() {
                         <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#spinGrad)" />
                         <defs>
                           <linearGradient id="spinGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stopColor="#13ec37" />
-                            <stop offset="100%" stopColor="#0dbd2a" />
+                            <stop offset="0%" stopColor="hsl(var(--primary))" />
+                            <stop offset="100%" stopColor="var(--color-primary-hover)" />
                           </linearGradient>
                         </defs>
                       </svg>
                     </div>
                     <div className="flex gap-1.5 bg-[#f0f4f9] dark:bg-[#1e1f20] border border-slate-200 dark:border-slate-800 px-5 py-4 rounded-2xl rounded-tl-none items-center h-12 shadow-2xs select-none">
-                      <div className="w-2.5 h-2.5 bg-[#13ec37] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2.5 h-2.5 bg-[#13ec37] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2.5 h-2.5 bg-[#13ec37] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                   </div>
                 )}
@@ -933,7 +932,7 @@ export default function DiagnosaV3Page() {
             {/* Sticky Bottom Input Bar Area (Matches State A style exactly but fixed at bottom) */}
             <div className="absolute bottom-0 left-0 w-full px-4 pb-6 pt-12 z-30 flex justify-center bg-gradient-to-t from-[#ffffff] via-[#ffffff]/90 to-transparent dark:from-background-dark dark:via-background-dark/90 dark:to-transparent pointer-events-none select-none">
               <div className="w-full max-w-3xl relative group pointer-events-auto">
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#13ec37]/30 via-[#0dbd2a]/20 to-[#92c99b]/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-primary-hover/20 to-leaf-400/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
 
                 <form
                   onSubmit={handleSendMessage}
@@ -976,7 +975,7 @@ export default function DiagnosaV3Page() {
                           disabled={isModelsLoading || aiModels.length === 0}
                           className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-background-light dark:bg-[#2b2c2d] text-[#444746] dark:text-[#c4c7c5] text-xs font-semibold border border-[#d3d6d9] dark:border-[#3e4042] hover:bg-slate-100 hover:dark:bg-[#353739] transition-all disabled:opacity-50 cursor-pointer"
                         >
-                          <span className="material-symbols-outlined text-[#13ec37] text-sm shrink-0">smart_toy</span>
+                          <span className="material-symbols-outlined text-primary text-sm shrink-0">smart_toy</span>
                           <span>{selectedModel ? selectedModel.label : "Pro"}</span>
                           <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
                         </button>
@@ -985,7 +984,7 @@ export default function DiagnosaV3Page() {
                         {showModelPicker && (
                           <div className="absolute bottom-full right-0 mb-3 w-64 bg-background-light dark:bg-[#282a2c] border border-[#e3e3e3] dark:border-[#3c4043] rounded-2xl shadow-2xl overflow-hidden z-[100] animate-[fadeIn_0.15s_ease-out]">
                             <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-black/10">
-                              <p className="text-[10px] font-bold text-[#13ec37] uppercase tracking-wider">Pilih Model AI Diagnosa</p>
+                              <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Pilih Model AI Diagnosa</p>
                             </div>
                             <div className="max-h-[220px] overflow-y-auto">
                               {aiModels.map((m, idx) => (
@@ -994,16 +993,16 @@ export default function DiagnosaV3Page() {
                                   type="button"
                                   onClick={() => { setSelectedModelIdx(idx); setShowModelPicker(false); }}
                                   className={`w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-100 dark:hover:bg-[#202124] transition-colors ${idx === selectedModelIdx
-                                    ? 'bg-blue-50 dark:bg-[#2b2c2d] border-l-3 border-[#13ec37]'
+                                    ? 'bg-blue-50 dark:bg-[#2b2c2d] border-l-3 border-primary'
                                     : 'border-l-3 border-transparent'
                                     }`}
                                 >
                                   <div className="min-w-0">
-                                    <p className={`text-xs font-semibold truncate ${idx === selectedModelIdx ? 'text-[#13ec37]' : 'text-[#1f1f1f] dark:text-[#e3e3e3]'}`}>{m.label}</p>
+                                    <p className={`text-xs font-semibold truncate ${idx === selectedModelIdx ? 'text-primary' : 'text-[#1f1f1f] dark:text-[#e3e3e3]'}`}>{m.label}</p>
                                     <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{m.provider}</p>
                                   </div>
                                   {idx === selectedModelIdx && (
-                                    <span className="material-symbols-outlined text-[#13ec37] text-base">check_circle</span>
+                                    <span className="material-symbols-outlined text-primary text-base">check_circle</span>
                                   )}
                                 </button>
                               ))}
@@ -1031,7 +1030,7 @@ export default function DiagnosaV3Page() {
                       <button
                         type="submit"
                         disabled={isLoading || !input.trim()}
-                        className="w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 disabled:opacity-35 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(19,236,55,0.4)] cursor-pointer"
+                        className="w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 disabled:opacity-35 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(31,137,54,0.4)] cursor-pointer"
                       >
                         <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
                       </button>
@@ -1053,7 +1052,7 @@ export default function DiagnosaV3Page() {
 
             <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#13ec37] text-xl">settings</span>
+                <span className="material-symbols-outlined text-primary text-xl">settings</span>
                 <h3 className="text-base font-bold text-[#1f1f1f] dark:text-white">Settings & Parameters</h3>
               </div>
               <button
@@ -1069,7 +1068,7 @@ export default function DiagnosaV3Page() {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-slate-600 dark:text-slate-400">Model Temperature</span>
-                  <span className="text-[#13ec37]">{temperature}</span>
+                  <span className="text-primary">{temperature}</span>
                 </div>
                 <input
                   type="range"
@@ -1078,7 +1077,7 @@ export default function DiagnosaV3Page() {
                   step="0.05"
                   value={temperature}
                   onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                  className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#13ec37]"
+                  className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary"
                 />
                 <p className="text-[9px] text-slate-400">Temperatur lebih rendah membuat agen lebih deterministic & patuh pada aturan grafik.</p>
               </div>
@@ -1087,7 +1086,7 @@ export default function DiagnosaV3Page() {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-slate-600 dark:text-slate-400">Max ReAct Thinking Steps</span>
-                  <span className="text-[#13ec37]">{maxSteps}</span>
+                  <span className="text-primary">{maxSteps}</span>
                 </div>
                 <input
                   type="range"
@@ -1096,7 +1095,7 @@ export default function DiagnosaV3Page() {
                   step="1"
                   value={maxSteps}
                   onChange={(e) => setMaxSteps(parseInt(e.target.value))}
-                  className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#13ec37]"
+                  className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary"
                 />
                 <p className="text-[9px] text-slate-400">Membatasi jumlah langkah pencarian database oleh agen AI untuk mencegah loop tak terbatas.</p>
               </div>
@@ -1106,7 +1105,7 @@ export default function DiagnosaV3Page() {
                 <p className="text-[10px] font-bold text-slate-500 uppercase">Status & Info Database</p>
                 <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-600 dark:text-slate-400 leading-relaxed">
                   <div>Model Aktif:</div>
-                  <div className="text-right text-[#13ec37] font-semibold truncate">{selectedModel?.label || "Flash 2.5"}</div>
+                  <div className="text-right text-primary font-semibold truncate">{selectedModel?.label || "Flash 2.5"}</div>
 
                   <div>Prisma Client:</div>
                   <div className="text-right text-green-500">Connected</div>

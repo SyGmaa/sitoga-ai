@@ -143,7 +143,7 @@ export default async function Home() {
                 <img alt="Phone screen showing plant scan" className="absolute inset-0 w-full h-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb6RjzApkVI_MviT6OeFEoxMI1_wMUCuVQ98pcB4DSeZqLC-i1FnnNjGrdVVApN-WeeOaTJZP4fRMMC1ECTy3gllDwBWUfRvEJ9Q8vsYK0v7AziYqhiDVcTd4PfUQWzvIsjcz7SAHhTNHENJRhfWWqVcs9WpvTuWHu6VcJf_Ja5Sdb7hWjtTX_qdT-voiPiWBYVhqKeQQC50YjN-iCltA-biawzyM9n-bpPVWD1uIFopWhL1ReD2svo-5qOJvaCZlQKEjgPpiU8g"/>
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
                   <div className="w-full h-64 border-2 border-primary/70 rounded-xl relative">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-primary shadow-[0_0_15px_#13ec37] animate-[scan_2s_ease-in-out_infinite]"></div>
+                    <div className="absolute top-0 left-0 w-full h-1 bg-primary shadow-[0_0_15px_rgba(31,137,54,0.8)] animate-[scan_2s_ease-in-out_infinite]"></div>
                     <div className="absolute -top-3 -left-3 border-t-4 border-l-4 border-primary w-8 h-8 rounded-tl-lg"></div>
                     <div className="absolute -top-3 -right-3 border-t-4 border-r-4 border-primary w-8 h-8 rounded-tr-lg"></div>
                     <div className="absolute -bottom-3 -left-3 border-b-4 border-l-4 border-primary w-8 h-8 rounded-bl-lg"></div>
@@ -165,7 +165,7 @@ export default async function Home() {
 
       {/* Floating Action Button */}
       <div className="fixed bottom-24 md:bottom-6 right-6 z-50">
-        <Link href="/scan" className="flex items-center justify-center size-14 rounded-full bg-primary text-background-dark shadow-[0_4px_20px_rgba(19,236,55,0.4)] hover:scale-110 transition-transform cursor-pointer">
+        <Link href="/scan" className="flex items-center justify-center size-14 rounded-full bg-primary text-background-dark shadow-[0_4px_20px_rgba(31,137,54,0.4)] hover:scale-110 transition-transform cursor-pointer">
           <span className="material-symbols-outlined text-3xl">qr_code_scanner</span>
         </Link>
       </div>
