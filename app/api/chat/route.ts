@@ -92,13 +92,23 @@ INGAT: Setiap balasan Anda WAJIB berisi teks sapaan DAN eksekusi tool jika diper
           // @ts-ignore
           execute: async (data: any) => {
              // Audit Trail logging (Phase 5)
-             const lastUserMsg = messages.reverse().find((m: any) => m.role === "user");
+             const lastUserMsg = [...messages].reverse().find((m: any) => m.role === "user");
              if (lastUserMsg && lastUserMsg.content) {
                 try {
+                  const percakapan = messages.map((m: any) => ({
+                    role: m.role,
+                    content: m.content || ""
+                  })).filter((m: any) => m.content && m.content.trim() !== "");
+
+                  const hasilDiagnosaWithChat = {
+                    ...data,
+                    percakapan
+                  };
+
                   await prisma.riwayatDiagnosa.create({
                     data: {
                       keluhanPengguna: lastUserMsg.content,
-                      hasilDiagnosa: data
+                      hasilDiagnosa: hasilDiagnosaWithChat
                     }
                   });
                 } catch(e) { console.error("Gagal simpan log:", e) }

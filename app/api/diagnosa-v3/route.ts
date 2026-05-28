@@ -2,6 +2,9 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { google } from "@ai-sdk/google";
 import { streamText, generateText, convertToModelMessages, stepCountIs } from "ai";
 import { agentV3Tools } from "@/lib/agentV3Tools";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 // Dynamic provider to maintain compatibility with the user's setup
 function getModel(clientProvider?: string, clientModel?: string) {
@@ -29,15 +32,20 @@ export async function POST(req: Request) {
 
     const SYSTEM_PROMPT = `Sebagai Agent Medis Botani ReAct (Relational GraphRAG) SITOBAT-AI.
 Kamu mengevaluasi keluhan dengan sangat analitis dengan menelusuri Graph Database secara berurutan.
+Jika keluhan user disampaikan dalam bahasa asing (seperti Bahasa Inggris), kamu WAJIB menerjemahkan gejala/keluhan tersebut ke Bahasa Indonesia terlebih dahulu sebelum memanggil alat pencarian gejala, karena basis data di dalam sistem semuanya menggunakan istilah Bahasa Indonesia.
+
+PENTING/CRITICAL: Kamu WAJIB membalas pesan pengguna menggunakan bahasa yang sama persis dengan bahasa yang digunakan oleh pengguna dalam keluhannya (baik Bahasa Inggris, Bahasa Indonesia, bahasa daerah, maupun bahasa asing lainnya). Abaikan fakta bahwa pesan pembuka asisten ("Ceritakan keluhan medis Anda...") ditulis dalam Bahasa Indonesia; jika pengguna merespon dalam Bahasa Inggris, kamu harus langsung membalas penuh dalam Bahasa Inggris. Jangan gunakan bahasa Indonesia jika pengguna mengirimkan keluhan dalam bahasa Inggris atau bahasa lainnya, meskipun istilah database atau instruksi sistem ini dalam bahasa Indonesia. Kamu harus menerjemahkan kesimpulan hasil analisis akhirmu ke bahasa pengguna.
+
+
 
 IKUTI LANGKAH INI DENGAN SANGAT KETAT:
 1. Ekstrak KATA KUNCI utama dari keluhan user (dalam bentuk string yang dipisah koma seperti 'kulit, melepuh'). WAJIB pakai tool "EkstrakDanCariGejala" dan isi parameter 'keywords' dengan string tersebut. Jangan mengirim object kosong \`{}\`.
 2. Masukkan ID Gejala hasil pencarian ke tool "TelusuriGrafPenyakit" (dalam bentuk array of strings jika lebih dari satu, ke dalam parameter 'id_gejala_array'). Jangan mengirim object kosong \`{}\`.
-3. Validasi ID Penyakit hasil penelusuran dengan tool "ValidasiGejalaWajib". Jika hasil validasi menyatakan 'sah: false', kamu TETAP BOLEH menyebutkan diagnosis penyakit tersebut sebagai KEMUNGKINAN AWAL/KEMUNGKINAN KECIL, tetapi kamu WAJIB menyampaikan secara jelas kepada pengguna bahwa diagnosis ini belum terverifikasi sepenuhnya karena pengguna tidak mengalami beberapa gejala wajib (sebutkan gejala wajib apa saja yang tidak dialami).
+3. Validasi ID Penyakit hasil penelusuran dengan tool "ValidasiGejalaWajib". Jika hasil validasi menyatakan 'sah: false' (penyakit belum pasti/batal diverifikasi), kamu TETAP BOLEH menyebutkan diagnosis penyakit tersebut sebagai KEMUNGKINAN AWAL/KEMUNGKINAN KECIL. Namun, kamu WAJIB menyampaikan secara jelas kepada pengguna bahwa diagnosis ini belum diverifikasi sepenuhnya karena beberapa gejala wajib tidak dialami, DAN kamu WAJIB secara aktif bertanya kepada pengguna apakah mereka mengalami gejala-gejala wajib yang tidak dialami tersebut (sebutkan secara spesifik gejala wajib apa saja yang belum terpenuhi dari hasil 'gejalaHilang' dan tanyakan apakah pengguna merasakannya) untuk memastikan kondisi mereka.
 4. Jika merekomendasikan resep tanaman, kamu HARUS memeriksanya dengan tool "FilterKontraindikasiMurni" beserta kondisi medis pasien jika ada (misal: Hamil, Darah Tinggi).
    - Tanaman yang tercantum dalam 'pesanDilarang' atau 'tanamanTerlarangIds' (tingkat risiko BERBAHAYA) DILARANG KERAS untuk direkomendasikan. Kamu wajib membuang tanaman ini dari daftar resep/rekomendasi.
    - Tanaman yang tercantum dalam 'pesanPeringatan' atau 'tanamanPeringatanIds' (tingkat risiko HATI-HATI) TETAP BOLEH direkomendasikan, tetapi kamu WAJIB menuliskan catatan peringatan/edukasi kontraindikasi tersebut secara eksplisit kepada pengguna dalam jawaban akhirmu.
-5. Teruslah berpikir mandiri jika menemukan jalan buntu (loop), lalu rangkai bukti konklusimu ke pengguna. Jelaskan apa yang kamu temukan dari database kepada pasien dengan ramah.
+5. Teruslah berpikir mandiri jika menemukan jalan buntu (loop), lalu rangkai bukti konklusimu ke pengguna. Jelaskan apa yang kamu temukan dari database kepada pasien dengan ramah. Kamu WAJIB membalas menggunakan bahasa yang sama persis dengan bahasa yang digunakan oleh pengguna dalam keluhannya (baik Bahasa Inggris, Bahasa Indonesia, bahasa daerah, maupun bahasa asing lainnya).
 `;
 
     // Pastikan payload memiliki array kosong atau 'parts' untuk property yang di-map secara buta oleh convertToModelMessages di SDK v6
@@ -54,11 +62,150 @@ IKUTI LANGKAH INI DENGAN SANGAT KETAT:
       messages: await convertToModelMessages(cleanMessages),
       stopWhen: stepCountIs(7), // Pengganti maxSteps di SDK AI V5/V6 untuk Agent Loop
       tools: agentV3Tools,
-      onFinish: (event) => {
+      onFinish: async (event) => {
          console.log("[V3 GraphRAG] Stream Finished:", { 
              finishReason: event.finishReason, 
              toolCalls: event.toolCalls?.map(t => t.toolName)
          });
+
+         const fs = require("fs");
+         const path = require("path");
+         const debugLogPath = path.join(process.cwd(), "diagnosa-v3-debug.log");
+         
+         const logDebug = (title: string, data: any) => {
+           try {
+             fs.appendFileSync(
+               debugLogPath,
+               `[${new Date().toISOString()}] ${title}:\n${JSON.stringify(data, null, 2)}\n\n`
+             );
+           } catch (e) {
+             console.error("Failed to write to debug log:", e);
+           }
+         };
+
+         try {
+           // 1. Dapatkan keluhan pengguna dari pesan terakhir user
+           const lastUserMsg = [...cleanMessages].reverse().find((m: any) => m.role === "user");
+           const keluhanPengguna = lastUserMsg?.content || lastUserMsg?.parts?.find((p: any) => p.type === "text")?.text || "";
+
+           logDebug("1. Keluhan Pengguna", { keluhanPengguna });
+
+           if (!keluhanPengguna) {
+             logDebug("Skipped", "Keluhan pengguna kosong");
+             return;
+           }
+
+           // 2. Ekstrak data dari toolResults
+           const toolResults = event.toolResults || [];
+           logDebug("2. Tool Results Raw", toolResults);
+
+           // Cari gejala terdeteksi
+           let gejalaTerdeteksi: string[] = [];
+           const gejalaToolResult = toolResults.find(t => t.toolName === "EkstrakDanCariGejala");
+           if (gejalaToolResult && gejalaToolResult.result && Array.isArray(gejalaToolResult.result.gejala)) {
+             gejalaTerdeteksi = gejalaToolResult.result.gejala.map((g: any) => g.nama || g.namaLokal || "").filter(Boolean);
+           }
+
+           // Cari daftar kandidat penyakit
+           let kandidatPenyakit: any[] = [];
+           const grafToolResult = toolResults.find(t => t.toolName === "TelusuriGrafPenyakit");
+           if (grafToolResult && grafToolResult.result && Array.isArray(grafToolResult.result.kandidat)) {
+             kandidatPenyakit = grafToolResult.result.kandidat;
+           }
+
+           // Cari penyakit yang divalidasi
+           const validasiToolResults = toolResults.filter(t => t.toolName === "ValidasiGejalaWajib");
+
+           // Tentukan penyakit diagnosa final
+           let finalPenyakit: any = null;
+
+           if (validasiToolResults.length > 0) {
+             // Cari yang berhasil divalidasi (sah === true)
+             const sahValidation = validasiToolResults.find(v => v.result && v.result.sah === true);
+             const chosenValidation = sahValidation || validasiToolResults[validasiToolResults.length - 1]; // fallback ke validasi terakhir jika semua tidak sah
+             const validatedPenyakitId = chosenValidation.args?.penyakitId;
+
+             if (validatedPenyakitId) {
+               finalPenyakit = kandidatPenyakit.find(k => k.id === validatedPenyakitId);
+             }
+           }
+
+           // Fallback ke kandidat dengan skor tertinggi jika belum ditemukan
+           if (!finalPenyakit && kandidatPenyakit.length > 0) {
+             finalPenyakit = kandidatPenyakit[0];
+           }
+
+           logDebug("3. Parsed Data", {
+             gejalaTerdeteksi,
+             kandidatPenyakitCount: kandidatPenyakit.length,
+             hasFinalPenyakit: !!finalPenyakit,
+             finalPenyakitName: finalPenyakit?.nama
+           });
+
+           if (!finalPenyakit && gejalaTerdeteksi.length === 0) {
+             logDebug("Skipped", "Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi");
+             return;
+           }
+
+           const namaPenyakit = finalPenyakit ? (finalPenyakit.nama || "Tidak diketahui") : "Tidak diketahui";
+
+           // Cari tanaman dilarang (kontraindikasi)
+           let tanamanTerlarangIds: string[] = [];
+           const filterToolResult = toolResults.find(t => t.toolName === "FilterKontraindikasiMurni");
+           if (filterToolResult && filterToolResult.result && Array.isArray(filterToolResult.result.tanamanTerlarangIds)) {
+             tanamanTerlarangIds = filterToolResult.result.tanamanTerlarangIds;
+           }
+
+           // Filter tanaman yang direkomendasikan
+           const rekomendasiTanamanRaw = finalPenyakit ? (finalPenyakit.tanamanObat || []) : [];
+           const rekomendasiTanaman = rekomendasiTanamanRaw
+             .filter((t: any) => !tanamanTerlarangIds.includes(t.id))
+             .map((t: any) => ({
+               id: t.id,
+               nama: t.nama
+             }));
+
+           // Bersihkan percakapan agar tidak ada object/parts mentah, hanya string content
+           const percakapan = [
+             ...cleanMessages.map((m: any) => ({
+               role: m.role,
+               content: m.content || m.parts?.find((p: any) => p.type === "text")?.text || ""
+             })),
+             {
+               role: "assistant",
+               content: event.text || ""
+             }
+           ].filter(m => m.content && m.content.trim() !== "");
+
+           // Bentuk payload hasilDiagnosa
+           const hasilDiagnosa = {
+             nama_penyakit: namaPenyakit,
+             gejala_terdeteksi: gejalaTerdeteksi,
+             rekomendasi_tanaman: rekomendasiTanaman,
+             tanaman_obat: rekomendasiTanaman, // kompatibilitas dengan dashboard riwayat
+             penjelasan_singkat: event.text || "",
+             percakapan: percakapan
+           };
+
+           logDebug("4. Payload to Save", {
+             namaPenyakit,
+             rekomendasiTanamanCount: rekomendasiTanaman.length,
+             percakapanCount: percakapan.length
+           });
+
+           // 3. Simpan ke database
+           const saved = await prisma.riwayatDiagnosa.create({
+             data: {
+               keluhanPengguna,
+               hasilDiagnosa
+             }
+           });
+           logDebug("5. DB Save Success", { id: saved.id });
+           console.log("[V3 GraphRAG] Berhasil menyimpan riwayat diagnosa:", namaPenyakit);
+         } catch (dbError: any) {
+           logDebug("ERROR", { message: dbError.message, stack: dbError.stack });
+           console.error("[V3 GraphRAG] Gagal menyimpan riwayat diagnosa ke database:", dbError);
+         }
       },
     });
 

@@ -12,7 +12,7 @@ export const EkstrakDanCariGejala = tool({
     keywords: z
       .string()
       .describe(
-        "WAJIB DIISI! Daftar kata kunci gejala medis dipisahkan koma. Jika user memakai bahasa awam (misal: 'kencing'), sertakan kata aslinya dan sinonim medisnya (misal: 'kencing, buang air kecil')."
+        "WAJIB DIISI! Daftar kata kunci gejala medis dipisahkan koma. Jika keluhan menggunakan bahasa asing (misal Inggris), kamu WAJIB menerjemahkan setiap gejala ke dalam Bahasa Indonesia terlebih dahulu sebelum menjadikannya kata kunci pencarian (karena database gejala menggunakan Bahasa Indonesia). Contoh: 'chills' menjadi 'menggigil', 'fever' menjadi 'demam', 'body temperature above normal' menjadi 'suhu tubuh meningkat'."
       ),
   }),
   // @ts-ignore
@@ -166,14 +166,10 @@ export const ValidasiGejalaWajib = tool({
       ),
   }),
   // @ts-ignore
-  execute: async ({
-    penyakitId,
-    keluhanUserGejalaIds,
-  }: {
-    penyakitId: string;
-    keluhanUserGejalaIds: string[];
-  }) => {
+  execute: async (args: any) => {
     try {
+      const penyakitId = args?.penyakitId || args?.id_penyakit;
+      const keluhanUserGejalaIds = args?.keluhanUserGejalaIds || args?.id_gejala_user || [];
       // Ambil seluruh gejala yang Wajib untuk penyakit ini
       const gejalaWajib = await prisma.penyakitGejala.findMany({
         where: {
@@ -209,7 +205,8 @@ export const ValidasiGejalaWajib = tool({
       if (gejalaHilang.length > 0) {
         return {
           sah: false,
-          message: `Diagnosis BATAL DIVERIFIKASI. Penyakit ini mensyaratkan pasien memiliki gejala: ${gejalaHilang.join(", ")} namun user tidak memilikinya dalam keluhan.`,
+          gejalaHilang,
+          message: `Diagnosis BATAL DIVERIFIKASI. Penyakit ini mensyaratkan pasien memiliki gejala wajib: ${gejalaHilang.join(", ")} namun user tidak memilikinya dalam keluhan.`,
         };
       }
 
