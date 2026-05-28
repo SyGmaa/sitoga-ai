@@ -26,6 +26,8 @@ export default function DiagnosaV3Page() {
   // Custom visual States for the Gemini UI Overhaul
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [warningMessage, setWarningMessage] = useState("");
   const [temperature, setTemperature] = useState(0.7);
   const [maxSteps, setMaxSteps] = useState(7);
   const [isListening, setIsListening] = useState(false);
@@ -153,8 +155,14 @@ export default function DiagnosaV3Page() {
 
   const handleSendMessage = async (e?: React.FormEvent, overrideInput?: string) => {
     if (e) e.preventDefault();
-    const finalInput = overrideInput || input;
-    if (!finalInput.trim() || isLoading) return;
+    const finalInput = overrideInput !== undefined ? overrideInput : input;
+    if (isLoading) return;
+
+    if (!finalInput.trim()) {
+      setWarningMessage("Masukkan keluhan medis atau gejala Anda terlebih dahulu untuk memulai diagnosa.");
+      setShowWarningModal(true);
+      return;
+    }
 
     setCurrentKeluhan(finalInput);
     setInput("");
@@ -525,10 +533,10 @@ export default function DiagnosaV3Page() {
           /* ==============================================
              Layout STATE A: Empty Chat (Centred Gemini UI)
              ============================================== */
-          <div className="flex-1 overflow-y-auto overflow-x-visible relative z-10 flex flex-col items-center justify-between sm:justify-center px-4 max-w-3xl mx-auto w-full pb-6 sm:pb-20 select-text">
+          <div className="flex-1 overflow-y-auto overflow-x-visible relative z-10 flex flex-col items-center justify-between sm:justify-center px-4 max-w-3xl mx-auto w-full pb-6 sm:pb-8 select-text">
 
             {/* Big Gradient Greetings */}
-            <div className="text-center w-full flex-1 flex flex-col justify-center sm:flex-none sm:mb-10 pt-8 sm:pt-0">
+            <div className="text-center w-full flex-1 flex flex-col justify-center sm:flex-none sm:mb-6 pt-8 sm:pt-0">
               <div className="w-full">
                 <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1f1f1f] dark:text-[#c4c7c5] mb-2">
                   Hi,
@@ -540,7 +548,7 @@ export default function DiagnosaV3Page() {
             </div>
 
             {/* Center Pill Input Bar */}
-            <div className="w-full relative group mb-4 sm:mb-10">
+            <div className="w-full relative group mb-4 sm:mb-6">
               {/* Pulsing Border Gradient Glow on focus/hover */}
               <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-primary-hover/20 to-leaf-400/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
 
@@ -639,8 +647,10 @@ export default function DiagnosaV3Page() {
                     {/* Submit Arrow Icon */}
                     <button
                       type="submit"
-                      disabled={isLoading || !input.trim()}
-                      className="w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 disabled:opacity-35 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(31,137,54,0.4)] cursor-pointer"
+                      disabled={isLoading}
+                      className={`w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(31,137,54,0.4)] cursor-pointer ${
+                        isLoading ? 'opacity-35 cursor-not-allowed' : ''
+                      }`}
                     >
                       <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
                     </button>
@@ -668,7 +678,7 @@ export default function DiagnosaV3Page() {
               ))}
             </div>
 
-            <p className="text-center text-[10px] text-slate-400 dark:text-slate-500 mt-6 sm:mt-14 font-medium tracking-wide">
+            <p className="text-center text-[10px] text-slate-400 dark:text-slate-500 mt-6 sm:mt-8 font-medium tracking-wide">
               SITOBAT V3 menggunakan GraphRAG Berbasis Prisma. Hasil diagnosa medis didasarkan sepenuhnya pada database kebun raya UP.
             </p>
           </div>
@@ -691,7 +701,7 @@ export default function DiagnosaV3Page() {
                   const isRawJson = (text: string) => {
                     if (typeof text !== 'string') return false;
                     const trimmed = text.trim();
-                    return trimmed.startsWith('{') || trimmed.startsWith('[');
+                    return trimmed.startsWith('{') || trimmed.startsWith('[') || trimmed.includes('_response": {') || (trimmed.startsWith('{"') && trimmed.endsWith('}'));
                   };
 
                   return (
@@ -731,7 +741,12 @@ export default function DiagnosaV3Page() {
                         {m.parts ? m.parts.map((part: any, partIndex: number) => {
 
                           // TEXT PART
-                          if (part.type === 'text' && part.text && !isRawJson(part.text)) {
+                          if (part.type === 'text' && part.text) {
+                            const trimmedText = part.text.trim();
+                            // Hapus/abaikan rendering jika isinya adalah format raw tool call / JSON bocor
+                            if (isRawJson(trimmedText) || trimmedText.includes('_response": {') || (trimmedText.startsWith('{') && trimmedText.endsWith('}'))) {
+                              return null;
+                            }
                             return (
                               <div
                                 key={partIndex}
@@ -1029,8 +1044,10 @@ export default function DiagnosaV3Page() {
                       {/* Submit Arrow Icon */}
                       <button
                         type="submit"
-                        disabled={isLoading || !input.trim()}
-                        className="w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 disabled:opacity-35 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(31,137,54,0.4)] cursor-pointer"
+                        disabled={isLoading}
+                        className={`w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(31,137,54,0.4)] cursor-pointer ${
+                          isLoading ? 'opacity-35 cursor-not-allowed' : ''
+                        }`}
                       >
                         <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
                       </button>
@@ -1128,12 +1145,42 @@ export default function DiagnosaV3Page() {
         </div>
       )}
 
+      {/* 4. Warning Modal */}
+      {showWarningModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 select-none animate-[fadeIn_0.2s_ease-out]">
+          <div className="bg-background-light dark:bg-[#1e1f20] border border-[#e3e3e3] dark:border-[#2d2e30] rounded-3xl p-6 w-full max-w-sm shadow-2xl relative text-center">
+            <div className="w-16 h-16 bg-amber-500/10 dark:bg-amber-500/20 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-[pulse_2s_infinite]">
+              <span className="material-symbols-outlined text-3xl">warning</span>
+            </div>
+
+            <h3 className="text-lg font-bold text-[#1f1f1f] dark:text-white mb-2">Input Kosong</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+              {warningMessage}
+            </p>
+
+            <button
+              onClick={() => setShowWarningModal(false)}
+              className="w-full py-3 rounded-full bg-primary hover:bg-primary-hover text-background-dark text-xs font-bold shadow-glow cursor-pointer transition-all active:scale-95"
+            >
+              Mengerti
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Global CSS style tags for animation & markdown formats */}
       <style>{`
+        /* Chrome, Edge, Safari */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(120, 120, 120, 0.2); border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(120, 120, 120, 0.4); }
+        
+        /* Firefox */
+        * {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(120, 120, 120, 0.25) transparent;
+        }
         
         .markdown-content strong {
           color: inherit;
