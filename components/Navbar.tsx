@@ -25,6 +25,7 @@ export function Navbar() {
         <nav className="hidden md:flex flex-wrap items-center gap-4 lg:gap-8">
           <Link href="/" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Home</Link>
           <Link href="/tanaman" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Tanaman</Link>
+          <Link href="/pustaka" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Pustaka Medis</Link>
           <Link href="/peta" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium">Garden Map</Link>
           <DiagnosaDropdown variant="navbar" />
           <a href="/graphrag-visualization.html" target="_blank" className="text-slate-600 dark:text-slate-200 hover:text-primary transition-colors text-sm font-medium flex items-center gap-1">

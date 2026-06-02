@@ -158,7 +158,7 @@ export default function ScanPage() {
                 <div className="absolute -top-1 -right-1 border-t-4 border-r-4 border-primary w-10 h-10 rounded-tr-lg" />
                 <div className="absolute -bottom-1 -left-1 border-b-4 border-l-4 border-primary w-10 h-10 rounded-bl-lg" />
                 <div className="absolute -bottom-1 -right-1 border-b-4 border-r-4 border-primary w-10 h-10 rounded-br-lg" />
-                <div className="absolute top-0 left-0 w-full h-1 bg-primary shadow-[0_0_15px_#13ec37] animate-scan" />
+                <div className="absolute top-0 left-0 w-full h-1 bg-primary shadow-[0_0_15px_rgba(31,137,54,0.8)] animate-scan" />
               </div>
             </div>
           )}
