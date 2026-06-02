@@ -15,7 +15,7 @@ interface AiModel {
   isDefault?: boolean;
 }
 
-export default function DiagnosaV3Page() {
+export default function DiagnosaV3StepPage() {
   const [input, setInput] = useState("");
   const [currentKeluhan, setCurrentKeluhan] = useState("");
   const [aiModels, setAiModels] = useState<AiModel[]>([]);
@@ -122,7 +122,6 @@ export default function DiagnosaV3Page() {
       if (showModelPicker) setShowModelPicker(false);
     };
     if (showModelPicker) {
-      // Delay to avoid closing immediately on the same click that opened it
       const timer = setTimeout(() => {
         document.addEventListener("click", handleClickOutside);
       }, 10);
@@ -134,15 +133,15 @@ export default function DiagnosaV3Page() {
   }, [showModelPicker]);
 
   const transport = new DefaultChatTransport({
-    api: "/api/diagnosa-v3",
+    api: "/api/diagnosa-v3-step",
   });
 
-  const { messages, setMessages, sendMessage, status, addToolResult } = useChat({
+  const { messages, setMessages, sendMessage, status } = useChat({
     transport,
     messages: [{
-      id: "system-v3",
+      id: "system-v3-step",
       role: "assistant",
-      parts: [{ type: 'text', text: "Ceritakan keluhan medis Anda, saya akan menelusuri hubungan Gejala dan Penyakit langsung dari database tanaman herbal kebun raya Universitas Pahlawan." }]
+      parts: [{ type: 'text', text: "Ceritakan keluhan medis Anda, saya akan menelusuri hubungan Gejala dan Penyakit secara bertahap menggunakan alur ReAct Agent (Multi-Step)." }]
     }] as UIMessage[]
   });
 
@@ -214,34 +213,6 @@ export default function DiagnosaV3Page() {
         try { result = JSON.parse(result); } catch { continue; }
       }
 
-      if (toolName === 'AnalisisDiagnosaMedisHibrida') {
-        if (result.gejala) {
-          for (const g of result.gejala) {
-            if (g.id && !gejalaIds.includes(g.id)) gejalaIds.push(g.id);
-          }
-        }
-        if (result.kandidat) {
-          for (const k of result.kandidat) {
-            if (k.id && !penyakitIds.includes(k.id)) penyakitIds.push(k.id);
-            if (k.tanamanObat) {
-              for (const t of k.tanamanObat) {
-                if (t.id && !tanamanIds.includes(t.id)) {
-                  tanamanIds.push(t.id);
-                  tanaman.push({ id: t.id, nama: t.nama, khasiatUtama: t.khasiatUtama });
-                }
-              }
-            }
-            if (k.tanamanTerlarangIds) {
-              for (const id of k.tanamanTerlarangIds) {
-                if (!prohibitedTanamanIds.includes(id)) {
-                  prohibitedTanamanIds.push(id);
-                }
-              }
-            }
-          }
-        }
-      }
-
       if (toolName === 'EkstrakDanCariGejala' && result.gejala) {
         for (const g of result.gejala) {
           if (g.id && !gejalaIds.includes(g.id)) gejalaIds.push(g.id);
@@ -292,7 +263,6 @@ export default function DiagnosaV3Page() {
 
   const getToolDisplayName = (toolName: string) => {
     switch (toolName) {
-      case "AnalisisDiagnosaMedisHibrida": return "Menganalisis Gejala, Relasi Penyakit, & Kontraindikasi...";
       case "EkstrakDanCariGejala": return "Mencari keyword gejala di database...";
       case "TelusuriGrafPenyakit": return "Menelusuri relasi kandidat Penyakit...";
       case "ValidasiGejalaWajib": return "Memvalidasi aturan Gejala Wajib penyakit...";
@@ -303,7 +273,6 @@ export default function DiagnosaV3Page() {
 
   const getToolIcon = (toolName: string) => {
     switch (toolName) {
-      case "AnalisisDiagnosaMedisHibrida": return "medical_services";
       case "EkstrakDanCariGejala": return "search";
       case "TelusuriGrafPenyakit": return "hub";
       case "ValidasiGejalaWajib": return "verified_user";
@@ -339,7 +308,6 @@ export default function DiagnosaV3Page() {
     <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-[#1f1f1f] dark:text-[#e3e3e3] font-sans transition-colors duration-300">
 
       {/* 1. Left Collapsible Sidebar */}
-      {/* Mobile backdrop */}
       {sidebarExpanded && (
         <div
           className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 animate-[fadeIn_0.2s_ease-out]"
@@ -348,7 +316,6 @@ export default function DiagnosaV3Page() {
       )}
       <aside
         className={`h-full bg-[#f0f4f9] dark:bg-[#1e1f20] border-r border-[#e3e3e3] dark:border-[#2d2e30] flex flex-col justify-between transition-all duration-300 ease-in-out shrink-0
-          ${/* Mobile: fixed overlay, hidden by default */''}
           fixed md:relative z-50 md:z-30
           ${sidebarExpanded ? 'w-[280px] translate-x-0' : 'w-[68px] -translate-x-full md:translate-x-0'}
         `}
@@ -378,7 +345,7 @@ export default function DiagnosaV3Page() {
                   </defs>
                 </svg>
                 <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-primary to-leaf-400 bg-clip-text text-transparent">
-                  SITOBAT V3
+                  SITOBAT V3 (Step)
                 </span>
               </div>
             )}
@@ -388,9 +355,9 @@ export default function DiagnosaV3Page() {
           <div className="mt-4">
             <button
               onClick={() => setMessages([{
-                id: "system-v3",
+                id: "system-v3-step",
                 role: "assistant",
-                parts: [{ type: 'text', text: "Ceritakan keluhan medis Anda, saya akan menelusuri hubungan Gejala dan Penyakit langsung dari database tanaman herbal kebun raya Universitas Pahlawan." }]
+                parts: [{ type: 'text', text: "Ceritakan keluhan medis Anda, saya akan menelusuri hubungan Gejala dan Penyakit secara bertahap menggunakan alur ReAct Agent (Multi-Step)." }]
               }] as UIMessage[])}
               className={`flex items-center hover:bg-[#e1e5ea] dark:hover:bg-[#2b2c2d] text-[#444746] dark:text-[#c4c7c5] transition-all cursor-pointer ${sidebarExpanded
                 ? 'w-full rounded-full py-3 px-5 gap-3.5 bg-[#e9eef6] dark:bg-[#1a1a1a] border border-[#d3d6d9] dark:border-[#2d2e30]'
@@ -441,13 +408,13 @@ export default function DiagnosaV3Page() {
             </Link>
 
             <Link
-              href="/diagnosa-v3-step"
-              className={`flex items-center bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 py-2.5 rounded-full transition-colors cursor-pointer ${sidebarExpanded ? 'px-5 gap-3.5' : 'justify-center w-10 h-10'
+              href="/diagnosa-v3"
+              className={`flex items-center bg-green-500/10 hover:bg-green-500/20 text-green-600 dark:text-green-400 py-2.5 rounded-full transition-colors cursor-pointer ${sidebarExpanded ? 'px-5 gap-3.5' : 'justify-center w-10 h-10'
                 }`}
-              title="Mode Multi-Step (Berpikir)"
+              title="Beralih ke Single-Hop (Cepat)"
             >
-              <span className="material-symbols-outlined text-xl">splitscreen</span>
-              {sidebarExpanded && <span className="text-xs font-semibold truncate select-none">Coba Multi-Step AI</span>}
+              <span className="material-symbols-outlined text-xl">speed</span>
+              {sidebarExpanded && <span className="text-xs font-semibold truncate select-none">Coba Single-Hop AI</span>}
             </Link>
           </div>
         </div>
@@ -502,25 +469,23 @@ export default function DiagnosaV3Page() {
       {/* 2. Main Content Container */}
       <main className="flex-1 flex flex-col h-full relative bg-background-light dark:bg-background-dark transition-colors duration-300">
 
-        {/* Glowing Gradient Background Highlight (Only visible in dark mode, matches screenshot perfectly) */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-[75%] bg-[radial-gradient(circle_at_50%_35%,_rgba(31,137,54,0.05)_0%,_transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_35%,_rgba(31,137,54,0.08)_0%,_transparent_65%)] pointer-events-none z-0"></div>
 
-        {/* Global Floating Header (Always accessible) */}
+        {/* Global Floating Header */}
         <header className="flex items-center justify-between px-6 py-4 relative z-10 shrink-0 select-none">
           <div className="flex items-center gap-3">
             <span className="md:hidden w-8 h-8 rounded-full hover:bg-slate-200 dark:hover:bg-[#2b2c2d] flex items-center justify-center cursor-pointer" onClick={() => setSidebarExpanded(!sidebarExpanded)}>
               <span className="material-symbols-outlined text-[#444746] dark:text-[#c4c7c5]">menu</span>
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(31,137,54,0.7)] animate-[pulse_1.5s_infinite]"></span>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#3a7544] dark:text-[#92c99b]">
-                GraphRAG ReAct Agent
+              <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)] animate-[pulse_1.5s_infinite]"></span>
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                Multi-Step ReAct Agent
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Interactive Model Selector for Mobile View (Hidden on desktop) */}
             <div className="relative select-none sm:hidden z-40">
               <button
                 type="button"
@@ -567,36 +532,30 @@ export default function DiagnosaV3Page() {
           </div>
         </header>
 
-        {/* Dynamic Inner Layout depending on state */}
+        {/* Dynamic Inner Layout */}
         {!hasUserMessages ? (
-
-          /* ==============================================
-             Layout STATE A: Empty Chat (Centred Gemini UI)
-             ============================================== */
           <div className="flex-1 overflow-y-auto overflow-x-visible relative z-10 flex flex-col items-center justify-between sm:justify-center px-4 max-w-3xl mx-auto w-full pb-6 sm:pb-8 select-text">
 
             {/* Big Gradient Greetings */}
             <div className="text-center w-full flex-1 flex flex-col justify-center sm:flex-none sm:mb-6 pt-8 sm:pt-0">
               <div className="w-full">
                 <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1f1f1f] dark:text-[#c4c7c5] mb-2">
-                  Hi,
+                  Diagnosa Bertahap,
                 </h2>
-                <h3 className="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary-hover to-leaf-400 bg-clip-text text-transparent py-1 leading-tight select-none">
-                  ada keluhan apa hari ini?
+                <h3 className="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent py-1 leading-tight select-none">
+                  alur ReAct Multi-Step AI
                 </h3>
               </div>
             </div>
 
             {/* Center Pill Input Bar */}
             <div className="w-full relative group mb-4 sm:mb-6">
-              {/* Pulsing Border Gradient Glow on focus/hover */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-primary-hover/20 to-leaf-400/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 via-indigo-500/20 to-purple-500/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
 
               <form
                 onSubmit={handleSendMessage}
                 className="relative bg-[#f0f4f9] dark:bg-[#1e1f20] border border-[#e3e3e3] dark:border-[#2d2e30] rounded-[28px] pt-3.5 pb-2 px-5 flex flex-col shadow-xl hover:bg-[#e9eff6] hover:dark:bg-[#232426] focus-within:bg-background-light focus-within:dark:bg-[#232426] transition-all duration-300 w-full"
               >
-                {/* 1. Text Area Row (Full Width) */}
                 <div className="w-full">
                   <textarea
                     ref={textareaRefA}
@@ -607,13 +566,11 @@ export default function DiagnosaV3Page() {
                     disabled={isLoading}
                     rows={1}
                     className="w-full bg-transparent border-none focus:ring-0 text-[#1f1f1f] dark:text-[#e3e3e3] placeholder-[#757775] dark:placeholder-[#8e918f] text-base py-1 outline-none resize-none overflow-y-auto max-h-[180px] leading-relaxed"
-                    placeholder={isLoading ? "Agent sedang menelusuri Graph Database..." : "Ketikan keluhan atau gejala di sini..."}
+                    placeholder={isLoading ? "AI sedang berputar menganalisis database..." : "Ketikan keluhan atau gejala di sini..."}
                   />
                 </div>
 
-                {/* 2. Actions Row (Left & Right) */}
                 <div className="flex items-center justify-between w-full mt-1.5">
-                  {/* Left Side: Plus Settings Button */}
                   <button
                     type="button"
                     onClick={() => setShowSettings(true)}
@@ -623,9 +580,7 @@ export default function DiagnosaV3Page() {
                     <span className="material-symbols-outlined text-[24px]">add</span>
                   </button>
 
-                  {/* Right Side: Model, Mic, and Send Buttons */}
                   <div className="flex items-center gap-2 select-none">
-                    {/* Dropdown Model Picker Inside Input (Hidden on mobile) */}
                     <div className="hidden sm:block relative shrink-0">
                       <button
                         type="button"
@@ -638,7 +593,6 @@ export default function DiagnosaV3Page() {
                         <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
                       </button>
 
-                      {/* Dropdown Options List */}
                       {showModelPicker && (
                         <div className="absolute top-full right-0 mt-3 w-64 bg-background-light dark:bg-[#282a2c] border border-[#e3e3e3] dark:border-[#3c4043] rounded-2xl shadow-2xl overflow-hidden z-[100] animate-[fadeIn_0.15s_ease-out]">
                           <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-black/10">
@@ -669,7 +623,6 @@ export default function DiagnosaV3Page() {
                       )}
                     </div>
 
-                    {/* Voice Microphone Dictation Icon */}
                     <button
                       type="button"
                       onClick={toggleListening}
@@ -677,18 +630,17 @@ export default function DiagnosaV3Page() {
                         ? 'text-red-500 bg-red-500/10 animate-pulse border border-red-500/20'
                         : 'text-[#444746] dark:text-[#c4c7c5]'
                         }`}
-                      title={isListening ? "Sedang mendengarkan... Klik untuk berhenti" : "Diagnosa lewat Suara (Speech to Text)"}
+                      title={isListening ? "Mendengarkan... Klik untuk berhenti" : "Diagnosa lewat Suara (Speech to Text)"}
                     >
                       <span className="material-symbols-outlined text-[22px]">
                         {isListening ? 'mic_off' : 'mic'}
                       </span>
                     </button>
 
-                    {/* Submit Arrow Icon */}
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className={`w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(31,137,54,0.4)] cursor-pointer ${
+                      className={`w-11 h-11 bg-blue-600 text-white rounded-full flex items-center justify-center shrink-0 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(59,130,246,0.4)] cursor-pointer ${
                         isLoading ? 'opacity-35 cursor-not-allowed' : ''
                       }`}
                     >
@@ -707,11 +659,11 @@ export default function DiagnosaV3Page() {
                   onClick={() => handleSendMessage(undefined, s.text)}
                   className="flex items-start gap-4 p-5 rounded-2xl bg-[#f0f4f9]/50 dark:bg-[#1e1f20]/50 border border-[#e3e3e3] dark:border-[#2d2e30]/80 text-left hover:bg-[#e1e5ea] hover:dark:bg-[#2b2c2d] hover:scale-[1.01] hover:border-slate-400 hover:dark:border-[#3e4042] transition-all duration-300 group cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#2d2e30] border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0 text-primary dark:text-leaf-400 group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#2d2e30] border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-xl">{s.icon}</span>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold text-[#1f1f1f] dark:text-[#e3e3e3] line-clamp-1 group-hover:text-primary transition-colors">{s.text}</p>
+                    <p className="text-xs font-semibold text-[#1f1f1f] dark:text-[#e3e3e3] line-clamp-1 group-hover:text-blue-600 transition-colors">{s.text}</p>
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">{s.subtext}</p>
                   </div>
                 </button>
@@ -723,10 +675,6 @@ export default function DiagnosaV3Page() {
             </p>
           </div>
         ) : (
-
-          /* ==============================================
-             Layout STATE B: Active Chat (Gemini Flowing stream)
-             ============================================== */
           <div className="flex-1 flex flex-col min-h-0 relative select-text">
 
             {/* Scrollable chat messages container */}
@@ -737,7 +685,6 @@ export default function DiagnosaV3Page() {
               <div className="max-w-3xl mx-auto flex flex-col gap-10">
 
                 {messages.map((m, index) => {
-                  // Cek raw JSON hasil pemanggilan tool agar tidak bocor kasar ke user
                   const isRawJson = (text: string) => {
                     if (typeof text !== 'string') return false;
                     const trimmed = text.trim();
@@ -759,9 +706,9 @@ export default function DiagnosaV3Page() {
                             <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#botGrad)" />
                             <defs>
                               <linearGradient id="botGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stopColor="hsl(var(--primary))" />
-                                <stop offset="50%" stopColor="var(--color-primary-hover)" />
-                                <stop offset="100%" stopColor="var(--color-leaf-400)" />
+                                <stop offset="0%" stopColor="#3b82f6" />
+                                <stop offset="50%" stopColor="#6366f1" />
+                                <stop offset="100%" stopColor="#a855f7" />
                               </linearGradient>
                             </defs>
                           </svg>
@@ -770,10 +717,9 @@ export default function DiagnosaV3Page() {
 
                       <div className={`flex flex-col gap-2.5 max-w-[85%] lg:max-w-[75%] ${m.role === 'user' ? 'items-end' : ''}`}>
 
-                        {/* Name Header */}
                         <div className="flex items-baseline gap-2 select-none">
                           <span className="text-[11px] font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400">
-                            {m.role === 'user' ? 'Anda' : 'SITOBAT V3 AGENT'}
+                            {m.role === 'user' ? 'Anda' : 'SITOBAT V3 MULTI-STEP AGENT'}
                           </span>
                         </div>
 
@@ -783,7 +729,6 @@ export default function DiagnosaV3Page() {
                           // TEXT PART
                           if (part.type === 'text' && part.text) {
                             const trimmedText = part.text.trim();
-                            // Hapus/abaikan rendering jika isinya adalah format raw tool call / JSON bocor
                             if (isRawJson(trimmedText) || trimmedText.includes('_response": {') || (trimmedText.startsWith('{') && trimmedText.endsWith('}'))) {
                               return null;
                             }
@@ -843,7 +788,6 @@ export default function DiagnosaV3Page() {
                                   </span>
                                 </div>
 
-                                {/* Payload database raw expandable */}
                                 {isResult && (
                                   <details className="mt-2 text-[10px] text-slate-500 border-t border-slate-200 dark:border-slate-800/80 pt-2 shrink-0">
                                     <summary className="cursor-pointer hover:text-slate-700 dark:hover:text-slate-300 transition-colors select-none">
@@ -860,7 +804,6 @@ export default function DiagnosaV3Page() {
 
                           return null;
                         }) : (
-                          // Fallback message text if no parts present
                           ((m as any).content || (m as any).text) ? (
                             (() => {
                               const fallbackText = (m as any).content || (m as any).text;
@@ -890,7 +833,7 @@ export default function DiagnosaV3Page() {
                               {extractedTanaman.length > 0 && (
                                 <div className="bg-white dark:bg-[#1a1a1a]/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
                                   <div className="flex items-center gap-2 mb-3.5 select-none">
-                                    <span className="material-symbols-outlined text-primary text-[19px]">eco</span>
+                                    <span className="material-symbols-outlined text-blue-500 text-[19px]">eco</span>
                                     <span className="text-xs font-bold text-[#1f1f1f] dark:text-white uppercase tracking-wider">
                                       Rekomendasi Tanaman Obat
                                     </span>
@@ -901,18 +844,18 @@ export default function DiagnosaV3Page() {
                                         key={t.id}
                                         href={`/tanaman/${t.id}`}
                                         target="_blank"
-                                        className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-slate-50 dark:bg-[#202124]/40 border border-slate-100 dark:border-slate-800/80 hover:border-primary/50 dark:hover:border-primary/50 hover:bg-slate-100 hover:dark:bg-[#202124]/90 hover:scale-[1.01] transition-all group shadow-2xs"
+                                        className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-slate-50 dark:bg-[#202124]/40 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/50 dark:hover:border-blue-500/50 hover:bg-slate-100 hover:dark:bg-[#202124]/90 hover:scale-[1.01] transition-all group shadow-2xs"
                                       >
                                         <div className="w-9.5 h-9.5 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500/20 transition-colors">
-                                          <span className="material-symbols-outlined text-primary text-[19px]">local_florist</span>
+                                          <span className="material-symbols-outlined text-blue-500 text-[19px]">local_florist</span>
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                          <p className="text-slate-800 dark:text-white text-xs font-bold truncate group-hover:text-primary transition-colors">{t.nama}</p>
+                                          <p className="text-slate-800 dark:text-white text-xs font-bold truncate group-hover:text-blue-500 transition-colors">{t.nama}</p>
                                           {t.khasiatUtama && (
                                             <p className="text-slate-500 dark:text-slate-400 text-[10px] truncate mt-1">{t.khasiatUtama}</p>
                                           )}
                                         </div>
-                                        <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-primary transition-colors">open_in_new</span>
+                                        <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-blue-500 transition-colors">open_in_new</span>
                                       </Link>
                                     ))}
                                   </div>
@@ -925,18 +868,18 @@ export default function DiagnosaV3Page() {
                                   href={buildGraphUrl(gejalaIds, penyakitIds, tanamanIds)}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-blue-500/5 dark:bg-[#1a1a2e]/40 border border-blue-500/10 dark:border-blue-500/10 hover:border-primary/50 hover:bg-blue-500/10 hover:dark:bg-[#1a1a2e]/85 hover:scale-[1.01] transition-all shadow-2xs group w-full"
+                                  className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-blue-500/5 dark:bg-[#1a1a2e]/40 border border-blue-500/10 dark:border-blue-500/10 hover:border-blue-500/50 hover:bg-blue-500/10 hover:dark:bg-[#1a1a2e]/85 hover:scale-[1.01] transition-all shadow-2xs group w-full"
                                 >
                                   <div className="w-9.5 h-9.5 rounded-full bg-blue-500/15 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500/25 transition-colors">
-                                    <span className="material-symbols-outlined text-primary text-[19px]">hub</span>
+                                    <span className="material-symbols-outlined text-blue-500 text-[19px]">hub</span>
                                   </div>
                                   <div className="min-w-0 flex-1">
-                                    <p className="text-slate-800 dark:text-white text-xs font-bold group-hover:text-primary transition-colors">Lihat Visualisasi Knowledge Graph</p>
+                                    <p className="text-slate-800 dark:text-white text-xs font-bold group-hover:text-blue-500 transition-colors">Lihat Visualisasi Knowledge Graph</p>
                                     <p className="text-slate-500 dark:text-slate-400 text-[10px] mt-1 select-none">
                                       Menelusuri peta relasi {gejalaIds.length} gejala, {penyakitIds.length} penyakit{tanamanIds.length > 0 ? `, ${tanamanIds.length} tanaman` : ''} di database
                                     </p>
                                   </div>
-                                  <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-primary transition-colors">arrow_outward</span>
+                                  <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-blue-500 transition-colors">arrow_outward</span>
                                 </a>
                               )}
                             </div>
@@ -966,16 +909,16 @@ export default function DiagnosaV3Page() {
                         <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#spinGrad)" />
                         <defs>
                           <linearGradient id="spinGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stopColor="hsl(var(--primary))" />
-                            <stop offset="100%" stopColor="var(--color-primary-hover)" />
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="100%" stopColor="#6366f1" />
                           </linearGradient>
                         </defs>
                       </svg>
                     </div>
                     <div className="flex gap-1.5 bg-[#f0f4f9] dark:bg-[#1e1f20] border border-slate-200 dark:border-slate-800 px-5 py-4 rounded-2xl rounded-tl-none items-center h-12 shadow-2xs select-none">
-                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                   </div>
                 )}
@@ -984,16 +927,15 @@ export default function DiagnosaV3Page() {
               </div>
             </div>
 
-            {/* Sticky Bottom Input Bar Area (Matches State A style exactly but fixed at bottom) */}
+            {/* Sticky Bottom Input Bar Area */}
             <div className="absolute bottom-0 left-0 w-full px-4 pb-6 pt-12 z-30 flex justify-center bg-gradient-to-t from-[#ffffff] via-[#ffffff]/90 to-transparent dark:from-background-dark dark:via-background-dark/90 dark:to-transparent pointer-events-none select-none">
               <div className="w-full max-w-3xl relative group pointer-events-auto">
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-primary-hover/20 to-leaf-400/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 via-indigo-500/20 to-purple-500/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
 
                 <form
                   onSubmit={handleSendMessage}
                   className="relative bg-[#f0f4f9] dark:bg-[#1e1f20] border border-[#e3e3e3] dark:border-[#2d2e30] rounded-[28px] pt-3.5 pb-2 px-5 flex flex-col shadow-xl hover:bg-[#e9eff6] hover:dark:bg-[#232426] focus-within:bg-background-light focus-within:dark:bg-[#232426] transition-all duration-300 w-full"
                 >
-                  {/* 1. Text Area Row (Full Width) */}
                   <div className="w-full">
                     <textarea
                       ref={textareaRefB}
@@ -1004,13 +946,11 @@ export default function DiagnosaV3Page() {
                       disabled={isLoading}
                       rows={1}
                       className="w-full bg-transparent border-none focus:ring-0 text-[#1f1f1f] dark:text-[#e3e3e3] placeholder-[#757775] dark:placeholder-[#8e918f] text-base py-1 outline-none resize-none overflow-y-auto max-h-[180px] leading-relaxed"
-                      placeholder={isLoading ? "Agent sedang menganalisis database..." : "Ketikan gejala atau keluhan lanjutan medis Anda..."}
+                      placeholder={isLoading ? "AI sedang berputar menganalisis database..." : "Ketikan gejala atau keluhan lanjutan medis Anda..."}
                     />
                   </div>
 
-                  {/* 2. Actions Row (Left & Right) */}
                   <div className="flex items-center justify-between w-full mt-1.5">
-                    {/* Left Side: Plus Settings Button */}
                     <button
                       type="button"
                       onClick={() => setShowSettings(true)}
@@ -1020,9 +960,7 @@ export default function DiagnosaV3Page() {
                       <span className="material-symbols-outlined text-[24px]">add</span>
                     </button>
 
-                    {/* Right Side: Model, Mic, and Send Buttons */}
                     <div className="flex items-center gap-2 select-none">
-                      {/* Dropdown Model Picker Inside Input (Hidden on mobile) */}
                       <div className="hidden sm:block relative shrink-0">
                         <button
                           type="button"
@@ -1035,7 +973,6 @@ export default function DiagnosaV3Page() {
                           <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
                         </button>
 
-                        {/* Dropdown Options List */}
                         {showModelPicker && (
                           <div className="absolute bottom-full right-0 mb-3 w-64 bg-background-light dark:bg-[#282a2c] border border-[#e3e3e3] dark:border-[#3c4043] rounded-2xl shadow-2xl overflow-hidden z-[100] animate-[fadeIn_0.15s_ease-out]">
                             <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-black/10">
@@ -1066,7 +1003,6 @@ export default function DiagnosaV3Page() {
                         )}
                       </div>
 
-                      {/* Voice Microphone Dictation Icon */}
                       <button
                         type="button"
                         onClick={toggleListening}
@@ -1081,11 +1017,10 @@ export default function DiagnosaV3Page() {
                         </span>
                       </button>
 
-                      {/* Submit Arrow Icon */}
                       <button
                         type="submit"
                         disabled={isLoading}
-                        className={`w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(31,137,54,0.4)] cursor-pointer ${
+                        className={`w-11 h-11 bg-blue-600 text-white rounded-full flex items-center justify-center shrink-0 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(59,130,246,0.4)] cursor-pointer ${
                           isLoading ? 'opacity-35 cursor-not-allowed' : ''
                         }`}
                       >
@@ -1121,7 +1056,6 @@ export default function DiagnosaV3Page() {
             </div>
 
             <div className="space-y-5 select-text">
-              {/* Temperature Slider */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-slate-600 dark:text-slate-400">Model Temperature</span>
@@ -1139,7 +1073,6 @@ export default function DiagnosaV3Page() {
                 <p className="text-[9px] text-slate-400">Temperatur lebih rendah membuat agen lebih deterministic & patuh pada aturan grafik.</p>
               </div>
 
-              {/* Max Steps Slider */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-slate-600 dark:text-slate-400">Max ReAct Thinking Steps</span>
@@ -1157,7 +1090,6 @@ export default function DiagnosaV3Page() {
                 <p className="text-[9px] text-slate-400">Membatasi jumlah langkah pencarian database oleh agen AI untuk mencegah loop tak terbatas.</p>
               </div>
 
-              {/* API Provider Status */}
               <div className="p-4 bg-slate-50 dark:bg-[#282a2c] rounded-2xl border border-slate-100 dark:border-[#3c4043] space-y-2">
                 <p className="text-[10px] font-bold text-slate-500 uppercase">Status & Info Database</p>
                 <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -1167,7 +1099,7 @@ export default function DiagnosaV3Page() {
                   <div>Prisma Client:</div>
                   <div className="text-right text-green-500">Connected</div>
 
-                  <div>GraphRAG V3:</div>
+                  <div>GraphRAG V3 Step:</div>
                   <div className="text-right">Enabled</div>
                 </div>
               </div>
@@ -1208,15 +1140,13 @@ export default function DiagnosaV3Page() {
         </div>
       )}
 
-      {/* Global CSS style tags for animation & markdown formats */}
+      {/* Global CSS style tags */}
       <style>{`
-        /* Chrome, Edge, Safari */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(120, 120, 120, 0.2); border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(120, 120, 120, 0.4); }
         
-        /* Firefox */
         * {
           scrollbar-width: thin;
           scrollbar-color: rgba(120, 120, 120, 0.25) transparent;

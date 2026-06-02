@@ -1,0 +1,344 @@
+[2026-05-29T01:45:30.575Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "suhu saya tinggi banget, saya juga menggigil, trus nafsumakan turn"
+}
+
+[2026-05-29T01:45:30.576Z] 2. Tool Results Raw:
+[]
+
+[2026-05-29T01:45:30.576Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-05-29T01:45:30.576Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-05-29T01:46:42.011Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "suhu ningkat diatas nomrl, dan saya juga menysuui"
+}
+
+[2026-05-29T01:46:42.012Z] 2. Tool Results Raw:
+[]
+
+[2026-05-29T01:46:42.013Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-05-29T01:46:42.013Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-05-29T08:34:52.798Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "Kepala pusing dan mual sekali mau muntah"
+}
+
+[2026-05-29T08:34:52.799Z] 2. Tool Results Raw:
+[]
+
+[2026-05-29T08:34:52.800Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-05-29T08:34:52.800Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-05-29T08:46:38.098Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "Kepala pusing dan mual sekali mau muntah"
+}
+
+[2026-05-29T08:46:38.100Z] 2. Tool Results Raw:
+[]
+
+[2026-05-29T08:46:38.100Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-05-29T08:46:38.101Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T11:42:48.645Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "Kepala pusing dan mual sekali mau muntah"
+}
+
+[2026-06-02T11:42:48.645Z] 2. Tool Results Raw:
+[]
+
+[2026-06-02T11:42:48.648Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T11:42:48.648Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T11:47:10.316Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "Kepala pusing dan mual sekali mau muntah"
+}
+
+[2026-06-02T11:47:10.317Z] 2. Tool Results Raw:
+[]
+
+[2026-06-02T11:47:10.318Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T11:47:10.318Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T11:47:56.620Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "Kepala pusing dan mual sekali mau muntah"
+}
+
+[2026-06-02T11:47:56.620Z] 2. Tool Results Raw:
+[]
+
+[2026-06-02T11:47:56.621Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T11:47:56.621Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T11:51:49.892Z] 1. Keluhan Pengguna (Multi-Step):
+{
+  "keluhanPengguna": "Kepala pusing dan mual sekali mau muntah"
+}
+
+[2026-06-02T11:51:49.893Z] 2. Tool Results Raw (Multi-Step):
+[]
+
+[2026-06-02T11:51:49.893Z] 3. Parsed Data (Multi-Step):
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T11:51:49.894Z] Skipped (Multi-Step):
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T11:52:27.462Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "Kepala pusing dan mual sekali mau muntah"
+}
+
+[2026-06-02T11:52:27.463Z] 2. Tool Results Raw:
+[]
+
+[2026-06-02T11:52:27.464Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T11:52:27.465Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T11:52:38.284Z] 1. Keluhan Pengguna (Multi-Step):
+{
+  "keluhanPengguna": "Kepala pusing dan mual sekali mau muntah"
+}
+
+[2026-06-02T11:52:38.285Z] 2. Tool Results Raw (Multi-Step):
+[]
+
+[2026-06-02T11:52:38.285Z] 3. Parsed Data (Multi-Step):
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T11:52:38.286Z] Skipped (Multi-Step):
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T14:40:54.967Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "Nyeri sendi di lutut dan asam urat tinggi"
+}
+
+[2026-06-02T14:40:54.968Z] 2. Tool Results Raw:
+[
+  {
+    "type": "tool-result",
+    "toolCallId": "8McrvpPZ2nXrs4Xi",
+    "toolName": "AnalisisDiagnosaMedisHibrida",
+    "input": {
+      "keluhanPasien": "Nyeri sendi di lutut dan asam urat tinggi"
+    },
+    "output": {
+      "message": "Keluhan tidak boleh kosong.",
+      "gejala": [],
+      "kandidat": []
+    },
+    "dynamic": false,
+    "providerMetadata": {
+      "google": {
+        "thoughtSignature": "CiQBDDnWxzIgnLlwS60aZ7PZF3M4LCf29Wc9dCQQq0Si6YEa9VUKYwEMOdbH56QtM6utarfspjy0CfpQhGsSwHT8nc437Y0TZMCb1tCXB4YZBbXgIXhEcVpEM7mLyF4vafRdTlhZBCR3f6/VzcPdAmmStKpuxoKejtp6eT3OLuIb3AX+F7C1XCFO3wrpAQEMOdbHcloCV6DQDpG0IxKw439wNMW/z6qM+OC0b+OKBykBScpUC3ILndVNPphOS0pRshiDt+Gt1Hkcv9hDt70A2MsoN8Zqd6csHhVHXEms+hRYK1AVslZ1DG0OGiyG2vxsDZWNtnl7952X5A2AmbjojOczgFycKoRyNkAoqXOWKMr49m1Cxi84bwWRYXeGyzt1011fHgrFpMbZCp42sWzxNybHL2iQ30UORrx6lBLQS6gIiU/CX/RiwbGbkneYO3V/xmxjjZeHWpYxBxDrj3/JTb2qe+zfKsEcP+CbrUZ7URzqDbWpYewoCskBAQw51sdlvC8s96mIrRmaNH4EwKpPFsfdDq1R3O5R6sa+4KHDoK4lvfe3jpfnoEd8RWwp21sGTEPE5m0r17kzBOfJ3Gmw90Q6OHNuParqaTiyRqPOYmhg4gRpymaDu0IZ6jaUnH1BRUPDsuC9fwgalZwtpmylCapFtiKiNEmJcJRfC2KkRItK0v6i3tvVaZyWNDlqnr8KS5XNDRAzTcV310ZoDRivAWoXJPXGsIYH3bbjFwoJCPoYbZdmii+6awpmZvRATrhCqMp/"
+      }
+    }
+  }
+]
+
+[2026-06-02T14:40:54.968Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T14:40:54.969Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T14:41:08.617Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "Nyeri sendi di lutut dan asam urat tinggi"
+}
+
+[2026-06-02T14:41:08.618Z] 2. Tool Results Raw:
+[]
+
+[2026-06-02T14:41:08.619Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T14:41:08.620Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T14:41:32.984Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "dah agak lama, terus terusan kerasanya, bengkak merah juga"
+}
+
+[2026-06-02T14:41:32.985Z] 2. Tool Results Raw:
+[]
+
+[2026-06-02T14:41:32.985Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T14:41:32.986Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T14:41:45.760Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "tidak ada"
+}
+
+[2026-06-02T14:41:45.761Z] 2. Tool Results Raw:
+[]
+
+[2026-06-02T14:41:45.762Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T14:41:45.762Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T14:41:56.938Z] 1. Keluhan Pengguna (Multi-Step):
+{
+  "keluhanPengguna": "Nyeri sendi di lutut dan asam urat tinggi"
+}
+
+[2026-06-02T14:41:56.938Z] 2. Tool Results Raw (Multi-Step):
+[]
+
+[2026-06-02T14:41:56.939Z] 3. Parsed Data (Multi-Step):
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T14:41:56.939Z] Skipped (Multi-Step):
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T14:42:48.208Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "saya gapunya kondisi medis"
+}
+
+[2026-06-02T14:42:48.209Z] 2. Tool Results Raw:
+[]
+
+[2026-06-02T14:42:48.210Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T14:42:48.210Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T15:00:32.143Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "Nyeri sendi di lutut dan asam urat tinggi"
+}
+
+[2026-06-02T15:00:32.145Z] 2. Tool Results Raw:
+[]
+
+[2026-06-02T15:00:32.146Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T15:00:32.146Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+
+[2026-06-02T15:01:07.372Z] 1. Keluhan Pengguna:
+{
+  "keluhanPengguna": "Nyeri sendi di lutut dan asam urat tinggi"
+}
+
+[2026-06-02T15:01:07.373Z] 2. Tool Results Raw:
+[]
+
+[2026-06-02T15:01:07.373Z] 3. Parsed Data:
+{
+  "gejalaTerdeteksi": [],
+  "kandidatPenyakitCount": 0,
+  "hasFinalPenyakit": false
+}
+
+[2026-06-02T15:01:07.373Z] Skipped:
+"Tidak ada penyakit terdiagnosa dan tidak ada gejala terdeteksi"
+

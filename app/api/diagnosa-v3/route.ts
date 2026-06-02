@@ -31,22 +31,19 @@ export async function POST(req: Request) {
     const { messages, provider, model } = await req.json();
 
     const SYSTEM_PROMPT = `Sebagai Agent Medis Botani ReAct (Relational GraphRAG) SITOBAT-AI.
-Kamu mengevaluasi keluhan dengan sangat analitis dengan menelusuri Graph Database secara berurutan.
-Jika keluhan user disampaikan dalam bahasa asing (seperti Bahasa Inggris), kamu WAJIB menerjemahkan gejala/keluhan tersebut ke Bahasa Indonesia terlebih dahulu sebelum memanggil alat pencarian gejala, karena basis data di dalam sistem semuanya menggunakan istilah Bahasa Indonesia.
+Kamu mengevaluasi keluhan dengan sangat analitis dengan menelusuri Graph Database menggunakan tool gabungan "AnalisisDiagnosaMedisHibrida".
+Jika keluhan user disampaikan dalam bahasa asing (seperti Bahasa Inggris), kamu WAJIB menerjemahkan gejala/keluhan tersebut ke Bahasa Indonesia terlebih dahulu sebelum memanggil tool, karena basis data di dalam sistem semuanya menggunakan istilah Bahasa Indonesia.
 
-PENTING/CRITICAL: Kamu WAJIB membalas pesan pengguna menggunakan bahasa yang sama persis dengan bahasa yang digunakan oleh pengguna dalam keluhannya (baik Bahasa Inggris, Bahasa Indonesia, bahasa daerah, maupun bahasa asing lainnya). Abaikan fakta bahwa pesan pembuka asisten ("Ceritakan keluhan medis Anda...") ditulis dalam Bahasa Indonesia; jika pengguna merespon dalam Bahasa Inggris, kamu harus langsung membalas penuh dalam Bahasa Inggris. Jangan gunakan bahasa Indonesia jika pengguna mengirimkan keluhan dalam bahasa Inggris atau bahasa lainnya, meskipun istilah database atau instruksi sistem ini dalam bahasa Indonesia. Kamu harus menerjemahkan kesimpulan hasil analisis akhirmu ke bahasa pengguna.
-
-
+PENTING/CRITICAL: Kamu WAJIB membalas pesan pengguna menggunakan bahasa yang sama persis dengan bahasa yang digunakan oleh pengguna dalam keluhannya (baik Bahasa Inggris, Bahasa Indonesia, bahasa daerah, maupun bahasa asing lainnya). Abaikan fakta bahwa pesan pembuka asisten ("Ceritakan keluhan medis Anda...") ditulis dalam Bahasa Indonesia; jika pengguna merespon dalam Bahasa Inggris, kamu harus langsung membalas penuh dalam Bahasa Inggris. Kamu harus menerjemahkan kesimpulan hasil analisis akhirmu ke bahasa pengguna.
 
 IKUTI LANGKAH INI DENGAN SANGAT KETAT:
-1. Ekstrak KATA KUNCI utama dari keluhan user (dalam bentuk string yang dipisah koma seperti 'kulit, melepuh'). WAJIB pakai tool "EkstrakDanCariGejala" dan isi parameter 'keywords' dengan string tersebut. Jangan mengirim object kosong \`{}\`.
-2. Masukkan ID Gejala hasil pencarian ke tool "TelusuriGrafPenyakit" (dalam bentuk array of strings jika lebih dari satu, ke dalam parameter 'id_gejala_array'). Jangan mengirim object kosong \`{}\`.
-3. Validasi ID Penyakit hasil penelusuran dengan tool "ValidasiGejalaWajib". Jika hasil validasi menyatakan 'sah: false' (penyakit belum pasti/batal diverifikasi), kamu TETAP BOLEH menyebutkan diagnosis penyakit tersebut sebagai KEMUNGKINAN AWAL/KEMUNGKINAN KECIL. Namun, kamu WAJIB menyampaikan secara jelas kepada pengguna bahwa diagnosis ini belum diverifikasi sepenuhnya karena beberapa gejala wajib tidak dialami, DAN kamu WAJIB secara aktif bertanya kepada pengguna apakah mereka mengalami gejala-gejala wajib yang tidak dialami tersebut (sebutkan secara spesifik gejala wajib apa saja yang belum terpenuhi dari hasil 'gejalaHilang' dan tanyakan apakah pengguna merasakannya) untuk memastikan kondisi mereka.
-4. Jika merekomendasikan resep tanaman, kamu HARUS memeriksanya dengan tool "FilterKontraindikasiMurni" beserta kondisi medis pasien jika ada (misal: Hamil, Darah Tinggi).
-   - Tanaman yang tercantum dalam 'pesanDilarang' atau 'tanamanTerlarangIds' (tingkat risiko BERBAHAYA) DILARANG KERAS untuk direkomendasikan. Kamu wajib membuang tanaman ini dari daftar resep/rekomendasi.
-   - Tanaman yang tercantum dalam 'pesanPeringatan' atau 'tanamanPeringatanIds' (tingkat risiko HATI-HATI) TETAP BOLEH direkomendasikan, tetapi kamu WAJIB menuliskan catatan peringatan/edukasi kontraindikasi tersebut secara eksplisit kepada pengguna dalam jawaban akhirmu.
-5. TANYAKAN KONDISI MEDIS SECARA PROAKTIF: Jika pengguna belum menyebutkan adanya kondisi medis khusus (seperti hamil, menyusui, darah tinggi/hipertensi, maag, gangguan ginjal/jantung, dll.) dalam riwayat percakapan, kamu WAJIB secara proaktif menanyakan kepada pengguna apakah mereka memiliki salah satu kondisi tersebut sebelum atau bersamaan dengan penyampaian hasil rekomendasi tanaman obat. Hal ini sangat penting agar pengguna dapat mengonfirmasinya jika saja mereka lupa menyebutkan kondisi medis tersebut di awal keluhan. Jika pengguna merespons dengan suatu kondisi medis, lakukan penyaringan ulang menggunakan tool 'FilterKontraindikasiMurni' pada giliran percakapan berikutnya.
-6. Teruslah berpikir mandiri jika menemukan jalan buntu (loop), lalu rangkai bukti konklusimu ke pengguna. Jelaskan apa yang kamu temukan dari database kepada pasien dengan ramah. Kamu WAJIB membalas menggunakan bahasa yang sama persis dengan bahasa yang digunakan oleh pengguna dalam keluhannya (baik Bahasa Inggris, Bahasa Indonesia, bahasa daerah, maupun bahasa asing lainnya).
+1. Panggil tool "AnalisisDiagnosaMedisHibrida" dengan keluhan pengguna (dan kondisi medisnya jika ada). Tool ini akan secara instan mengembalikan gejala terdeteksi, kandidat penyakit, status validasi gejala wajib, dan filter kontraindikasi tanaman obat.
+2. Evaluasi hasil dari "AnalisisDiagnosaMedisHibrida":
+   - Jika hasil validasi penyakit menyatakan 'sah: false' (penyakit belum pasti/batal diverifikasi), kamu TETAP BOLEH menyebutkan diagnosis penyakit tersebut sebagai KEMUNGKINAN AWAL/KEMUNGKINAN KECIL. Namun, kamu WAJIB menyampaikan secara jelas kepada pengguna bahwa diagnosis ini belum diverifikasi sepenuhnya karena beberapa gejala wajib tidak dialami, DAN kamu WAJIB secara aktif bertanya kepada pengguna apakah mereka mengalami gejala-gejala wajib yang tidak dialami tersebut (sebutkan secara spesifik gejala wajib apa saja yang belum terpenuhi dari hasil 'gejalaHilang' dan tanyakan apakah pengguna merasakannya) untuk memastikan kondisi mereka.
+   - Jika merekomendasikan resep tanaman, pastikan membuang tanaman yang terlarang/dilarang keras (dari 'pesanDilarang' atau 'tanamanTerlarangIds').
+   - Tanaman yang memiliki peringatan/tingkat risiko 'HATI-HATI' ('pesanPeringatan' atau 'tanamanPeringatanIds') TETAP BOLEH direkomendasikan, tetapi kamu WAJIB menuliskan catatan peringatan/edukasi kontraindikasi tersebut secara eksplisit kepada pengguna dalam jawaban akhirmu.
+3. TANYAKAN KONDISI MEDIS SECARA PROAKTIF: Jika pengguna belum menyebutkan adanya kondisi medis khusus (seperti hamil, menyusui, darah tinggi/hipertensi, maag, gangguan ginjal/jantung, dll.) dalam riwayat percakapan, kamu WAJIB secara proaktif menanyakan kepada pengguna apakah mereka memiliki salah satu kondisi tersebut sebelum atau bersamaan dengan penyampaian hasil rekomendasi tanaman obat. Hal ini sangat penting agar pengguna dapat mengonfirmasinya jika saja mereka lupa menyebutkan kondisi medis tersebut di awal keluhan. Jika pengguna merespons dengan suatu kondisi medis, lakukan penyaringan ulang menggunakan tool 'AnalisisDiagnosaMedisHibrida' pada giliran percakapan berikutnya dengan parameter kondisiKesehatanPasien yang sesuai.
+4. Rangkai bukti konklusimu ke pengguna. Jelaskan apa yang kamu temukan dari database kepada pasien dengan ramah menggunakan bahasa yang sama dengan keluhan mereka.
 `;
 
     // Pastikan payload memiliki array kosong atau 'parts' untuk property yang di-map secara buta oleh convertToModelMessages di SDK v6
@@ -67,7 +64,7 @@ IKUTI LANGKAH INI DENGAN SANGAT KETAT:
          console.log("[V3 GraphRAG] Stream Finished:", { 
              finishReason: event.finishReason, 
              toolCalls: event.toolCalls?.map(t => t.toolName)
-         });
+          });
 
          const fs = require("fs");
          const path = require("path");
@@ -100,40 +97,60 @@ IKUTI LANGKAH INI DENGAN SANGAT KETAT:
            const toolResults = (event.toolResults || []) as any[];
            logDebug("2. Tool Results Raw", toolResults);
 
-           // Cari gejala terdeteksi
            let gejalaTerdeteksi: string[] = [];
-           const gejalaToolResult = toolResults.find(t => t.toolName === "EkstrakDanCariGejala");
-           if (gejalaToolResult && gejalaToolResult.result && Array.isArray(gejalaToolResult.result.gejala)) {
-             gejalaTerdeteksi = gejalaToolResult.result.gejala.map((g: any) => g.nama || g.namaLokal || "").filter(Boolean);
-           }
-
-           // Cari daftar kandidat penyakit
            let kandidatPenyakit: any[] = [];
-           const grafToolResult = toolResults.find(t => t.toolName === "TelusuriGrafPenyakit");
-           if (grafToolResult && grafToolResult.result && Array.isArray(grafToolResult.result.kandidat)) {
-             kandidatPenyakit = grafToolResult.result.kandidat;
-           }
-
-           // Cari penyakit yang divalidasi
-           const validasiToolResults = toolResults.filter(t => t.toolName === "ValidasiGejalaWajib");
-
-           // Tentukan penyakit diagnosa final
            let finalPenyakit: any = null;
+           let tanamanTerlarangIds: string[] = [];
 
-           if (validasiToolResults.length > 0) {
-             // Cari yang berhasil divalidasi (sah === true)
-             const sahValidation = validasiToolResults.find(v => v.result && v.result.sah === true);
-             const chosenValidation = sahValidation || validasiToolResults[validasiToolResults.length - 1]; // fallback ke validasi terakhir jika semua tidak sah
-             const validatedPenyakitId = chosenValidation.args?.penyakitId;
-
-             if (validatedPenyakitId) {
-               finalPenyakit = kandidatPenyakit.find(k => k.id === validatedPenyakitId);
+           // Periksa apakah ada hasil dari AnalisisDiagnosaMedisHibrida
+           const hibridaResult = toolResults.find(t => t.toolName === "AnalisisDiagnosaMedisHibrida");
+           if (hibridaResult && hibridaResult.result) {
+             const res = hibridaResult.result;
+             if (Array.isArray(res.gejala)) {
+               gejalaTerdeteksi = res.gejala.map((g: any) => g.nama || "").filter(Boolean);
              }
-           }
+             if (Array.isArray(res.kandidat)) {
+               kandidatPenyakit = res.kandidat;
+               
+               // Cari kandidat yang sah
+               const sahPenyakit = kandidatPenyakit.find(k => k.sah === true);
+               finalPenyakit = sahPenyakit || kandidatPenyakit[0] || null;
 
-           // Fallback ke kandidat dengan skor tertinggi jika belum ditemukan
-           if (!finalPenyakit && kandidatPenyakit.length > 0) {
-             finalPenyakit = kandidatPenyakit[0];
+               if (finalPenyakit && Array.isArray(finalPenyakit.tanamanTerlarangIds)) {
+                 tanamanTerlarangIds = finalPenyakit.tanamanTerlarangIds;
+               }
+             }
+           } else {
+             // Fallback/Legacy parsing untuk tool individu lama
+             const gejalaToolResult = toolResults.find(t => t.toolName === "EkstrakDanCariGejala");
+             if (gejalaToolResult && gejalaToolResult.result && Array.isArray(gejalaToolResult.result.gejala)) {
+               gejalaTerdeteksi = gejalaToolResult.result.gejala.map((g: any) => g.nama || g.namaLokal || "").filter(Boolean);
+             }
+
+             const grafToolResult = toolResults.find(t => t.toolName === "TelusuriGrafPenyakit");
+             if (grafToolResult && grafToolResult.result && Array.isArray(grafToolResult.result.kandidat)) {
+               kandidatPenyakit = grafToolResult.result.kandidat;
+             }
+
+             const validasiToolResults = toolResults.filter(t => t.toolName === "ValidasiGejalaWajib");
+             if (validasiToolResults.length > 0) {
+               const sahValidation = validasiToolResults.find(v => v.result && v.result.sah === true);
+               const chosenValidation = sahValidation || validasiToolResults[validasiToolResults.length - 1];
+               const validatedPenyakitId = chosenValidation.args?.penyakitId;
+
+               if (validatedPenyakitId) {
+                 finalPenyakit = kandidatPenyakit.find(k => k.id === validatedPenyakitId);
+               }
+             }
+
+             if (!finalPenyakit && kandidatPenyakit.length > 0) {
+               finalPenyakit = kandidatPenyakit[0];
+             }
+
+             const filterToolResult = toolResults.find(t => t.toolName === "FilterKontraindikasiMurni");
+             if (filterToolResult && filterToolResult.result && Array.isArray(filterToolResult.result.tanamanTerlarangIds)) {
+               tanamanTerlarangIds = filterToolResult.result.tanamanTerlarangIds;
+             }
            }
 
            logDebug("3. Parsed Data", {
@@ -149,13 +166,6 @@ IKUTI LANGKAH INI DENGAN SANGAT KETAT:
            }
 
            const namaPenyakit = finalPenyakit ? (finalPenyakit.nama || "Tidak diketahui") : "Tidak diketahui";
-
-           // Cari tanaman dilarang (kontraindikasi)
-           let tanamanTerlarangIds: string[] = [];
-           const filterToolResult = toolResults.find(t => t.toolName === "FilterKontraindikasiMurni");
-           if (filterToolResult && filterToolResult.result && Array.isArray(filterToolResult.result.tanamanTerlarangIds)) {
-             tanamanTerlarangIds = filterToolResult.result.tanamanTerlarangIds;
-           }
 
            // Filter tanaman yang direkomendasikan
            const rekomendasiTanamanRaw = finalPenyakit ? (finalPenyakit.tanamanObat || []) : [];

@@ -37,19 +37,19 @@ export const EkstrakDanCariGejala = tool({
       // Fallback jika semua kata terfilter tapi ada keyword asli
       const finalKeywords = processedKeywords.length > 0 ? processedKeywords : keywordArray;
 
-      for (const keyword of finalKeywords as string[]) {
-        // Melakukan penelusuran string toleran (Full-Text Search) menggunakan contains dan insensitive
-        const hasil = await prisma.gejala.findMany({
+      const queryPromises = (finalKeywords as string[]).map((keyword) =>
+        prisma.gejala.findMany({
           where: {
             nama: {
               contains: keyword,
               mode: "insensitive",
             },
           },
-          select: { id: true, nama: true }, // Limit payload LLM (Phase 5 Token Efficiency)
-        });
-        allResults.push(...hasil);
-      }
+          select: { id: true, nama: true },
+        })
+      );
+      const resultsArray = await Promise.all(queryPromises);
+      allResults.push(...resultsArray.flat());
 
       // Hapus duplikat ID gejala jika user mengulang kata yang mengarah ke ID yang sama
       const uniqueResults = Array.from(
@@ -350,9 +350,239 @@ export const FilterKontraindikasiMurni = tool({
   },
 });
 
+// 5. Tool: AnalisisDiagnosaMedisHibrida (Combined Tool - Opsi A)
+export const AnalisisDiagnosaMedisHibrida = tool({
+  description:
+    "Menganalisis keluhan medis pengguna secara menyeluruh, mencocokkan gejala dengan database, menelusuri penyakit terkait, memvalidasi gejala wajib, serta memfilter rekomendasi tanaman obat berdasarkan kontraindikasi pasien dalam satu langkah cepat terpadu.",
+  parameters: z.object({
+    keluhan: z
+      .string()
+      .describe(
+        "Keluhan medis atau gejala mentah dari pengguna. Jika keluhan ditulis dalam bahasa asing (misal Inggris), kamu harus menerjemahkannya ke Bahasa Indonesia sebelum memanggil tool (karena basis data di sistem menggunakan Bahasa Indonesia). Contoh: 'fever' -> 'demam'."
+      ),
+    kondisiKesehatanPasien: z
+      .array(z.string())
+      .describe(
+        "Kondisi kesehatan khusus pasien (contoh: ['Hamil', 'Darah Tinggi'] atau [] jika tidak ada)."
+      ),
+  }),
+  // @ts-ignore
+  execute: async ({
+    keluhan,
+    kondisiKesehatanPasien,
+  }: {
+    keluhan: string;
+    kondisiKesehatanPasien: string[];
+  }) => {
+    try {
+      console.log("[AnalisisDiagnosaMedisHibrida] Input:", { keluhan, kondisiKesehatanPasien });
+      if (!keluhan || keluhan.trim() === "") {
+        return { message: "Keluhan tidak boleh kosong.", gejala: [], kandidat: [] };
+      }
+
+      // --- LANGKAH 1: Ekstrak & Cari Gejala (Secara Paralel) ---
+      const words = keluhan
+        .split(/[\s,.;?]+/)
+        .map((w) => w.trim())
+        .filter(
+          (w) =>
+            w.length > 3 &&
+            ![
+              "saya", "aku", "kami", "kita", "dia", "mereka", "anda", "kamu",
+              "ingin", "tolong", "bantu", "dengan", "yang", "dan", "di", "ke",
+              "dari", "atau", "pada", "juga", "sakit", "nyeri", "merasa", "mengalami"
+            ].includes(w.toLowerCase())
+        );
+
+      const processedKeywords = Array.from(new Set([keluhan.trim(), ...words]));
+
+      const queryPromises = processedKeywords.map((keyword) =>
+        prisma.gejala.findMany({
+          where: {
+            nama: {
+              contains: keyword,
+              mode: "insensitive",
+            },
+          },
+          select: { id: true, nama: true },
+        })
+      );
+      const resultsArray = await Promise.all(queryPromises);
+      const allGejala = resultsArray.flat();
+
+      const uniqueGejala = Array.from(
+        new Map(allGejala.map((item) => [item.id, item])).values()
+      );
+
+      console.log("[AnalisisDiagnosaMedisHibrida] Gejala terdeteksi:", uniqueGejala);
+
+      if (uniqueGejala.length === 0) {
+        return {
+          message: "Tidak ada gejala spesifik di database yang cocok dengan keluhan.",
+          gejala: [],
+          kandidat: [],
+        };
+      }
+
+      const gejalaIdArray = uniqueGejala.map((g) => g.id);
+
+      // --- LANGKAH 2: Telusuri Graf Penyakit ---
+      const penyakitTerkait = await prisma.penyakit.findMany({
+        where: {
+          gejala: {
+            some: {
+              gejalaId: {
+                in: gejalaIdArray,
+              },
+            },
+          },
+        },
+        include: {
+          gejala: {
+            select: {
+              gejalaId: true,
+              isGejalaWajib: true,
+              gejala: { select: { nama: true } },
+            },
+          },
+          tanamanObat: {
+            include: {
+              tanaman: {
+                select: {
+                  id: true,
+                  namaLokal: true,
+                  khasiatUtama: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // --- LANGKAH 3 & 4: Validasi & Filter Kontraindikasi ---
+      let kondisiDatabase: any[] = [];
+      if (kondisiKesehatanPasien && kondisiKesehatanPasien.length > 0) {
+        kondisiDatabase = await prisma.kondisiMedis.findMany({
+          where: {
+            OR: kondisiKesehatanPasien.map((k) => ({
+              nama: { contains: k, mode: "insensitive" },
+            })),
+          },
+        });
+      }
+      const kondisiIds = kondisiDatabase.map((k) => k.id);
+
+      const kandidatPenyakit = [];
+
+      for (const p of penyakitTerkait) {
+        // Hitung skor kecocokan
+        const matchingGejalaIds = p.gejala
+          .filter((g) => gejalaIdArray.includes(g.gejalaId))
+          .map((g) => g.gejalaId);
+        const skor = matchingGejalaIds.length;
+
+        // Validasi Gejala Wajib
+        const gejalaWajibList = p.gejala.filter((g) => g.isGejalaWajib);
+        const gejalaHilang: string[] = [];
+        for (const gw of gejalaWajibList) {
+          if (!gejalaIdArray.includes(gw.gejalaId)) {
+            gejalaHilang.push(gw.gejala.nama);
+          }
+        }
+        const sah = gejalaHilang.length === 0;
+        const validasiMessage = sah
+          ? "Validasi Lulus. Semua Gejala Wajib telah terpenuhi."
+          : `Batal Diverifikasi. Penyakit ini mensyaratkan gejala wajib: ${gejalaHilang.join(", ")} tetapi tidak dialami user.`;
+
+        // Tanaman Obat
+        const tanamanObatList = p.tanamanObat.map((t) => ({
+          id: t.tanaman.id,
+          nama: t.tanaman.namaLokal,
+          khasiatUtama: t.tanaman.khasiatUtama,
+        }));
+
+        // Filter kontraindikasi
+        let tanamanTerlarangIds: string[] = [];
+        let tanamanPeringatanIds: string[] = [];
+        let pesanDilarang: string[] = [];
+        let pesanPeringatan: string[] = [];
+
+        if (kondisiIds.length > 0 && tanamanObatList.length > 0) {
+          const pantangan = await prisma.pantanganTanaman.findMany({
+            where: {
+              tanamanId: { in: tanamanObatList.map((t) => t.id) },
+              kondisiMedisId: { in: kondisiIds },
+            },
+            include: {
+              tanaman: { select: { id: true, namaLokal: true } },
+              kondisiMedis: { select: { nama: true } },
+            },
+          });
+
+          if (pantangan.length > 0) {
+            const dilarang = pantangan.filter(
+              (pan) => pan.tingkatRisiko?.toUpperCase() === "BERBAHAYA" || !pan.tingkatRisiko
+            );
+            const peringatan = pantangan.filter(
+              (pan) => pan.tingkatRisiko?.toUpperCase() === "HATI-HATI"
+            );
+
+            tanamanTerlarangIds = dilarang.map((pan) => pan.tanamanId);
+            tanamanPeringatanIds = peringatan.map((pan) => pan.tanamanId);
+
+            pesanDilarang = dilarang.map(
+              (pan) =>
+                `[DILARANG - BERBAHAYA] Tanaman '${pan.tanaman.namaLokal}' DILARANG untuk penderita '${pan.kondisiMedis.nama}'. Alasan: ${pan.alasan || "Tidak ada alasan spesifik."}`
+            );
+            pesanPeringatan = peringatan.map(
+              (pan) =>
+                `[PERINGATAN - HATI-HATI] Tanaman '${pan.tanaman.namaLokal}' bisa dikonsumsi penderita '${pan.kondisiMedis.nama}' dengan catatan: ${pan.alasan || "Tidak ada alasan spesifik."}`
+            );
+          }
+        }
+
+        // Rekomendasi aman (tidak dilarang keras)
+        const rekomendasiTanaman = tanamanObatList.filter(
+          (t) => !tanamanTerlarangIds.includes(t.id)
+        );
+
+        kandidatPenyakit.push({
+          id: p.id,
+          nama: p.nama,
+          skor,
+          sah,
+          gejalaHilang,
+          validasiMessage,
+          tanamanObat: rekomendasiTanaman,
+          tanamanTerlarangIds,
+          tanamanPeringatanIds,
+          pesanDilarang,
+          pesanPeringatan,
+        });
+      }
+
+      kandidatPenyakit.sort((a, b) => b.skor - a.skor);
+
+      return {
+        message: "Analisis Diagnosa Selesai Berbasis Graph.",
+        gejala: uniqueGejala,
+        kandidat: kandidatPenyakit.slice(0, 5),
+      };
+    } catch (error: any) {
+      console.error("AnalisisDiagnosaMedisHibrida Error:", error);
+      return {
+        message: "Terjadi kesalahan internal saat menganalisis diagnosa.",
+        gejala: [],
+        kandidat: [],
+      };
+    }
+  },
+});
+
 export const agentV3Tools = {
   EkstrakDanCariGejala,
   TelusuriGrafPenyakit,
   ValidasiGejalaWajib,
   FilterKontraindikasiMurni,
+  AnalisisDiagnosaMedisHibrida,
 };

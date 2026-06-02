@@ -59,6 +59,8 @@ model Penyakit {
   // Relasi
   gejala      PenyakitGejala[]
   tanamanObat TanamanPenyakit[]
+
+  @@index([nama])
 }
 
 model Gejala {
@@ -67,6 +69,8 @@ model Gejala {
 
   // Relasi
   penyakit PenyakitGejala[]
+
+  @@index([nama])
 }
 
 // ==========================================
