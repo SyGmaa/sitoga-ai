@@ -171,8 +171,8 @@ export default function DiagnosaV2Page() {
               <h3 className="text-slate-800 dark:text-white font-bold text-lg">Hybrid Deterministic Result</h3>
             </div>
           </div>
-          <div className="bg-[#13ec37]/10 px-3 py-1 rounded-full border border-[#13ec37]/30">
-             <span className="text-[#13ec37] font-bold text-sm">{data.probabilitas}% Match</span>
+          <div className="bg-primary/10 px-3 py-1 rounded-full border border-primary/30">
+             <span className="text-primary font-bold text-sm">{data.probabilitas}% Match</span>
           </div>
         </div>
         <div className="p-6">
@@ -201,7 +201,7 @@ export default function DiagnosaV2Page() {
                         <h6 className="text-slate-800 dark:text-white font-bold text-lg">{plant.namaLokal}</h6>
                         <p className="text-slate-500 dark:text-slate-400 text-xs italic">{plant.namaLatin}</p>
                       </div>
-                      <Link href={`/tanaman/${plant.id}`} className="flex items-center text-[#13ec37] hover:brightness-125 text-sm gap-1 transition-all">
+                      <Link href={`/tanaman/${plant.id}`} className="flex items-center text-primary hover:brightness-125 text-sm gap-1 transition-all">
                           <span className="font-semibold">Resep</span>
                           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
                       </Link>
@@ -406,7 +406,7 @@ export default function DiagnosaV2Page() {
                 {m.role !== 'user' && (
                   <div className="w-10 h-10 rounded-full bg-white dark:bg-surface-dark border border-slate-200 dark:border-[#234829] flex items-center justify-center shrink-0 shadow-sm relative">
                     <span className="material-symbols-outlined text-primary">science</span>
-                    <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#13ec37] rounded-full border-2 border-background-light dark:border-background-dark"></span>
+                    <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background-light dark:border-background-dark"></span>
                   </div>
                 )}
                 
@@ -468,7 +468,7 @@ export default function DiagnosaV2Page() {
         <div className="absolute bottom-0 left-0 w-full px-4 pb-6 pt-10 fade-mask-bottom z-10 flex justify-center bg-gradient-to-t from-background-light via-background-light/95 to-transparent dark:from-background-dark dark:via-background-dark/90 dark:to-transparent">
           <div className="w-full max-w-3xl relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-[#92c99b]/20 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-            <form onSubmit={handleSendMessage} className="relative bg-white dark:bg-[#234829]/40 backdrop-blur-md border border-slate-200 dark:border-[#13ec37]/10 rounded-full p-2 pl-6 flex items-center gap-3 shadow-lg ring-1 ring-slate-100 dark:ring-white/10 focus-within:ring-primary/50 transition-all">
+            <form onSubmit={handleSendMessage} className="relative bg-white dark:bg-[#234829]/40 backdrop-blur-md border border-slate-200 dark:border-primary/10 rounded-full p-2 pl-6 flex items-center gap-3 shadow-lg ring-1 ring-slate-100 dark:ring-white/10 focus-within:ring-primary/50 transition-all">
               <input 
                 name="prompt"
                 value={input}
@@ -479,7 +479,7 @@ export default function DiagnosaV2Page() {
                 type="text"
                 autoComplete="off"
               />
-              <button disabled={isLoading || !input.trim()} type="submit" className="p-3 bg-primary text-background-dark rounded-full hover:brightness-110 disabled:opacity-50 transition-transform active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(19,236,55,0.4)]">
+              <button disabled={isLoading || !input.trim()} type="submit" className="p-3 bg-primary text-background-dark rounded-full hover:brightness-110 disabled:opacity-50 transition-transform active:scale-95 flex items-center justify-center shadow-[0_0_15px_rgba(31,137,54,0.4)]">
                 <span className="material-symbols-outlined">send</span>
               </button>
             </form>
