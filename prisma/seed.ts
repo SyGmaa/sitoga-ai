@@ -26,6 +26,64 @@ const plantImageMap: Record<string, string> = {
 
 const defaultImage = 'https://images.unsplash.com/photo-1596708682121-50e561e13a96?auto=format&fit=crop&q=80';
 
+// Cache for local images in public/images: normalized filename (lowercase, alphanumeric) -> original filename
+const localImagesMap: Record<string, string> = {};
+
+function initLocalImages() {
+  try {
+    const imagesDir = path.join(process.cwd(), 'public', 'images');
+    if (fs.existsSync(imagesDir)) {
+      const files = fs.readdirSync(imagesDir);
+      for (const file of files) {
+        const ext = path.extname(file);
+        if (['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext.toLowerCase())) {
+          const nameWithoutExt = path.basename(file, ext);
+          const normalized = nameWithoutExt.toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (normalized) {
+            localImagesMap[normalized] = file;
+          }
+        }
+      }
+      console.log(`[Local Images] Berhasil mengindeks ${Object.keys(localImagesMap).length} gambar dari folder public/images.`);
+    } else {
+      console.log(`[Local Images] Folder public/images tidak ditemukan di: ${imagesDir}`);
+    }
+  } catch (error) {
+    console.error('Gagal membaca folder public/images:', error);
+  }
+}
+
+function findLocalImage(namaLokal: string): string | null {
+  if (!namaLokal) return null;
+
+  const normalizedNama = namaLokal.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  // 1. Exact match (case insensitive, alphanumeric only)
+  if (localImagesMap[normalizedNama]) {
+    return `/images/${localImagesMap[normalizedNama]}`;
+  }
+
+  // 2. Custom manual overrides (e.g. Jadam Centong -> kaktus-centong.jpg)
+  const customMap: Record<string, string> = {
+    'jadamcentong': 'kaktuscentong',
+  };
+  const overridden = customMap[normalizedNama];
+  if (overridden && localImagesMap[overridden]) {
+    return `/images/${localImagesMap[overridden]}`;
+  }
+
+  // 3. Partial/substring match fallback (only if the plant name contains the file name)
+  // E.g., "Daun Mint" (daunmint) matches "mint.jpg" (mint)
+  // This prevents incorrect matches like "Kunyit" (kunyit) matching "Kunyit Putih.jpg" (kunyitputih)
+  for (const normalizedFile of Object.keys(localImagesMap)) {
+    if (normalizedFile && normalizedNama && normalizedNama.includes(normalizedFile)) {
+      return `/images/${localImagesMap[normalizedFile]}`;
+    }
+  }
+
+  return null;
+}
+
 interface MasterCondition {
   slug: string;
   nama: string;
@@ -186,6 +244,7 @@ function normalizeEntityName(name: string): string {
 
 async function main() {
   console.log('=== Inisialisasi Seeding Database ===');
+  initLocalImages();
 
   // 1. Seed Admin
   const adminEmail = 'admin@sitoga.com';
@@ -203,6 +262,29 @@ async function main() {
   } else {
     console.log(`[Admin] Akun admin sudah terdaftar.`);
   }
+
+  // 1.5. Seed AI Models
+  console.log('[Seeder] Menyimpan Master AI Models...');
+  const initialModels = [
+    { provider: "google", modelId: "gemini-2.5-flash", label: "Gemini 2.5 Flash", badge: "Recommended", isActive: true, isDefault: false },
+    { provider: "google", modelId: "gemini-3.1-flash-lite", label: "Gemini 3.1 Flash Lite", badge: "Fast", isActive: true, isDefault: true },
+    { provider: "google", modelId: "gemini-3-flash-preview", label: "Gemini 3 Flash", badge: "New", isActive: true, isDefault: false },
+    { provider: "google", modelId: "gemini-3.5-flash", label: "Gemini 3.5 Flash", badge: "New", isActive: true, isDefault: false },
+    { provider: "google", modelId: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Lite", badge: "Fast", isActive: true, isDefault: false },
+    { provider: "openrouter", modelId: "mistralai/mistral-small-3.1-24b-instruct:free", label: "Mistral Small", badge: "Free", isActive: true, isDefault: false },
+    { provider: "openrouter", modelId: "arcee-ai/trinity-large-preview:free", label: "Trinity Large", badge: "Free", isActive: true, isDefault: false },
+    { provider: "openrouter", modelId: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free", label: "Dolphin Mistral", badge: "Free", isActive: true, isDefault: false },
+    { provider: "openrouter", modelId: "deepseek/deepseek-r1-0528:free", label: "DeepSeek R1", badge: "Free", isActive: true, isDefault: false },
+  ];
+
+  for (const item of initialModels) {
+    await prisma.aiModel.upsert({
+      where: { modelId: item.modelId },
+      update: item,
+      create: item,
+    });
+  }
+  console.log(`[Seeder] Berhasil menyimpan ${initialModels.length} AI Models.`);
 
   // 2. Pembersihan Data Lama
   console.log('[Pembersihan] Menghapus data lama di database...');
@@ -360,7 +442,13 @@ async function main() {
     const deskripsi = (overviewData['Deskripsi'] || '').trim();
     const kandunganSenyawa = (overviewData['Senyawa aktif utama'] || '').trim();
     const khasiatUtama = (overviewData['Manfaat/khasiat tradisional'] || deskripsi).trim();
-    const gambarUrl = plantImageMap[namaLokal] || defaultImage;
+    
+    // Cari gambar dari public/images, lalu fall back ke static map atau default image
+    const localImg = findLocalImage(namaLokal);
+    const gambarUrl = localImg || plantImageMap[namaLokal] || defaultImage;
+    if (localImg) {
+      console.log(`  -> Menggunakan gambar lokal untuk [${namaLokal}]: ${localImg}`);
+    }
 
     // Simpan Tanaman ke Database
     const dbTanaman = await prisma.tanaman.create({

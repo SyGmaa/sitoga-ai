@@ -46,7 +46,7 @@ export default async function AdminTanamanPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
                       {tanaman.gambarUrl ? (
-                         <div className="h-12 w-12 rounded-xl bg-cover bg-center shadow-md group-hover:scale-110 transition-transform duration-300 border border-white/20" style={{ backgroundImage: `url(${tanaman.gambarUrl})` }}></div>
+                         <div className="h-12 w-12 rounded-xl bg-cover bg-center shadow-md group-hover:scale-110 transition-transform duration-300 border border-white/20" style={{ backgroundImage: `url("${encodeURI(tanaman.gambarUrl)}")` }}></div>
                       ) : (
                          <div className="h-12 w-12 rounded-xl bg-slate-200 dark:bg-slate-800/50 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 border border-slate-200 dark:border-slate-700">
                            <span className="material-symbols-outlined text-slate-400">local_florist</span>
@@ -96,7 +96,7 @@ export default async function AdminTanamanPage() {
           <div key={tanaman.id} className="bg-white/60 dark:bg-[#0a1e0f]/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-sm rounded-3xl p-4 flex flex-col gap-4">
             <div className="flex items-center gap-4">
               {tanaman.gambarUrl ? (
-                 <div className="h-16 w-16 rounded-2xl bg-cover bg-center shadow-md border border-white/20 shrink-0" style={{ backgroundImage: `url(${tanaman.gambarUrl})` }}></div>
+                 <div className="h-16 w-16 rounded-2xl bg-cover bg-center shadow-md border border-white/20 shrink-0" style={{ backgroundImage: `url("${encodeURI(tanaman.gambarUrl)}")` }}></div>
               ) : (
                  <div className="h-16 w-16 rounded-2xl bg-slate-200 dark:bg-slate-800/50 flex items-center justify-center shadow-md border border-slate-200 dark:border-slate-700 shrink-0">
                    <span className="material-symbols-outlined text-slate-400 text-2xl">local_florist</span>
