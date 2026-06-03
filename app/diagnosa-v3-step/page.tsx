@@ -180,107 +180,111 @@ export default function DiagnosaV3StepPage() {
     }
   };
 
-  // Helper: Extract tanaman, gejala, and penyakit data from tool results in a message
-  const extractGraphDataFromMessage = (msg: UIMessage) => {
+  // Helper: Extract cumulative tanaman, gejala, and penyakit data from tool results in all messages up to current index
+  const extractGraphDataFromMessage = (msg: UIMessage, msgIndex: number, allMessages: UIMessage[]) => {
     const tanaman: { id: string; nama: string; khasiatUtama?: string }[] = [];
     const gejalaIds: string[] = [];
     const penyakitIds: string[] = [];
     const tanamanIds: string[] = [];
     const prohibitedTanamanIds: string[] = [];
-
-    if (!msg.parts) return { tanaman, gejalaIds, penyakitIds, tanamanIds };
-
     const sahPenyakitIds: string[] = [];
-    const validatedPenyakitIds: string[] = [];
 
-    // Pass 1: find all verified disease ids
-    for (const part of msg.parts as any[]) {
-      const isToolPart = part.type === 'tool-invocation' ||
-        part.type?.startsWith('tool-') ||
-        part.type === 'dynamic-tool';
-      if (!isToolPart) continue;
+    // Accumulate tool results from all assistant messages up to the current index
+    for (let i = 0; i <= msgIndex; i++) {
+      const currentMsg = allMessages[i];
+      if (currentMsg.role !== 'assistant' || !currentMsg.parts) continue;
 
-      const toolName = part.type === 'dynamic-tool'
-        ? part.toolName
-        : (part.toolInvocation?.toolName || part.toolName || part.type?.replace('tool-', '') || '');
+      const currentSahPenyakitIds: string[] = [];
 
-      const state = part.toolInvocation?.state || part.state;
-      const isResult = state === 'result' ||
-        state === 'output-available' ||
-        part.type === 'tool-result';
-      if (!isResult) continue;
+      // Pass 1: find all verified disease ids in this message
+      for (const part of currentMsg.parts as any[]) {
+        const isToolPart = part.type === 'tool-invocation' ||
+          part.type?.startsWith('tool-') ||
+          part.type === 'dynamic-tool';
+        if (!isToolPart) continue;
 
-      let result = part.toolInvocation?.result || part.output || (part as any).result || part.args;
-      if (!result) continue;
+        const toolName = part.type === 'dynamic-tool'
+          ? part.toolName
+          : (part.toolInvocation?.toolName || part.toolName || part.type?.replace('tool-', '') || '');
 
-      if (typeof result === 'string') {
-        try { result = JSON.parse(result); } catch { continue; }
-      }
+        const state = part.toolInvocation?.state || part.state;
+        const isResult = state === 'result' ||
+          state === 'output-available' ||
+          part.type === 'tool-result';
+        if (!isResult) continue;
 
-      if (toolName === 'ValidasiGejalaWajib') {
-        const pId = part.toolInvocation?.args?.penyakitId || part.args?.penyakitId || part.toolInvocation?.args?.id_penyakit || part.args?.id_penyakit;
-        if (pId) {
-          validatedPenyakitIds.push(pId);
-          if (result.sah === true) {
-            sahPenyakitIds.push(pId);
-          }
+        let result = part.toolInvocation?.result || part.output || (part as any).result || part.args;
+        if (!result) continue;
+
+        if (typeof result === 'string') {
+          try { result = JSON.parse(result); } catch { continue; }
         }
-      }
-    }
 
-    // Pass 2: extract symptoms, filtered diseases, and plants
-    for (const part of msg.parts as any[]) {
-      const isToolPart = part.type === 'tool-invocation' ||
-        part.type?.startsWith('tool-') ||
-        part.type === 'dynamic-tool';
-      if (!isToolPart) continue;
-
-      const toolName = part.type === 'dynamic-tool'
-        ? part.toolName
-        : (part.toolInvocation?.toolName || part.toolName || part.type?.replace('tool-', '') || '');
-
-      const state = part.toolInvocation?.state || part.state;
-      const isResult = state === 'result' ||
-        state === 'output-available' ||
-        part.type === 'tool-result';
-      if (!isResult) continue;
-
-      let result = part.toolInvocation?.result || part.output || (part as any).result || part.args;
-      if (!result) continue;
-
-      if (typeof result === 'string') {
-        try { result = JSON.parse(result); } catch { continue; }
-      }
-
-      if (toolName === 'EkstrakDanCariGejala' && result.gejala) {
-        for (const g of result.gejala) {
-          if (g.id && !gejalaIds.includes(g.id)) gejalaIds.push(g.id);
-        }
-      }
-
-      if (toolName === 'TelusuriGrafPenyakit' && result.kandidat) {
-        const hasSah = result.kandidat.some((k: any) => sahPenyakitIds.includes(k.id));
-        const activeKandidat = hasSah
-          ? result.kandidat.filter((k: any) => sahPenyakitIds.includes(k.id))
-          : (result.kandidat.length > 0 ? [result.kandidat[0]] : []);
-
-        for (const k of activeKandidat) {
-          if (k.id && !penyakitIds.includes(k.id)) penyakitIds.push(k.id);
-          if (k.tanamanObat) {
-            for (const t of k.tanamanObat) {
-              if (t.id && !tanamanIds.includes(t.id)) {
-                tanamanIds.push(t.id);
-                tanaman.push({ id: t.id, nama: t.nama, khasiatUtama: t.khasiatUtama });
-              }
+        if (toolName === 'ValidasiGejalaWajib') {
+          const pId = part.toolInvocation?.args?.penyakitId || part.args?.penyakitId || part.toolInvocation?.args?.id_penyakit || part.args?.id_penyakit;
+          if (pId) {
+            if (result.sah === true) {
+              if (!sahPenyakitIds.includes(pId)) sahPenyakitIds.push(pId);
+              if (!currentSahPenyakitIds.includes(pId)) currentSahPenyakitIds.push(pId);
             }
           }
         }
       }
 
-      if (toolName === 'FilterKontraindikasiMurni' && result.tanamanTerlarangIds) {
-        for (const id of result.tanamanTerlarangIds) {
-          if (!prohibitedTanamanIds.includes(id)) {
-            prohibitedTanamanIds.push(id);
+      // Pass 2: extract symptoms, filtered diseases, and plants in this message
+      for (const part of currentMsg.parts as any[]) {
+        const isToolPart = part.type === 'tool-invocation' ||
+          part.type?.startsWith('tool-') ||
+          part.type === 'dynamic-tool';
+        if (!isToolPart) continue;
+
+        const toolName = part.type === 'dynamic-tool'
+          ? part.toolName
+          : (part.toolInvocation?.toolName || part.toolName || part.type?.replace('tool-', '') || '');
+
+        const state = part.toolInvocation?.state || part.state;
+        const isResult = state === 'result' ||
+          state === 'output-available' ||
+          part.type === 'tool-result';
+        if (!isResult) continue;
+
+        let result = part.toolInvocation?.result || part.output || (part as any).result || part.args;
+        if (!result) continue;
+
+        if (typeof result === 'string') {
+          try { result = JSON.parse(result); } catch { continue; }
+        }
+
+        if (toolName === 'EkstrakDanCariGejala' && result.gejala) {
+          for (const g of result.gejala) {
+            if (g.id && !gejalaIds.includes(g.id)) gejalaIds.push(g.id);
+          }
+        }
+
+        if (toolName === 'TelusuriGrafPenyakit' && result.kandidat) {
+          const hasSah = result.kandidat.some((k: any) => sahPenyakitIds.includes(k.id) || currentSahPenyakitIds.includes(k.id));
+          const activeKandidat = hasSah
+            ? result.kandidat.filter((k: any) => sahPenyakitIds.includes(k.id) || currentSahPenyakitIds.includes(k.id))
+            : (result.kandidat.length > 0 ? [result.kandidat[0]] : []);
+
+          for (const k of activeKandidat) {
+            if (k.id && !penyakitIds.includes(k.id)) penyakitIds.push(k.id);
+            if (k.tanamanObat) {
+              for (const t of k.tanamanObat) {
+                if (t.id && !tanamanIds.includes(t.id)) {
+                  tanamanIds.push(t.id);
+                  tanaman.push({ id: t.id, nama: t.nama, khasiatUtama: t.khasiatUtama });
+                }
+              }
+            }
+          }
+        }
+
+        if (toolName === 'FilterKontraindikasiMurni' && result.tanamanTerlarangIds) {
+          for (const id of result.tanamanTerlarangIds) {
+            if (!prohibitedTanamanIds.includes(id)) {
+              prohibitedTanamanIds.push(id);
+            }
           }
         }
       }
@@ -866,8 +870,12 @@ export default function DiagnosaV3StepPage() {
                         )}
 
                         {/* Plant Recommendation Cards & Graph Link */}
-                        {m.role === 'assistant' && index > 0 && status !== 'streaming' && status !== 'submitted' && (() => {
-                          const { tanaman: extractedTanaman, gejalaIds, penyakitIds, tanamanIds } = extractGraphDataFromMessage(m);
+                        {m.role === 'assistant' && index > 0 && (() => {
+                          // Only hide recommendations for the *currently streaming message*
+                          const isCurrentMessageStreaming = (index === messages.length - 1) && (status === 'streaming' || status === 'submitted');
+                          if (isCurrentMessageStreaming) return null;
+
+                          const { tanaman: extractedTanaman, gejalaIds, penyakitIds, tanamanIds } = extractGraphDataFromMessage(m, index, messages);
                           if (extractedTanaman.length === 0 && gejalaIds.length === 0) return null;
 
                           return (
