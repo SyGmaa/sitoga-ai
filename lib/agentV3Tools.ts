@@ -4,6 +4,61 @@ import { z } from "zod";
 
 const prisma = new PrismaClient();
 
+const stopWords = new Set([
+  "saya", "aku", "kami", "kita", "dia", "mereka", "anda", "kamu",
+  "ingin", "tolong", "bantu", "dengan", "yang", "dan", "di", "ke",
+  "dari", "atau", "pada", "juga", "sakit", "nyeri", "merasa", "mengalami",
+  "mulu", "tu", "ada", "itu", "ini", "sih", "kok", "toh", "pun", "deh", "dong", "ya"
+]);
+
+function getKeywordVariations(word: string): string[] {
+  const w = word.toLowerCase().trim();
+  const variations = new Set<string>([w]);
+
+  // Synonyms mapping
+  const synonyms: Record<string, string[]> = {
+    "keringetan": ["keringat", "berkeringat"],
+    "keringet": ["keringat", "berkeringat"],
+    "baju": ["pakaian"],
+    "badan": ["tubuh"],
+    "kencing": ["bak", "kemih"],
+    "pipis": ["bak", "kemih"],
+    "gatel": ["gatal"],
+    "pegel": ["pegal"],
+    "puyeng": ["pusing"],
+    "pening": ["pusing"],
+    "anget": ["panas", "demam"],
+    "demam": ["panas"],
+    "panas": ["demam"],
+    "capek": ["lemas", "lelah"],
+    "lelah": ["lemas"],
+    "berak": ["diare", "bab"],
+    "mulas": ["mulas", "perut mulas"],
+    "perih": ["perih"],
+    "lambung": ["ulu hati", "maag"],
+    "begah": ["kembung", "begah"],
+  };
+
+  if (synonyms[w]) {
+    synonyms[w].forEach(s => variations.add(s));
+  }
+
+  // Stemming suffix "-an" (e.g., keringetan -> keringet, bengkakan -> bengkak)
+  if (w.endsWith("an") && w.length > 4) {
+    variations.add(w.slice(0, -2));
+  }
+  // Stemming suffix "-nya" (e.g., sakitnya -> sakit)
+  if (w.endsWith("nya") && w.length > 5) {
+    variations.add(w.slice(0, -3));
+  }
+  // Stemming prefix "ber-" (e.g., berkeringat -> keringat)
+  if (w.startsWith("ber") && w.length > 5) {
+    variations.add(w.slice(3));
+  }
+
+  return Array.from(variations);
+}
+
 // 1. Tool: EkstrakDanCariGejala
 export const EkstrakDanCariGejala = tool({
   description:
@@ -29,8 +84,10 @@ export const EkstrakDanCariGejala = tool({
       // tapi TETAP PERTAHANKAN frasa aslinya agar pencarian spesifik (seperti 'buang air kecil') tetap jalan.
       const processedKeywords = Array.from(new Set(
         keywordArray.flatMap((k: string) => {
-          const words = k.split(/[\s,]+/).map((w: string) => w.trim()).filter((w: string) => w.length > 3 && !['saya', 'aku', 'kami', 'kita', 'dia', 'mereka', 'anda', 'kamu', 'ingin', 'tolong', 'bantu', 'dengan', 'yang', 'dan', 'di', 'ke', 'dari', 'atau', 'pada', 'juga'].includes(w.toLowerCase()));
-          return [k.trim(), ...words]; 
+          const words = k.split(/[\s,]+/)
+            .map((w: string) => w.trim())
+            .filter((w: string) => w.length >= 3 && !stopWords.has(w.toLowerCase()));
+          return [k.trim(), ...words].flatMap(w => getKeywordVariations(w)); 
         })
       ));
 
@@ -156,14 +213,24 @@ export const ValidasiGejalaWajib = tool({
   parameters: z.object({
     penyakitId: z
       .string()
+      .optional()
       .describe(
-        "ID Penyakit Kandidat (dari TelusuriGrafPenyakit) yang ingin divalidasi",
+        "ID Penyakit Kandidat (dari TelusuriGrafPenyakit) yang ingin divalidasi"
       ),
+    id_penyakit: z
+      .string()
+      .optional()
+      .describe("Alternatif ID Penyakit Kandidat"),
     keluhanUserGejalaIds: z
       .array(z.string())
+      .optional()
       .describe(
-        "Daftar ID Gejala yang MEMANG dirasakan user (dari tool EkstrakDanCariGejala)",
+        "Daftar ID Gejala yang MEMANG dirasakan user (dari tool EkstrakDanCariGejala)"
       ),
+    id_gejala_user: z
+      .array(z.string())
+      .optional()
+      .describe("Alternatif daftar ID Gejala"),
   }),
   // @ts-ignore
   execute: async (args: any) => {
@@ -232,22 +299,24 @@ export const FilterKontraindikasiMurni = tool({
   parameters: z.object({
     tanamanIds: z
       .array(z.string())
+      .optional()
       .describe(
         "Daftar ID Tanaman Obat yang ingin diresepkan untuk penyakit tersebut.",
       ),
     kondisiKesehatanPasien: z
       .array(z.string())
+      .optional()
       .describe(
         "Kondisi kesehatan pasien (contoh: ['Hamil', 'Darah Tinggi'] atau [] jika tidak ada).",
       ),
   }),
   // @ts-ignore
   execute: async ({
-    tanamanIds,
-    kondisiKesehatanPasien,
+    tanamanIds = [],
+    kondisiKesehatanPasien = [],
   }: {
-    tanamanIds: string[];
-    kondisiKesehatanPasien: string[];
+    tanamanIds?: string[];
+    kondisiKesehatanPasien?: string[];
   }) => {
     try {
       if (!tanamanIds || tanamanIds.length === 0)
@@ -357,24 +426,31 @@ export const AnalisisDiagnosaMedisHibrida = tool({
   parameters: z.object({
     keluhan: z
       .string()
+      .optional()
       .describe(
-        "Keluhan medis atau gejala mentah dari pengguna. Jika keluhan ditulis dalam bahasa asing (misal Inggris), kamu harus menerjemahkannya ke Bahasa Indonesia sebelum memanggil tool (karena basis data di sistem menggunakan Bahasa Indonesia). Contoh: 'fever' -> 'demam'."
+        "Keluhan medis atau gejala mentah dari pengguna. Jika keluhan ditulis dalam bahasa asing (misal Inggris), kamu harus menerjemahkannya ke Bahasa Indonesia sebelum memanggil tool. Contoh: 'fever' -> 'demam'."
       ),
+    keluhanPasien: z
+      .string()
+      .optional()
+      .describe("Alternatif parameter keluhan medis mentah dari pengguna."),
+    keluhanPengguna: z
+      .string()
+      .optional()
+      .describe("Alternatif parameter keluhan medis mentah dari pengguna."),
     kondisiKesehatanPasien: z
       .array(z.string())
+      .optional()
       .describe(
         "Kondisi kesehatan khusus pasien (contoh: ['Hamil', 'Darah Tinggi'] atau [] jika tidak ada)."
       ),
   }),
   // @ts-ignore
-  execute: async ({
-    keluhan,
-    kondisiKesehatanPasien,
-  }: {
-    keluhan: string;
-    kondisiKesehatanPasien: string[];
-  }) => {
+  execute: async (args: any) => {
     try {
+      const keluhan = args?.keluhan || args?.keluhanPasien || args?.keluhanPengguna || "";
+      const kondisiKesehatanPasien: string[] = args?.kondisiKesehatanPasien || [];
+
       console.log("[AnalisisDiagnosaMedisHibrida] Input:", { keluhan, kondisiKesehatanPasien });
       if (!keluhan || keluhan.trim() === "") {
         return { message: "Keluhan tidak boleh kosong.", gejala: [], kandidat: [] };
@@ -383,18 +459,18 @@ export const AnalisisDiagnosaMedisHibrida = tool({
       // --- LANGKAH 1: Ekstrak & Cari Gejala (Secara Paralel) ---
       const words = keluhan
         .split(/[\s,.;?]+/)
-        .map((w) => w.trim())
+        .map((w: string) => w.trim())
         .filter(
-          (w) =>
-            w.length > 3 &&
-            ![
-              "saya", "aku", "kami", "kita", "dia", "mereka", "anda", "kamu",
-              "ingin", "tolong", "bantu", "dengan", "yang", "dan", "di", "ke",
-              "dari", "atau", "pada", "juga", "sakit", "nyeri", "merasa", "mengalami"
-            ].includes(w.toLowerCase())
+          (w: string) =>
+            w.length >= 3 &&
+            !stopWords.has(w.toLowerCase())
         );
 
-      const processedKeywords = Array.from(new Set([keluhan.trim(), ...words]));
+      const processedKeywords = Array.from(
+        new Set(
+          [keluhan.trim(), ...words].flatMap(w => getKeywordVariations(w))
+        )
+      );
 
       const queryPromises = processedKeywords.map((keyword) =>
         prisma.gejala.findMany({

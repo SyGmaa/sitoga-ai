@@ -65,23 +65,13 @@ export default function LibraryClient({
   const [selectedRisks, setSelectedRisks] = useState<string[]>([]);
   const [showRiskPanel, setShowRiskPanel] = useState(false);
 
-  // Symptom Matcher States
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  const [symptomSearch, setSymptomSearch] = useState("");
+  // Disease Selection States
+  const [diseaseSearch, setDiseaseSearch] = useState("");
   const [selectedDiseaseId, setSelectedDiseaseId] = useState<string | null>(null);
 
   // Catalog States
   const [plantSearch, setPlantSearch] = useState("");
   const [selectedPlantId, setSelectedPlantId] = useState<string | null>(null);
-
-  // Toggle Symptom Selection
-  const toggleSymptom = (id: string) => {
-    setSelectedSymptoms((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-    // Reset selected disease detail if symptom changes, so calculation refreshes
-    setSelectedDiseaseId(null);
-  };
 
   // Toggle Risk Selection
   const toggleRisk = (id: string) => {
@@ -90,79 +80,28 @@ export default function LibraryClient({
     );
   };
 
-  // Clear All Selection Helpers
-  const clearSymptoms = () => {
-    setSelectedSymptoms([]);
-    setSelectedDiseaseId(null);
-  };
-
   const clearRisks = () => {
     setSelectedRisks([]);
   };
 
-  // Filter symptoms based on search text
-  const filteredSymptoms = useMemo(() => {
-    if (!symptomSearch.trim()) return symptoms;
-    return symptoms.filter((s) =>
-      s.nama.toLowerCase().includes(symptomSearch.toLowerCase())
+  // Filter diseases based on search text
+  const filteredDiseases = useMemo(() => {
+    if (!diseaseSearch.trim()) return diseases;
+    const query = diseaseSearch.toLowerCase();
+    return diseases.filter(
+      (d) =>
+        d.nama.toLowerCase().includes(query) ||
+        (d.deskripsi && d.deskripsi.toLowerCase().includes(query))
     );
-  }, [symptoms, symptomSearch]);
+  }, [diseases, diseaseSearch]);
 
-  // Main Diagnosis Matching Engine
-  const matchedDiseases = useMemo(() => {
-    if (selectedSymptoms.length === 0) return [];
-
-    return diseases
-      .map((disease) => {
-        // Calculate required (wajib) symptoms matching
-        const wajibGejala = disease.gejala.filter((g) => g.isGejalaWajib);
-        const wajibMatched = wajibGejala.filter((g) =>
-          selectedSymptoms.includes(g.gejalaId)
-        );
-
-        // Calculate general symptoms matching
-        const umumGejala = disease.gejala.filter((g) => !g.isGejalaWajib);
-        const umumMatched = umumGejala.filter((g) =>
-          selectedSymptoms.includes(g.gejalaId)
-        );
-
-        // Weighted calculations
-        const matchedWeight = disease.gejala
-          .filter((g) => selectedSymptoms.includes(g.gejalaId))
-          .reduce((sum, g) => sum + g.bobotGejala, 0);
-
-        const totalWeight = disease.gejala.reduce(
-          (sum, g) => sum + g.bobotGejala,
-          0
-        );
-
-        const matchPercent =
-          totalWeight > 0 ? Math.round((matchedWeight / totalWeight) * 100) : 0;
-
-        return {
-          ...disease,
-          wajibTotal: wajibGejala.length,
-          wajibMatchedCount: wajibMatched.length,
-          umumTotal: umumGejala.length,
-          umumMatchedCount: umumMatched.length,
-          matchPercent,
-          isWajibComplete: wajibGejala.length === wajibMatched.length,
-        };
-      })
-      .filter((d) => d.matchPercent > 0)
-      .sort((a, b) => b.matchPercent - a.matchPercent);
-  }, [diseases, selectedSymptoms]);
-
-  // Set default selected disease to the highest matched one if none selected
+  // Set default selected disease to the first one in the list if none selected
   const activeDisease = useMemo(() => {
     if (selectedDiseaseId) {
       return diseases.find((d) => d.id === selectedDiseaseId) || null;
     }
-    if (matchedDiseases.length > 0) {
-      return matchedDiseases[0];
-    }
-    return null;
-  }, [selectedDiseaseId, matchedDiseases, diseases]);
+    return filteredDiseases[0] || diseases[0] || null;
+  }, [selectedDiseaseId, filteredDiseases, diseases]);
 
   // Recommended plants for the active disease
   const recommendedPlants = useMemo(() => {
@@ -324,9 +263,9 @@ export default function LibraryClient({
             }`}
           >
             <span className="material-symbols-outlined text-[20px]">
-              stethoscope
+              healing
             </span>
-            <span>Cek Gejala & Penyakit</span>
+            <span>Cari Penyakit & Herbal</span>
           </button>
           <button
             onClick={() => setActiveTab("catalog")}
@@ -421,36 +360,28 @@ export default function LibraryClient({
       {/* 3. Tab Contents */}
       <div className="w-full">
         {activeTab === "diagnose" ? (
-          /* TAB 1: SYMPTOM DIAGNOSIS WORKFLOW */
+          /* TAB 1: DISEASE DIRECT LOOKFLOW */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Panel A: Symptom Selector (3 Columns) */}
+            {/* Panel A: Disease Selector (4 Columns) */}
             <div className="lg:col-span-4 bg-white dark:bg-leaf-800 border border-slate-200 dark:border-leaf-700/50 rounded-3xl p-5 shadow-sm space-y-4">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary">
-                    list_alt
+                    format_list_bulleted
                   </span>
                   <h3 className="font-bold text-base text-slate-800 dark:text-white">
-                    Pilih Gejala Anda
+                    Pilih Penyakit
                   </h3>
                 </div>
-                {selectedSymptoms.length > 0 && (
-                  <button
-                    onClick={clearSymptoms}
-                    className="text-xs font-bold text-red-500 hover:text-red-400 transition-colors"
-                  >
-                    Clear All
-                  </button>
-                )}
               </div>
 
-              {/* Symptom Search Bar */}
+              {/* Disease Search Bar */}
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Cari nama gejala..."
-                  value={symptomSearch}
-                  onChange={(e) => setSymptomSearch(e.target.value)}
+                  placeholder="Cari nama penyakit..."
+                  value={diseaseSearch}
+                  onChange={(e) => setDiseaseSearch(e.target.value)}
                   className="w-full bg-slate-50 dark:bg-leaf-900 border border-slate-200 dark:border-leaf-700/50 rounded-2xl py-2.5 pl-9 pr-4 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
                 />
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
@@ -458,195 +389,113 @@ export default function LibraryClient({
                 </span>
               </div>
 
-              {/* Symptom Selection List */}
-              <div className="h-[400px] overflow-y-auto pr-1 space-y-1 bg-slate-50/50 dark:bg-leaf-900/30 p-2 rounded-2xl border border-slate-100 dark:border-leaf-700/20">
-                {filteredSymptoms.map((symptom) => {
-                  const isSelected = selectedSymptoms.includes(symptom.id);
+              {/* Disease Selection List */}
+              <div className="h-[450px] overflow-y-auto pr-1 space-y-1 bg-slate-50/50 dark:bg-leaf-900/30 p-2 rounded-2xl border border-slate-100 dark:border-leaf-700/20">
+                {filteredDiseases.map((disease) => {
+                  const isSelected = activeDisease?.id === disease.id;
+                  const plantCount = disease.tanamanObatIds.length;
                   return (
                     <button
-                      key={symptom.id}
-                      onClick={() => toggleSymptom(symptom.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2 text-left rounded-xl transition-all text-xs font-medium cursor-pointer ${
+                      key={disease.id}
+                      onClick={() => setSelectedDiseaseId(disease.id)}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 text-left rounded-xl transition-all text-xs font-medium cursor-pointer ${
                         isSelected
-                          ? "bg-primary/10 dark:bg-primary/20 text-primary border border-primary/30 font-bold"
+                          ? "bg-primary/10 dark:bg-primary/20 text-primary border border-primary/30 font-bold shadow-sm"
                           : "hover:bg-slate-100 dark:hover:bg-leaf-750 text-slate-600 dark:text-slate-300 border border-transparent"
                       }`}
                     >
-                      <span className="truncate">{symptom.nama}</span>
-                      <span
-                        className={`material-symbols-outlined text-[16px] ${
-                          isSelected ? "text-primary" : "text-slate-300 dark:text-slate-600"
-                        }`}
-                      >
-                        {isSelected ? "check_circle" : "add_circle"}
+                      <span className="truncate pr-2">{disease.nama}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${
+                        isSelected
+                          ? "bg-primary/20 text-primary"
+                          : "bg-slate-100 dark:bg-leaf-900 text-slate-500 dark:text-leaf-400"
+                      }`}>
+                        {plantCount} Tanaman
                       </span>
                     </button>
                   );
                 })}
 
-                {filteredSymptoms.length === 0 && (
+                {filteredDiseases.length === 0 && (
                   <p className="text-center text-slate-400 text-xs italic py-10">
-                    Gejala tidak ditemukan.
+                    Penyakit tidak ditemukan.
                   </p>
                 )}
               </div>
-
-              {/* Active Selected Tags Display */}
-              {selectedSymptoms.length > 0 && (
-                <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-leaf-700/30">
-                  <p className="text-[10px] font-bold text-slate-400 dark:text-leaf-400 uppercase tracking-wider">
-                    Gejala Terpilih ({selectedSymptoms.length})
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto">
-                    {selectedSymptoms.map((id) => {
-                      const sym = symptoms.find((s) => s.id === id);
-                      if (!sym) return null;
-                      return (
-                        <span
-                          key={id}
-                          onClick={() => toggleSymptom(id)}
-                          className="flex items-center gap-1 bg-primary/20 text-primary hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30 cursor-pointer border border-primary/20 px-2 py-0.5 rounded-full text-[10px] font-semibold transition-colors"
-                          title="Hapus gejala"
-                        >
-                          {sym.nama}
-                          <span className="material-symbols-outlined text-[12px]">
-                            close
-                          </span>
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* Panel B: Disease Matcher Results (4 Columns) */}
+            {/* Panel B: Disease Detail & Symptoms (4 Columns) */}
             <div className="lg:col-span-4 bg-white dark:bg-leaf-800 border border-slate-200 dark:border-leaf-700/50 rounded-3xl p-5 shadow-sm space-y-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">
-                  troubleshoot
+                  info
                 </span>
                 <h3 className="font-bold text-base text-slate-800 dark:text-white">
-                  Kecocokan Keluhan Medis
+                  Detail Penyakit & Gejala
                 </h3>
               </div>
 
-              {selectedSymptoms.length === 0 ? (
+              {!activeDisease ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
                   <span className="material-symbols-outlined text-5xl text-slate-300 dark:text-leaf-700">
                     medical_services
                   </span>
                   <div className="space-y-1">
                     <p className="text-sm font-bold text-slate-600 dark:text-slate-400">
-                      Belum Ada Gejala Dipilih
+                      Penyakit Belum Dipilih
                     </p>
                     <p className="text-xs text-slate-400 max-w-[200px]">
-                      Silakan pilih gejala di kolom kiri untuk mulai mendeteksi kecocokan penyakit.
+                      Silakan pilih penyakit di kolom kiri untuk melihat penjelasan dan gejalanya.
                     </p>
                   </div>
                 </div>
-              ) : matchedDiseases.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
-                  <span className="material-symbols-outlined text-5xl text-amber-500">
-                    warning
-                  </span>
-                  <p className="text-sm font-bold text-slate-600 dark:text-slate-400">
-                    Tidak Ada Kecocokan
-                  </p>
-                  <p className="text-xs text-slate-400 max-w-[200px]">
-                    Gejala yang Anda pilih tidak cocok dengan data resep di database botani kami.
-                  </p>
-                </div>
               ) : (
-                <div className="space-y-3 h-[525px] overflow-y-auto pr-1">
-                  {matchedDiseases.map((d) => {
-                    const isSelected = activeDisease?.id === d.id;
-                    return (
-                      <button
-                        key={d.id}
-                        onClick={() => setSelectedDiseaseId(d.id)}
-                        className={`w-full text-left p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2.5 ${
-                          isSelected
-                            ? "bg-slate-50 dark:bg-leaf-700/30 border-primary ring-2 ring-primary/20"
-                            : "bg-white dark:bg-leaf-800 border-slate-200 dark:border-leaf-700/50 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-leaf-750"
-                        }`}
-                      >
-                        {/* Disease name & Match pct */}
-                        <div className="flex justify-between items-start gap-2 w-full">
-                          <h4 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 leading-snug">
-                            {d.nama}
-                          </h4>
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                              d.matchPercent >= 70
-                                ? "bg-red-500/10 text-red-500"
-                                : d.matchPercent >= 40
-                                ? "bg-amber-500/10 text-amber-500"
-                                : "bg-emerald-500/10 text-emerald-500"
-                            }`}
-                          >
-                            {d.matchPercent}% Cocok
+                <div className="space-y-4 h-[500px] overflow-y-auto pr-1">
+                  {/* Disease Info Box */}
+                  <div className="bg-slate-50 dark:bg-leaf-900 border border-slate-100 dark:border-leaf-700/30 p-4 rounded-2xl space-y-2">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                      {activeDisease.nama}
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-light">
+                      {activeDisease.deskripsi || "Tidak ada deskripsi tertulis untuk penyakit ini."}
+                    </p>
+                  </div>
+
+                  {/* Disease Symptoms List */}
+                  <div className="space-y-2.5">
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-leaf-400 uppercase tracking-wider">
+                      Gejala yang Terkait ({activeDisease.gejala.length})
+                    </p>
+                    
+                    <div className="flex flex-col gap-2">
+                      {activeDisease.gejala.map((g) => (
+                        <div
+                          key={g.gejalaId}
+                          className="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50/50 dark:bg-leaf-900/20 border border-slate-100 dark:border-leaf-700/10 text-xs"
+                        >
+                          <span className={`material-symbols-outlined text-[16px] shrink-0 mt-0.5 ${
+                            g.isGejalaWajib ? "text-red-500" : "text-emerald-500"
+                          }`}>
+                            {g.isGejalaWajib ? "emergency" : "circle"}
                           </span>
-                        </div>
-
-                        {/* Match Progress Bar */}
-                        <div className="w-full bg-slate-100 dark:bg-leaf-900 rounded-full h-1.5 overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              d.matchPercent >= 70
-                                ? "bg-red-500"
-                                : d.matchPercent >= 40
-                                ? "bg-amber-500"
-                                : "bg-emerald-500"
-                            }`}
-                            style={{ width: `${d.matchPercent}%` }}
-                          ></div>
-                        </div>
-
-                        {/* Symptoms breakdown indicator */}
-                        <div className="flex flex-col gap-1 text-[10px] text-slate-500 dark:text-leaf-400">
-                          <div className="flex justify-between">
-                            <span>Gejala Wajib/Utama:</span>
-                            <span
-                              className={`font-semibold ${
-                                d.isWajibComplete
-                                  ? "text-emerald-500"
-                                  : "text-slate-600 dark:text-slate-300"
-                              }`}
-                            >
-                              {d.wajibMatchedCount} / {d.wajibTotal}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Gejala Umum:</span>
-                            <span className="font-semibold text-slate-600 dark:text-slate-300">
-                              {d.umumMatchedCount} / {d.umumTotal}
-                            </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-slate-800 dark:text-slate-200 leading-snug">
+                              {g.nama}
+                            </p>
+                            <p className="text-[10px] text-slate-500 dark:text-leaf-400 mt-0.5">
+                              Tipe: {g.isGejalaWajib ? "Gejala Utama/Wajib" : "Gejala Umum"} • Bobot: {g.bobotGejala}/5
+                            </p>
                           </div>
                         </div>
+                      ))}
 
-                        {/* Wajib complete alert */}
-                        {d.wajibTotal > 0 && (
-                          <div
-                            className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded w-fit ${
-                              d.isWajibComplete
-                                ? "bg-emerald-500/10 text-emerald-500"
-                                : "bg-amber-500/10 text-amber-500"
-                            }`}
-                          >
-                            <span className="material-symbols-outlined text-[11px]">
-                              {d.isWajibComplete ? "verified" : "info"}
-                            </span>
-                            <span>
-                              {d.isWajibComplete
-                                ? "Gejala Utama Terpenuhi"
-                                : "Gejala Utama Belum Lengkap"}
-                            </span>
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
+                      {activeDisease.gejala.length === 0 && (
+                        <p className="text-slate-400 italic text-xs py-4 text-center">
+                          Belum ada data gejala tercatat untuk penyakit ini.
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -679,56 +528,11 @@ export default function LibraryClient({
                   {/* Summary of Active Disease */}
                   <div className="bg-slate-50 dark:bg-leaf-900 border border-slate-100 dark:border-leaf-700/30 p-4 rounded-2xl space-y-1.5">
                     <p className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                      Diagnosis Terpilih
+                      Penyakit Terpilih
                     </p>
                     <h4 className="font-bold text-sm text-slate-900 dark:text-white">
                       {activeDisease.nama}
                     </h4>
-                    {activeDisease.deskripsi && (
-                      <p className="text-xs text-slate-500 dark:text-leaf-400 line-clamp-2 leading-relaxed">
-                        {activeDisease.deskripsi}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Gejala Breakdown for Detail Panel */}
-                  <div className="space-y-2">
-                    <p className="text-[10px] font-bold text-slate-400 dark:text-leaf-400 uppercase tracking-wider">
-                      Pemeriksaan Detail Gejala
-                    </p>
-                    <div className="flex flex-col gap-1 max-h-[120px] overflow-y-auto pr-1 bg-slate-50/50 dark:bg-leaf-900/20 p-2.5 rounded-xl border border-slate-100 dark:border-leaf-700/10">
-                      {activeDisease.gejala.map((g) => {
-                        const isMatched = selectedSymptoms.includes(g.gejalaId);
-                        return (
-                          <div
-                            key={g.gejalaId}
-                            className="flex justify-between items-center text-[10px]"
-                          >
-                            <div className="flex items-center gap-1 truncate">
-                              <span
-                                className={`material-symbols-outlined text-[12px] ${
-                                  isMatched ? "text-emerald-500" : "text-slate-300"
-                                }`}
-                              >
-                                {isMatched ? "check_circle" : "cancel"}
-                              </span>
-                              <span
-                                className={`truncate ${
-                                  isMatched
-                                    ? "text-slate-800 dark:text-white font-semibold"
-                                    : "text-slate-400 line-through"
-                                }`}
-                              >
-                                {g.nama}
-                              </span>
-                            </div>
-                            <span className="text-[8px] bg-slate-100 dark:bg-leaf-700 px-1.5 py-0.5 rounded text-slate-500 dark:text-leaf-300 scale-90">
-                              {g.isGejalaWajib ? "Wajib" : "Umum"} (W:{g.bobotGejala})
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
                   </div>
 
                   {/* Recommended Plants Grid */}
@@ -737,7 +541,7 @@ export default function LibraryClient({
                       Tanaman Pengobatan ({recommendedPlants.length})
                     </p>
 
-                    <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                    <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
                       {recommendedPlants.map((plant) => {
                         const safety = getPlantSafetyStatus(plant);
                         return (
