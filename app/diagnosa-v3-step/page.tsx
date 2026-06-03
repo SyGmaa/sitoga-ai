@@ -190,6 +190,45 @@ export default function DiagnosaV3StepPage() {
 
     if (!msg.parts) return { tanaman, gejalaIds, penyakitIds, tanamanIds };
 
+    const sahPenyakitIds: string[] = [];
+    const validatedPenyakitIds: string[] = [];
+
+    // Pass 1: find all verified disease ids
+    for (const part of msg.parts as any[]) {
+      const isToolPart = part.type === 'tool-invocation' ||
+        part.type?.startsWith('tool-') ||
+        part.type === 'dynamic-tool';
+      if (!isToolPart) continue;
+
+      const toolName = part.type === 'dynamic-tool'
+        ? part.toolName
+        : (part.toolInvocation?.toolName || part.toolName || part.type?.replace('tool-', '') || '');
+
+      const state = part.toolInvocation?.state || part.state;
+      const isResult = state === 'result' ||
+        state === 'output-available' ||
+        part.type === 'tool-result';
+      if (!isResult) continue;
+
+      let result = part.toolInvocation?.result || part.output || (part as any).result || part.args;
+      if (!result) continue;
+
+      if (typeof result === 'string') {
+        try { result = JSON.parse(result); } catch { continue; }
+      }
+
+      if (toolName === 'ValidasiGejalaWajib') {
+        const pId = part.toolInvocation?.args?.penyakitId || part.args?.penyakitId || part.toolInvocation?.args?.id_penyakit || part.args?.id_penyakit;
+        if (pId) {
+          validatedPenyakitIds.push(pId);
+          if (result.sah === true) {
+            sahPenyakitIds.push(pId);
+          }
+        }
+      }
+    }
+
+    // Pass 2: extract symptoms, filtered diseases, and plants
     for (const part of msg.parts as any[]) {
       const isToolPart = part.type === 'tool-invocation' ||
         part.type?.startsWith('tool-') ||
@@ -220,7 +259,12 @@ export default function DiagnosaV3StepPage() {
       }
 
       if (toolName === 'TelusuriGrafPenyakit' && result.kandidat) {
-        for (const k of result.kandidat) {
+        const hasSah = result.kandidat.some((k: any) => sahPenyakitIds.includes(k.id));
+        const activeKandidat = hasSah
+          ? result.kandidat.filter((k: any) => sahPenyakitIds.includes(k.id))
+          : (result.kandidat.length > 0 ? [result.kandidat[0]] : []);
+
+        for (const k of activeKandidat) {
           if (k.id && !penyakitIds.includes(k.id)) penyakitIds.push(k.id);
           if (k.tanamanObat) {
             for (const t of k.tanamanObat) {

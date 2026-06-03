@@ -221,7 +221,12 @@ export default function DiagnosaV3Page() {
           }
         }
         if (result.kandidat) {
-          for (const k of result.kandidat) {
+          const hasSah = result.kandidat.some((k: any) => k.sah === true);
+          const activeKandidat = hasSah
+            ? result.kandidat.filter((k: any) => k.sah === true)
+            : (result.kandidat.length > 0 ? [result.kandidat[0]] : []);
+
+          for (const k of activeKandidat) {
             if (k.id && !penyakitIds.includes(k.id)) penyakitIds.push(k.id);
             if (k.tanamanObat) {
               for (const t of k.tanamanObat) {
