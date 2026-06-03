@@ -59,7 +59,7 @@ export default function LibraryClient({
   conditions,
 }: LibraryClientProps) {
   // Navigation & Tabs
-  const [activeTab, setActiveTab] = useState<"diagnose" | "catalog">("diagnose");
+  const [activeTab, setActiveTab] = useState<"diagnose" | "catalog" | "pantangan">("diagnose");
 
   // Health Profile / Risks States
   const [selectedRisks, setSelectedRisks] = useState<string[]>([]);
@@ -72,6 +72,10 @@ export default function LibraryClient({
   // Catalog States
   const [plantSearch, setPlantSearch] = useState("");
   const [selectedPlantId, setSelectedPlantId] = useState<string | null>(null);
+
+  // Contraindications (Pantangan) States
+  const [conditionSearch, setConditionSearch] = useState("");
+  const [selectedConditionId, setSelectedConditionId] = useState<string | null>(null);
 
   // Toggle Risk Selection
   const toggleRisk = (id: string) => {
@@ -129,6 +133,49 @@ export default function LibraryClient({
     if (!selectedPlantId) return null;
     return plants.find((p) => p.id === selectedPlantId) || null;
   }, [selectedPlantId, plants]);
+
+  // Filter conditions based on search text
+  const filteredConditions = useMemo(() => {
+    if (!conditionSearch.trim()) return conditions;
+    const query = conditionSearch.toLowerCase();
+    return conditions.filter(
+      (c) =>
+        c.nama.toLowerCase().includes(query) ||
+        (c.deskripsi && c.deskripsi.toLowerCase().includes(query))
+    );
+  }, [conditions, conditionSearch]);
+
+  // Set default selected condition to the first one in the list if none selected
+  const activeCondition = useMemo(() => {
+    if (selectedConditionId) {
+      return conditions.find((c) => c.id === selectedConditionId) || null;
+    }
+    return filteredConditions[0] || conditions[0] || null;
+  }, [selectedConditionId, filteredConditions, conditions]);
+
+  // Get all plants that have a contraindication for the active condition
+  const contraindicatedPlantsForActiveCondition = useMemo(() => {
+    if (!activeCondition) return [];
+    
+    const list: {
+      plant: Plant;
+      tingkatRisiko: string | null;
+      alasan: string | null;
+    }[] = [];
+
+    plants.forEach((plant) => {
+      const match = plant.pantangan.find((p) => p.kondisiMedisId === activeCondition.id);
+      if (match) {
+        list.push({
+          plant,
+          tingkatRisiko: match.tingkatRisiko,
+          alasan: match.alasan,
+        });
+      }
+    });
+
+    return list;
+  }, [activeCondition, plants]);
 
   // Contraindication Tiered Warning Checker
   const getPlantSafetyStatus = (plant: Plant) => {
@@ -253,7 +300,7 @@ export default function LibraryClient({
         </div>
 
         {/* Tab switch Navigation */}
-        <div className="flex gap-2 mt-8 border-t border-white/10 pt-4 z-10 relative">
+        <div className="flex flex-wrap gap-2 mt-8 border-t border-white/10 pt-4 z-10 relative">
           <button
             onClick={() => setActiveTab("diagnose")}
             className={`flex h-11 items-center gap-2.5 rounded-full px-6 text-sm font-bold transition-all ${
@@ -279,6 +326,19 @@ export default function LibraryClient({
               local_florist
             </span>
             <span>Katalog Tanaman Obat</span>
+          </button>
+          <button
+            onClick={() => setActiveTab("pantangan")}
+            className={`flex h-11 items-center gap-2.5 rounded-full px-6 text-sm font-bold transition-all ${
+              activeTab === "pantangan"
+                ? "bg-primary text-background-dark shadow-glow"
+                : "bg-white/10 text-white hover:bg-white/20"
+            }`}
+          >
+            <span className="material-symbols-outlined text-[20px]">
+              warning
+            </span>
+            <span>Pantangan & Kontraindikasi</span>
           </button>
         </div>
       </div>
@@ -359,7 +419,7 @@ export default function LibraryClient({
 
       {/* 3. Tab Contents */}
       <div className="w-full">
-        {activeTab === "diagnose" ? (
+        {activeTab === "diagnose" && (
           /* TAB 1: DISEASE DIRECT LOOKFLOW */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Panel A: Disease Selector (4 Columns) */}
@@ -642,7 +702,9 @@ export default function LibraryClient({
               )}
             </div>
           </div>
-        ) : (
+        )}
+
+        {activeTab === "catalog" && (
           /* TAB 2: DETAILED BOTANICAL CATALOGUE */
           <div className="space-y-6">
             {/* Search & Statistics Bar */}
@@ -765,6 +827,212 @@ export default function LibraryClient({
               {filteredPlantsCatalog.length === 0 && (
                 <div className="col-span-full py-20 text-center text-slate-400 italic">
                   Tanaman tidak ditemukan dalam katalog database.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "pantangan" && (
+          /* TAB 3: PLANT CONTRAINDICATIONS */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Panel A: Medical Condition Selector (4 Columns) */}
+            <div className="lg:col-span-4 bg-white dark:bg-leaf-800 border border-slate-200 dark:border-leaf-700/50 rounded-3xl p-5 shadow-sm space-y-4">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-amber-500">
+                    health_and_safety
+                  </span>
+                  <h3 className="font-bold text-base text-slate-800 dark:text-white">
+                    Pilih Kondisi Medis
+                  </h3>
+                </div>
+              </div>
+
+              {/* Condition Search Bar */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Cari kondisi medis..."
+                  value={conditionSearch}
+                  onChange={(e) => setConditionSearch(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-leaf-900 border border-slate-200 dark:border-leaf-700/50 rounded-2xl py-2.5 pl-9 pr-4 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                />
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
+                  search
+                </span>
+              </div>
+
+              {/* Condition Selection List */}
+              <div className="h-[450px] overflow-y-auto pr-1 space-y-1 bg-slate-50/50 dark:bg-leaf-900/30 p-2 rounded-2xl border border-slate-100 dark:border-leaf-700/20">
+                {filteredConditions.map((cond) => {
+                  const isSelected = activeCondition?.id === cond.id;
+                  const plantCount = plants.filter((plant) =>
+                    plant.pantangan.some((p) => p.kondisiMedisId === cond.id)
+                  ).length;
+                  return (
+                    <button
+                      key={cond.id}
+                      onClick={() => setSelectedConditionId(cond.id)}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 text-left rounded-xl transition-all text-xs font-medium cursor-pointer ${
+                        isSelected
+                          ? "bg-amber-500/15 dark:bg-amber-500/25 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm"
+                          : "hover:bg-slate-100 dark:hover:bg-leaf-750 text-slate-600 dark:text-slate-300 border border-transparent"
+                      }`}
+                    >
+                      <span className="truncate pr-2">{cond.nama}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${
+                        isSelected
+                          ? "bg-amber-500/20 text-amber-600 dark:text-amber-400"
+                          : "bg-slate-100 dark:bg-leaf-900 text-slate-500 dark:text-leaf-400"
+                      }`}>
+                        {plantCount} Pantangan
+                      </span>
+                    </button>
+                  );
+                })}
+
+                {filteredConditions.length === 0 && (
+                  <p className="text-center text-slate-400 text-xs italic py-10">
+                    Kondisi medis tidak ditemukan.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Panel B: Condition Detail & Contraindicated Plants (8 Columns) */}
+            <div className="lg:col-span-8 bg-white dark:bg-leaf-800 border border-slate-200 dark:border-leaf-700/50 rounded-3xl p-5 shadow-sm space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">
+                  info
+                </span>
+                <h3 className="font-bold text-base text-slate-800 dark:text-white">
+                  Detail Kondisi & Pantangan Tanaman
+                </h3>
+              </div>
+
+              {!activeCondition ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
+                  <span className="material-symbols-outlined text-5xl text-slate-300 dark:text-leaf-700">
+                    medical_services
+                  </span>
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-slate-600 dark:text-slate-400">
+                      Kondisi Medis Belum Dipilih
+                    </p>
+                    <p className="text-xs text-slate-400 max-w-[200px]">
+                      Silakan pilih kondisi medis di kolom kiri untuk melihat penjelasan dan tanaman obat yang dipantang.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Condition Info Box */}
+                  <div className="bg-slate-50 dark:bg-leaf-900 border border-slate-100 dark:border-leaf-700/30 p-4 rounded-2xl space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-amber-500 text-[18px]">
+                        warning
+                      </span>
+                      <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                        {activeCondition.nama}
+                      </h4>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-light">
+                      {activeCondition.deskripsi || "Tidak ada penjelasan tertulis mengenai kondisi medis ini."}
+                    </p>
+                  </div>
+
+                  {/* Contraindicated Plants Section */}
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-leaf-400 uppercase tracking-wider">
+                      Tanaman yang Harus Dihindari ({contraindicatedPlantsForActiveCondition.length})
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[450px] overflow-y-auto pr-1">
+                      {contraindicatedPlantsForActiveCondition.map(({ plant, tingkatRisiko, alasan }) => {
+                        const isHigh = tingkatRisiko?.toUpperCase() === "BERBAHAYA" || tingkatRisiko?.toUpperCase() === "TINGGI";
+                        
+                        return (
+                          <div
+                            key={plant.id}
+                            className={`p-4 rounded-2xl border flex flex-col justify-between gap-3 transition-all bg-white dark:bg-leaf-800/40 ${
+                              isHigh
+                                ? "border-red-500/30 bg-red-50/10 dark:bg-red-950/10 hover:border-red-500/50"
+                                : "border-amber-500/30 bg-amber-50/10 dark:bg-amber-950/10 hover:border-amber-500/50"
+                            }`}
+                          >
+                            <div className="space-y-2.5">
+                              {/* Plant card header */}
+                              <div className="flex gap-3 items-start">
+                                {plant.gambarUrl ? (
+                                  <img
+                                    src={plant.gambarUrl}
+                                    alt={plant.namaLokal}
+                                    className="w-12 h-12 rounded-xl object-cover shrink-0 border border-slate-100 dark:border-leaf-700"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-leaf-900 flex items-center justify-center shrink-0">
+                                    <span className="material-symbols-outlined text-primary/40 text-2xl">
+                                      spa
+                                    </span>
+                                  </div>
+                                )}
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5 justify-between">
+                                    <h5 className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                                      {plant.namaLokal}
+                                    </h5>
+                                    <span className={`text-[9px] px-2 py-0.5 rounded-full shrink-0 font-bold ${
+                                      isHigh
+                                        ? "bg-red-500/20 text-red-600 dark:text-red-400"
+                                        : "bg-amber-500/20 text-amber-600 dark:text-amber-400"
+                                    }`}>
+                                      {tingkatRisiko || "Sedang"}
+                                    </span>
+                                  </div>
+                                  <p className="text-[10px] text-slate-500 dark:text-leaf-400 italic truncate font-serif">
+                                    {plant.namaLatin}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Reason for contraindication */}
+                              <div className={`text-[11px] p-2.5 rounded-xl border leading-relaxed ${
+                                isHigh
+                                  ? "bg-red-500/5 text-red-700 dark:text-red-300 border-red-500/10"
+                                  : "bg-amber-500/5 text-amber-700 dark:text-amber-300 border-amber-500/10"
+                              }`}>
+                                <div className="flex items-center gap-1 font-semibold uppercase tracking-wider mb-1 text-[9px]">
+                                  <span className="material-symbols-outlined text-[12px]">
+                                    {isHigh ? "error" : "warning"}
+                                  </span>
+                                  <span>Alasan Medis</span>
+                                </div>
+                                <p className="font-light">{alasan || "Penggunaan tanaman ini dapat memicu efek samping negatif untuk kondisi tersebut."}</p>
+                              </div>
+                            </div>
+
+                            {/* Action button */}
+                            <button
+                              onClick={() => setSelectedPlantId(plant.id)}
+                              className="w-full bg-slate-50 hover:bg-slate-100 dark:bg-leaf-900 dark:hover:bg-leaf-750 text-slate-700 dark:text-white border border-slate-100 dark:border-leaf-700 text-[10px] font-bold py-1.5 rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer"
+                            >
+                              <span>Lihat Resep & Detail</span>
+                              <span className="material-symbols-outlined text-[12px]">
+                                arrow_forward
+                              </span>
+                            </button>
+                          </div>
+                        );
+                      })}
+
+                      {contraindicatedPlantsForActiveCondition.length === 0 && (
+                        <div className="col-span-full py-12 text-center text-slate-400 text-xs italic bg-slate-50/50 dark:bg-leaf-900/10 rounded-2xl border border-dashed border-slate-200 dark:border-leaf-700/30">
+                          Tidak ada tanaman herbal yang tercatat dipantang untuk kondisi medis ini.
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
