@@ -522,8 +522,8 @@ export default function DiagnosaV3StepPage() {
               <span className="material-symbols-outlined text-[#444746] dark:text-[#c4c7c5]">menu</span>
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)] animate-[pulse_1.5s_infinite]"></span>
-              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+              <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(31,137,54,0.7)] animate-[pulse_1.5s_infinite]"></span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#3a7544] dark:text-[#92c99b]">
                 Multi-Step ReAct Agent
               </span>
             </div>
@@ -586,7 +586,7 @@ export default function DiagnosaV3StepPage() {
                 <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1f1f1f] dark:text-[#c4c7c5] mb-2">
                   Diagnosa Bertahap,
                 </h2>
-                <h3 className="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent py-1 leading-tight select-none">
+                <h3 className="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary-hover to-leaf-400 bg-clip-text text-transparent py-1 leading-tight select-none">
                   alur ReAct Multi-Step AI
                 </h3>
               </div>
@@ -594,7 +594,7 @@ export default function DiagnosaV3StepPage() {
 
             {/* Center Pill Input Bar */}
             <div className="w-full relative group mb-4 sm:mb-6">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 via-indigo-500/20 to-purple-500/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-primary-hover/20 to-leaf-400/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
 
               <form
                 onSubmit={handleSendMessage}
@@ -684,7 +684,7 @@ export default function DiagnosaV3StepPage() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className={`w-11 h-11 bg-blue-600 text-white rounded-full flex items-center justify-center shrink-0 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(59,130,246,0.4)] cursor-pointer ${
+                      className={`w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(31,137,54,0.4)] cursor-pointer ${
                         isLoading ? 'opacity-35 cursor-not-allowed' : ''
                       }`}
                     >
@@ -703,11 +703,11 @@ export default function DiagnosaV3StepPage() {
                   onClick={() => handleSendMessage(undefined, s.text)}
                   className="flex items-start gap-4 p-5 rounded-2xl bg-[#f0f4f9]/50 dark:bg-[#1e1f20]/50 border border-[#e3e3e3] dark:border-[#2d2e30]/80 text-left hover:bg-[#e1e5ea] hover:dark:bg-[#2b2c2d] hover:scale-[1.01] hover:border-slate-400 hover:dark:border-[#3e4042] transition-all duration-300 group cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#2d2e30] border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#2d2e30] border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0 text-primary dark:text-leaf-400 group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-xl">{s.icon}</span>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold text-[#1f1f1f] dark:text-[#e3e3e3] line-clamp-1 group-hover:text-blue-600 transition-colors">{s.text}</p>
+                    <p className="text-xs font-semibold text-[#1f1f1f] dark:text-[#e3e3e3] line-clamp-1 group-hover:text-primary transition-colors">{s.text}</p>
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">{s.subtext}</p>
                   </div>
                 </button>
@@ -750,9 +750,9 @@ export default function DiagnosaV3StepPage() {
                             <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#botGrad)" />
                             <defs>
                               <linearGradient id="botGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stopColor="#3b82f6" />
-                                <stop offset="50%" stopColor="#6366f1" />
-                                <stop offset="100%" stopColor="#a855f7" />
+                                <stop offset="0%" stopColor="hsl(var(--primary))" />
+                                <stop offset="50%" stopColor="var(--color-primary-hover)" />
+                                <stop offset="100%" stopColor="var(--color-leaf-400)" />
                               </linearGradient>
                             </defs>
                           </svg>
@@ -877,7 +877,7 @@ export default function DiagnosaV3StepPage() {
                               {extractedTanaman.length > 0 && (
                                 <div className="bg-white dark:bg-[#1a1a1a]/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
                                   <div className="flex items-center gap-2 mb-3.5 select-none">
-                                    <span className="material-symbols-outlined text-blue-500 text-[19px]">eco</span>
+                                    <span className="material-symbols-outlined text-primary text-[19px]">eco</span>
                                     <span className="text-xs font-bold text-[#1f1f1f] dark:text-white uppercase tracking-wider">
                                       Rekomendasi Tanaman Obat
                                     </span>
@@ -888,18 +888,18 @@ export default function DiagnosaV3StepPage() {
                                         key={t.id}
                                         href={`/tanaman/${t.id}`}
                                         target="_blank"
-                                        className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-slate-50 dark:bg-[#202124]/40 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/50 dark:hover:border-blue-500/50 hover:bg-slate-100 hover:dark:bg-[#202124]/90 hover:scale-[1.01] transition-all group shadow-2xs"
+                                        className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-slate-50 dark:bg-[#202124]/40 border border-slate-100 dark:border-slate-800/80 hover:border-primary/50 dark:hover:border-primary/50 hover:bg-slate-100 hover:dark:bg-[#202124]/90 hover:scale-[1.01] transition-all group shadow-2xs"
                                       >
-                                        <div className="w-9.5 h-9.5 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500/20 transition-colors">
-                                          <span className="material-symbols-outlined text-blue-500 text-[19px]">local_florist</span>
+                                        <div className="w-9.5 h-9.5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                                          <span className="material-symbols-outlined text-primary text-[19px]">local_florist</span>
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                          <p className="text-slate-800 dark:text-white text-xs font-bold truncate group-hover:text-blue-500 transition-colors">{t.nama}</p>
+                                          <p className="text-slate-800 dark:text-white text-xs font-bold truncate group-hover:text-primary transition-colors">{t.nama}</p>
                                           {t.khasiatUtama && (
                                             <p className="text-slate-500 dark:text-slate-400 text-[10px] truncate mt-1">{t.khasiatUtama}</p>
                                           )}
                                         </div>
-                                        <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-blue-500 transition-colors">open_in_new</span>
+                                        <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-primary transition-colors">open_in_new</span>
                                       </Link>
                                     ))}
                                   </div>
@@ -912,18 +912,18 @@ export default function DiagnosaV3StepPage() {
                                   href={buildGraphUrl(gejalaIds, penyakitIds, tanamanIds)}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-blue-500/5 dark:bg-[#1a1a2e]/40 border border-blue-500/10 dark:border-blue-500/10 hover:border-blue-500/50 hover:bg-blue-500/10 hover:dark:bg-[#1a1a2e]/85 hover:scale-[1.01] transition-all shadow-2xs group w-full"
+                                  className="flex items-center gap-3.5 px-4.5 py-4 rounded-xl bg-primary/5 dark:bg-[#1a2e1a]/40 border border-primary/10 dark:border-primary/10 hover:border-primary/50 hover:bg-primary/10 hover:dark:bg-[#1a2e1a]/85 hover:scale-[1.01] transition-all shadow-2xs group w-full"
                                 >
-                                  <div className="w-9.5 h-9.5 rounded-full bg-blue-500/15 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500/25 transition-colors">
-                                    <span className="material-symbols-outlined text-blue-500 text-[19px]">hub</span>
+                                  <div className="w-9.5 h-9.5 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/25 transition-colors">
+                                    <span className="material-symbols-outlined text-primary text-[19px]">hub</span>
                                   </div>
                                   <div className="min-w-0 flex-1">
-                                    <p className="text-slate-800 dark:text-white text-xs font-bold group-hover:text-blue-500 transition-colors">Lihat Visualisasi Knowledge Graph</p>
+                                    <p className="text-slate-800 dark:text-white text-xs font-bold group-hover:text-primary transition-colors">Lihat Visualisasi Knowledge Graph</p>
                                     <p className="text-slate-500 dark:text-slate-400 text-[10px] mt-1 select-none">
                                       Menelusuri peta relasi {gejalaIds.length} gejala, {penyakitIds.length} penyakit{tanamanIds.length > 0 ? `, ${tanamanIds.length} tanaman` : ''} di database
                                     </p>
                                   </div>
-                                  <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-blue-500 transition-colors">arrow_outward</span>
+                                  <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-[16px] group-hover:text-primary transition-colors">arrow_outward</span>
                                 </a>
                               )}
                             </div>
@@ -953,16 +953,16 @@ export default function DiagnosaV3StepPage() {
                         <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#spinGrad)" />
                         <defs>
                           <linearGradient id="spinGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stopColor="#3b82f6" />
-                            <stop offset="100%" stopColor="#6366f1" />
+                            <stop offset="0%" stopColor="hsl(var(--primary))" />
+                            <stop offset="100%" stopColor="var(--color-primary-hover)" />
                           </linearGradient>
                         </defs>
                       </svg>
                     </div>
                     <div className="flex gap-1.5 bg-[#f0f4f9] dark:bg-[#1e1f20] border border-slate-200 dark:border-slate-800 px-5 py-4 rounded-2xl rounded-tl-none items-center h-12 shadow-2xs select-none">
-                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                   </div>
                 )}
@@ -974,7 +974,7 @@ export default function DiagnosaV3StepPage() {
             {/* Sticky Bottom Input Bar Area */}
             <div className="absolute bottom-0 left-0 w-full px-4 pb-6 pt-12 z-30 flex justify-center bg-gradient-to-t from-[#ffffff] via-[#ffffff]/90 to-transparent dark:from-background-dark dark:via-background-dark/90 dark:to-transparent pointer-events-none select-none">
               <div className="w-full max-w-3xl relative group pointer-events-auto">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 via-indigo-500/20 to-purple-500/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-primary-hover/20 to-leaf-400/10 rounded-[28px] blur opacity-15 group-hover:opacity-30 group-focus-within:opacity-40 transition duration-500 ease-out"></div>
 
                 <form
                   onSubmit={handleSendMessage}
@@ -1064,7 +1064,7 @@ export default function DiagnosaV3StepPage() {
                       <button
                         type="submit"
                         disabled={isLoading}
-                        className={`w-11 h-11 bg-blue-600 text-white rounded-full flex items-center justify-center shrink-0 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(59,130,246,0.4)] cursor-pointer ${
+                        className={`w-11 h-11 bg-primary text-background-dark rounded-full flex items-center justify-center shrink-0 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(31,137,54,0.4)] cursor-pointer ${
                           isLoading ? 'opacity-35 cursor-not-allowed' : ''
                         }`}
                       >
