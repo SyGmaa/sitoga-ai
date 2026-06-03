@@ -105,17 +105,40 @@ export const EkstrakDanCariGejala = tool({
           select: { id: true, nama: true },
         })
       );
-      const resultsArray = await Promise.all(queryPromises);
+
+      const diseasePromises = (finalKeywords as string[]).map((keyword) =>
+        prisma.penyakit.findMany({
+          where: {
+            nama: {
+              contains: keyword,
+              mode: "insensitive",
+            },
+          },
+          select: { id: true, nama: true },
+        })
+      );
+
+      const [resultsArray, diseaseResults] = await Promise.all([
+        Promise.all(queryPromises),
+        Promise.all(diseasePromises)
+      ]);
+
       allResults.push(...resultsArray.flat());
+      const allDiseases = diseaseResults.flat();
 
       // Hapus duplikat ID gejala jika user mengulang kata yang mengarah ke ID yang sama
       const uniqueResults = Array.from(
         new Map(allResults.map((item) => [item.id, item])).values(),
       );
 
+      const uniqueDiseases = Array.from(
+        new Map(allDiseases.map((item) => [item.id, item])).values(),
+      );
+
       return {
-        message: "Data Gejala Ditemukan",
+        message: "Data Gejala & Penyakit Ditemukan",
         gejala: uniqueResults,
+        penyakit: uniqueDiseases,
       };
     } catch (error: any) {
       console.error("EkstrakDanCariGejala Error:", error);
@@ -127,30 +150,45 @@ export const EkstrakDanCariGejala = tool({
 // 2. Tool: TelusuriGrafPenyakit
 export const TelusuriGrafPenyakit = tool({
   description:
-    "Menelusuri relasi kandidat penyakit yang cocok dengan node-node Gejala yang ditemukan.",
+    "Menelusuri relasi kandidat penyakit yang cocok dengan node-node Gejala atau Penyakit langsung yang ditemukan.",
   parameters: z.object({
     id_gejala_array: z
       .array(z.string())
-      .describe("WAJIB DIISI! Daftar ID Gejala (didapatkan dari tool EkstrakDanCariGejala)"),
+      .optional()
+      .describe("Daftar ID Gejala (didapatkan dari tool EkstrakDanCariGejala)"),
+    id_penyakit_array: z
+      .array(z.string())
+      .optional()
+      .describe("Daftar ID Penyakit yang terdeteksi langsung oleh user jika ada"),
   }),
   // @ts-ignore
-  execute: async ({ id_gejala_array }: { id_gejala_array: string[] }) => {
+  execute: async ({ id_gejala_array = [], id_penyakit_array = [] }: { id_gejala_array?: string[]; id_penyakit_array?: string[] }) => {
     try {
-      if (!id_gejala_array || id_gejala_array.length === 0)
-        return { message: "Data ID Gejala kosong." };
+      const gejalaIdArray = id_gejala_array || [];
+      const penyakitIdArray = id_penyakit_array || [];
 
-      const gejalaIdArray = id_gejala_array;
+      if (gejalaIdArray.length === 0 && penyakitIdArray.length === 0)
+        return { message: "Data ID Gejala dan ID Penyakit kosong.", kandidat: [] };
 
-      // Cari Penyakit yang terhubung (melalui Pivot PenyakitGejala) ke ID-ID Gejala input
+      // Cari Penyakit yang terhubung (melalui Pivot PenyakitGejala) ke ID-ID Gejala input ATAU dicocokkan langsung dari ID Penyakit
       const penyakitTerkait = await prisma.penyakit.findMany({
         where: {
-          gejala: {
-            some: {
-              gejalaId: {
-                in: gejalaIdArray,
+          OR: [
+            {
+              gejala: {
+                some: {
+                  gejalaId: {
+                    in: gejalaIdArray,
+                  },
+                },
               },
             },
-          },
+            {
+              id: {
+                in: penyakitIdArray,
+              },
+            },
+          ],
         },
         include: {
           gejala: {
@@ -172,15 +210,19 @@ export const TelusuriGrafPenyakit = tool({
         },
       });
 
-      // Hitung skor kecocokan: jumlah gejala yang overlap antara database dan input LLM
+      // Hitung skor kecocokan: jumlah gejala yang overlap + bonus jika dicocokkan langsung
       const penyakitDenganSkor = penyakitTerkait.map((p) => {
         const matchingGejalaIds = p.gejala.filter((g) =>
-          gejalaIdArray.includes(g.gejalaId),
+          gejalaIdArray.includes(g.gejalaId)
         );
+        const isDirectMatch = penyakitIdArray.includes(p.id);
+        const skor = isDirectMatch ? (matchingGejalaIds.length + 10) : matchingGejalaIds.length;
+
         return {
           id: p.id,
           nama: p.nama,
-          skor: matchingGejalaIds.length,
+          skor: skor,
+          isDirectMatch,
           // Mengembalikan relasi tanaman obat agar AI bisa melanjutkan proses FilterKontraindikasiMurni
           tanamanObat: p.tanamanObat.map((t) => ({
             id: t.tanaman.id,
@@ -209,7 +251,7 @@ export const TelusuriGrafPenyakit = tool({
 // 3. Tool: ValidasiGejalaWajib
 export const ValidasiGejalaWajib = tool({
   description:
-    "Menghentikan halusinasi dengan memastikan bahwa SEMUA parameter Gejala Wajib dari sebuah penyakit benar-benar dimiliki oleh user.",
+    "Menghentikan halusinasi dengan memastikan bahwa SEMUA parameter Gejala Wajib dari sebuah penyakit benar-benar dimiliki oleh user, atau meloloskannya langsung jika dicocokkan sebagai penyakit langsung.",
   parameters: z.object({
     penyakitId: z
       .string()
@@ -231,12 +273,25 @@ export const ValidasiGejalaWajib = tool({
       .array(z.string())
       .optional()
       .describe("Alternatif daftar ID Gejala"),
+    isDirectDiseaseMatch: z
+      .boolean()
+      .optional()
+      .describe("Set to true jika penyakit ini diinput langsung oleh user (bukan dari diagnosa gejala)"),
   }),
   // @ts-ignore
   execute: async (args: any) => {
     try {
       const penyakitId = args?.penyakitId || args?.id_penyakit;
+      const isDirectDiseaseMatch = args?.isDirectDiseaseMatch || false;
       const keluhanUserGejalaIds = args?.keluhanUserGejalaIds || args?.id_gejala_user || [];
+
+      if (isDirectDiseaseMatch) {
+        return {
+          sah: true,
+          message: "Validasi Lulus. Penyakit dideteksi langsung dari input pengguna.",
+        };
+      }
+
       // Ambil seluruh gejala yang Wajib untuk penyakit ini
       const gejalaWajib = await prisma.penyakitGejala.findMany({
         where: {
@@ -456,7 +511,7 @@ export const AnalisisDiagnosaMedisHibrida = tool({
         return { message: "Keluhan tidak boleh kosong.", gejala: [], kandidat: [] };
       }
 
-      // --- LANGKAH 1: Ekstrak & Cari Gejala (Secara Paralel) ---
+      // --- LANGKAH 1: Ekstrak & Cari Gejala & Penyakit (Secara Paralel) ---
       const words = keluhan
         .split(/[\s,.;?]+/)
         .map((w: string) => w.trim())
@@ -483,35 +538,68 @@ export const AnalisisDiagnosaMedisHibrida = tool({
           select: { id: true, nama: true },
         })
       );
-      const resultsArray = await Promise.all(queryPromises);
+
+      const diseaseQueryPromises = processedKeywords.map((keyword) =>
+        prisma.penyakit.findMany({
+          where: {
+            nama: {
+              contains: keyword,
+              mode: "insensitive",
+            },
+          },
+          select: { id: true, nama: true },
+        })
+      );
+
+      const [resultsArray, diseaseResultsArray] = await Promise.all([
+        Promise.all(queryPromises),
+        Promise.all(diseaseQueryPromises)
+      ]);
+
       const allGejala = resultsArray.flat();
+      const allDiseases = diseaseResultsArray.flat();
 
       const uniqueGejala = Array.from(
         new Map(allGejala.map((item) => [item.id, item])).values()
       );
 
-      console.log("[AnalisisDiagnosaMedisHibrida] Gejala terdeteksi:", uniqueGejala);
+      const uniqueMatchedDiseases = Array.from(
+        new Map(allDiseases.map((item) => [item.id, item])).values()
+      );
 
-      if (uniqueGejala.length === 0) {
+      console.log("[AnalisisDiagnosaMedisHibrida] Gejala terdeteksi:", uniqueGejala);
+      console.log("[AnalisisDiagnosaMedisHibrida] Penyakit terdeteksi langsung:", uniqueMatchedDiseases);
+
+      if (uniqueGejala.length === 0 && uniqueMatchedDiseases.length === 0) {
         return {
-          message: "Tidak ada gejala spesifik di database yang cocok dengan keluhan.",
+          message: "Tidak ada gejala atau penyakit spesifik di database yang cocok dengan keluhan.",
           gejala: [],
           kandidat: [],
         };
       }
 
       const gejalaIdArray = uniqueGejala.map((g) => g.id);
+      const matchedDiseaseIds = uniqueMatchedDiseases.map((d) => d.id);
 
       // --- LANGKAH 2: Telusuri Graf Penyakit ---
       const penyakitTerkait = await prisma.penyakit.findMany({
         where: {
-          gejala: {
-            some: {
-              gejalaId: {
-                in: gejalaIdArray,
+          OR: [
+            {
+              gejala: {
+                some: {
+                  gejalaId: {
+                    in: gejalaIdArray,
+                  },
+                },
               },
             },
-          },
+            {
+              id: {
+                in: matchedDiseaseIds,
+              },
+            },
+          ],
         },
         include: {
           gejala: {
@@ -551,24 +639,37 @@ export const AnalisisDiagnosaMedisHibrida = tool({
       const kandidatPenyakit = [];
 
       for (const p of penyakitTerkait) {
+        const isDirectMatch = matchedDiseaseIds.includes(p.id);
+
         // Hitung skor kecocokan
         const matchingGejalaIds = p.gejala
           .filter((g) => gejalaIdArray.includes(g.gejalaId))
           .map((g) => g.gejalaId);
-        const skor = matchingGejalaIds.length;
+        
+        // Boost score if direct match
+        const skor = isDirectMatch ? (matchingGejalaIds.length + 10) : matchingGejalaIds.length;
 
         // Validasi Gejala Wajib
         const gejalaWajibList = p.gejala.filter((g) => g.isGejalaWajib);
-        const gejalaHilang: string[] = [];
-        for (const gw of gejalaWajibList) {
-          if (!gejalaIdArray.includes(gw.gejalaId)) {
-            gejalaHilang.push(gw.gejala.nama);
+        let gejalaHilang: string[] = [];
+        let sah = false;
+        let validasiMessage = "";
+
+        if (isDirectMatch) {
+          sah = true;
+          gejalaHilang = [];
+          validasiMessage = "Validasi Lulus. Penyakit dideteksi langsung dari input pengguna.";
+        } else {
+          for (const gw of gejalaWajibList) {
+            if (!gejalaIdArray.includes(gw.gejalaId)) {
+              gejalaHilang.push(gw.gejala.nama);
+            }
           }
+          sah = gejalaHilang.length === 0;
+          validasiMessage = sah
+            ? "Validasi Lulus. Semua Gejala Wajib telah terpenuhi."
+            : `Batal Diverifikasi. Penyakit ini mensyaratkan gejala wajib: ${gejalaHilang.join(", ")} tetapi tidak dialami user.`;
         }
-        const sah = gejalaHilang.length === 0;
-        const validasiMessage = sah
-          ? "Validasi Lulus. Semua Gejala Wajib telah terpenuhi."
-          : `Batal Diverifikasi. Penyakit ini mensyaratkan gejala wajib: ${gejalaHilang.join(", ")} tetapi tidak dialami user.`;
 
         // Tanaman Obat
         const tanamanObatList = p.tanamanObat.map((t) => ({
