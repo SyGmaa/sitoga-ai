@@ -331,12 +331,12 @@ export default function DiagnosaV3StepPage() {
 
   const suggestions = [
     {
-      text: "Kepala pusing dan mual sekali mau muntah",
-      subtext: "Menguji diagnosa penyakit ringan di database",
+      text: "Suhu Badan saya diatas normal, menggigil, badan tesasa kemas, nyeri otot",
+      subtext: "Menguji diagnosis demam",
       icon: "sick",
     },
     {
-      text: "Saya mual dan perut perih, kondisi saya sedang Hamil",
+      text: "Suhu Badan saya diatas normal, menggigil, badan tesasa kemas, nyeri otot, Saya sedang hamil 3 bulan",
       subtext: "Menguji filter pantangan kontraindikasi obat herbal",
       icon: "pregnant_woman",
     },
@@ -588,10 +588,10 @@ export default function DiagnosaV3StepPage() {
             <div className="text-center w-full flex-1 flex flex-col justify-center sm:flex-none sm:mb-6 pt-8 sm:pt-0">
               <div className="w-full">
                 <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1f1f1f] dark:text-[#c4c7c5] mb-2">
-                  Diagnosa Bertahap,
+                  Hiii...,
                 </h2>
                 <h3 className="text-3xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary-hover to-leaf-400 bg-clip-text text-transparent py-1 leading-tight select-none">
-                  alur ReAct Multi-Step AI
+                  Ada keluhan apa hari ini??
                 </h3>
               </div>
             </div>
